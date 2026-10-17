@@ -622,3 +622,9 @@
 - Adds Ropes - non-solid, deployable ladder blocks;
 - Adds Safety Net - negates fall damage and bounces entities slightly;
 - Adds JEI integration.
+
+## 2026-10-17 08:19 — Paired legacy foundation
+- Establish isolated Forge 1.12.2 and 1.7.10 targets using the ExampleMod toolchain pins, with a root paired build coordinator. Preserve the original 1.16.5 source/assets and former build configuration as the behavioral reference.
+- Add the shared food catalog, four native knife tiers, basic materials and Straw Bale registration, exact ingredient/OreDictionary memberships, duplicate-rejecting recipe registration, initial crafting recipes, and optional JEI/NEI presentation. Gate unavailable honey, sweet-berry and Nether-vegetation foods.
+- Implement native consumables with survival container returns, one-effect milk/cocoa curing and server-owned effects. Nourishment reduces activity exhaustion without refunding natural regeneration costs; Comfort supplies slow healing only outside eligible natural regeneration. Modern Regen remains optional and owns its hunger state and timers.
+- Adopt paired foundation → cutting → cooking → farming/serving → secondary-system milestones, then 1.8.9 and 1.6.4; addon support follows equivalent feature-gated paired acceptance.

@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "vectorwing.farmersdelight.legacy.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerExhaustionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "mixins.farmersdelight.refmap.json"
+}

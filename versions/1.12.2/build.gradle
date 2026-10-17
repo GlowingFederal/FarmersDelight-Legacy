@@ -1,0 +1,45 @@
+plugins { id 'java'; id 'xyz.wagyourtail.unimined' version '1.4.1' }
+ext.minecraftTarget = '1.12.2'
+apply from: '../../build-logic/legacy.gradle'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+tasks.withType(JavaCompile).configureEach { options.release = 8 }
+unimined.minecraft {
+    version '1.12.2'
+    mappings { mcp('stable', '39-1.12') }
+    runs {
+        config('client') { javaVersion = JavaVersion.VERSION_1_8 }
+        config('server') { javaVersion = JavaVersion.VERSION_1_8 }
+    }
+    minecraftForge { loader '14.23.5.2859' }
+}
+repositories {
+    maven { url = 'https://maven.cleanroommc.com' }
+    maven { url = 'https://maven.blamejared.com' }
+}
+dependencies {
+    implementation('zone.rong:mixinbooter:11.18') { transitive = false }
+    annotationProcessor 'zone.rong:mixinbooter:11.18'
+    compileOnly 'mezz.jei:jei_1.12.2:4.16.1.302:api'
+    runtimeOnly 'mezz.jei:jei_1.12.2:4.16.1.302'
+}
+// This one-method mapping is the same MCP/SRG boundary used by both native targets.
+def mixinSrg = layout.buildDirectory.file('generated/mapping/activity.srg')
+def mixinRefmap = layout.buildDirectory.file('generated/mixinResources/mixins.farmersdelight.refmap.json')
+tasks.register('generateMixinMapping') {
+    outputs.file mixinSrg
+    doLast {
+        def target = mixinSrg.get().asFile
+        target.parentFile.mkdirs()
+        target.text = 'MD: net/minecraft/entity/player/EntityPlayer/addExhaustion (F)V net/minecraft/entity/player/EntityPlayer/func_71020_j (F)V\n'
+        mixinRefmap.get().asFile.parentFile.mkdirs()
+    }
+}
+compileJava {
+    dependsOn 'generateMixinMapping'
+    inputs.file mixinSrg
+    outputs.file mixinRefmap
+    options.compilerArgs += ["-AreobfSrgFile=${mixinSrg.get().asFile}", "-AoutRefMapFile=${mixinRefmap.get().asFile}"]
+}
+processResources { dependsOn compileJava; from(mixinRefmap) }
+jar { manifest { attributes 'MixinConfigs': 'mixins.farmersdelight.json' } }
+jar.finalizedBy 'remapJar'

@@ -1,0 +1,535 @@
+[
+  {
+    "nutrition": 2,
+    "saturation": 0.4,
+    "id": "cabbage"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.3,
+    "id": "tomato"
+  },
+  {
+    "nutrition": 2,
+    "saturation": 0.4,
+    "id": "onion"
+  },
+  {
+    "nutrition": 4,
+    "saturation": 0.4,
+    "id": "fried_egg"
+  },
+  {
+    "nutrition": 0,
+    "saturation": 0.0,
+    "effect": "absorption",
+    "duration": 1200,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "apple_cider",
+    "container": "minecraft:glass_bottle",
+    "stackSize": 16,
+    "action": "drink",
+    "alwaysEat": true
+  },
+  {
+    "nutrition": 2,
+    "saturation": 0.4,
+    "id": "tomato_sauce",
+    "container": "minecraft:bowl"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.2,
+    "id": "wheat_dough"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.4,
+    "effect": "hunger",
+    "duration": 600,
+    "amplifier": 0,
+    "chance": 0.3,
+    "id": "raw_pasta"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.3,
+    "id": "pumpkin_slice"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.4,
+    "fast": true,
+    "id": "cabbage_leaf"
+  },
+  {
+    "nutrition": 2,
+    "saturation": 0.3,
+    "meat": true,
+    "fast": true,
+    "id": "minced_beef"
+  },
+  {
+    "nutrition": 4,
+    "saturation": 0.8,
+    "meat": true,
+    "fast": true,
+    "id": "beef_patty"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.3,
+    "meat": true,
+    "fast": true,
+    "effect": "hunger",
+    "duration": 600,
+    "amplifier": 0,
+    "chance": 0.3,
+    "id": "chicken_cuts"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.6,
+    "meat": true,
+    "fast": true,
+    "id": "cooked_chicken_cuts"
+  },
+  {
+    "nutrition": 2,
+    "saturation": 0.3,
+    "meat": true,
+    "fast": true,
+    "id": "bacon"
+  },
+  {
+    "nutrition": 4,
+    "saturation": 0.8,
+    "meat": true,
+    "fast": true,
+    "id": "cooked_bacon"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.1,
+    "fast": true,
+    "id": "cod_slice"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.5,
+    "fast": true,
+    "id": "cooked_cod_slice"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.1,
+    "fast": true,
+    "id": "salmon_slice"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.8,
+    "fast": true,
+    "id": "cooked_salmon_slice"
+  },
+  {
+    "nutrition": 1,
+    "saturation": 0.3,
+    "meat": true,
+    "fast": true,
+    "id": "mutton_chops"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.8,
+    "meat": true,
+    "fast": true,
+    "id": "cooked_mutton_chops"
+  },
+  {
+    "nutrition": 5,
+    "saturation": 0.3,
+    "id": "ham"
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "id": "smoked_ham"
+  },
+  {
+    "nutrition": 2,
+    "saturation": 0.2,
+    "id": "pie_crust"
+  },
+  {
+    "nutrition": 2,
+    "saturation": 0.1,
+    "fast": true,
+    "effect": "speed",
+    "duration": 400,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "cake_slice"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.3,
+    "fast": true,
+    "effect": "speed",
+    "duration": 600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "apple_pie_slice"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.3,
+    "fast": true,
+    "effect": "speed",
+    "duration": 600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "chocolate_pie_slice"
+  },
+  {
+    "nutrition": 3,
+    "saturation": 0.2,
+    "fast": true,
+    "alwaysEat": true,
+    "id": "melon_popsicle"
+  },
+  {
+    "nutrition": 6,
+    "saturation": 0.6,
+    "effect": "regeneration",
+    "duration": 100,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "fruit_salad",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 6,
+    "saturation": 0.6,
+    "effect": "regeneration",
+    "duration": 100,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "mixed_salad",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 8,
+    "saturation": 0.9,
+    "id": "barbecue_stick"
+  },
+  {
+    "nutrition": 8,
+    "saturation": 0.8,
+    "id": "egg_sandwich"
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "id": "chicken_sandwich"
+  },
+  {
+    "nutrition": 11,
+    "saturation": 0.8,
+    "id": "hamburger"
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "id": "bacon_sandwich"
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "id": "mutton_wrap"
+  },
+  {
+    "nutrition": 8,
+    "saturation": 0.8,
+    "id": "dumplings"
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.7,
+    "id": "stuffed_potato"
+  },
+  {
+    "nutrition": 5,
+    "saturation": 0.5,
+    "id": "cabbage_rolls"
+  },
+  {
+    "nutrition": 6,
+    "saturation": 0.4,
+    "effect": "comfort",
+    "duration": 600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "cooked_rice",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "effect": "comfort",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "beef_stew",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "comfort",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "chicken_soup",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "effect": "comfort",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "vegetable_soup",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.9,
+    "effect": "comfort",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "fish_stew",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "comfort",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "fried_rice",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "comfort",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "pumpkin_soup",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "comfort",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "baked_cod_stew",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "comfort",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "noodle_soup",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 9,
+    "saturation": 0.6,
+    "effect": "nourishment",
+    "duration": 1200,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "bacon_and_eggs",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "effect": "nourishment",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "pasta_with_meatballs",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "effect": "nourishment",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "pasta_with_mutton_chop",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "roasted_mutton_chops",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "vegetable_noodles",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 10,
+    "saturation": 0.8,
+    "effect": "nourishment",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "steak_and_potatoes",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 9,
+    "saturation": 0.6,
+    "effect": "nourishment",
+    "duration": 1200,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "ratatouille",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "squid_ink_pasta",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 3600,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "grilled_salmon",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "roast_chicken",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "stuffed_pumpkin",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "amplifier": 0,
+    "chance": 1.0,
+    "id": "shepherds_pie",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "nutrition": 4,
+    "saturation": 0.2,
+    "meat": true,
+    "id": "dog_food",
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "id": "milk_bottle",
+    "nutrition": 0,
+    "saturation": 0,
+    "container": "minecraft:glass_bottle",
+    "stackSize": 16,
+    "action": "milk",
+    "alwaysEat": true
+  },
+  {
+    "id": "hot_cocoa",
+    "nutrition": 0,
+    "saturation": 0,
+    "container": "minecraft:glass_bottle",
+    "stackSize": 16,
+    "action": "cocoa",
+    "alwaysEat": true
+  },
+  {
+    "id": "melon_juice",
+    "nutrition": 0,
+    "saturation": 0,
+    "container": "minecraft:glass_bottle",
+    "stackSize": 16,
+    "action": "heal",
+    "alwaysEat": true
+  }
+]

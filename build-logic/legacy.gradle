@@ -1,0 +1,68 @@
+import groovy.json.JsonSlurper
+
+group = 'vectorwing.farmersdelight'
+def release = new Properties()
+file('../../version.properties').withInputStream { release.load(it) }
+version = release.getProperty('version')
+base.archivesName = "farmersdelight-${version}+mc${minecraftTarget}-forge"
+sourceSets.main.java.srcDir '../../common/src/main/java'
+sourceSets.main.resources.srcDir '../../common/src/main/resources'
+def generatedJava = layout.buildDirectory.dir('generated/farmersdelight/java')
+sourceSets.main.java.srcDir generatedJava
+tasks.register('generateVersion') {
+    inputs.property('modVersion', project.version)
+    outputs.dir generatedJava
+    doLast {
+        def target = new File(generatedJava.get().asFile, 'vectorwing/farmersdelight/legacy/BuildVersion.java')
+        target.parentFile.mkdirs()
+        target.text = "package vectorwing.farmersdelight.legacy; public final class BuildVersion { public static final String VERSION = \"${project.version}\"; private BuildVersion() {} }\n"
+    }
+}
+compileJava.dependsOn 'generateVersion'
+repositories { mavenCentral() }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+def catalog = file('../../common/src/main/resources/farmersdelight/foods.json')
+def sourceAssets = file('../../src/main/resources/assets/farmersdelight')
+processResources {
+    inputs.file catalog
+    inputs.dir sourceAssets
+    inputs.property('modVersion', project.version)
+    filesMatching('mcmod.info') { expand(modVersion: project.version, minecraftTarget: minecraftTarget) }
+    doLast {
+        def foods = new JsonSlurper().parse(catalog)
+        def ids = foods.collect { it.id } + ['rice', 'rice_panicle', 'straw', 'canvas', 'tree_bark',
+                'flint_knife', 'iron_knife', 'golden_knife', 'diamond_knife']
+        def language = new JsonSlurper().parse(new File(sourceAssets, 'lang/en_us.json'))
+        def entries = []
+        ids.each { id ->
+            copy { from new File(sourceAssets, "textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
+            if (!new File(destinationDir, "assets/farmersdelight/textures/items/${id}.png").isFile())
+                throw new GradleException("Missing production texture: ${id}")
+            entries += "item.farmersdelight.${id}.name=${language['item.farmersdelight.' + id] ?: id}"
+            if (minecraftTarget == '1.12.2') {
+                def model = new File(destinationDir, "assets/farmersdelight/models/item/${id}.json")
+                model.parentFile.mkdirs()
+                model.text = groovy.json.JsonOutput.toJson([parent: id.endsWith('_knife') ? 'item/handheld' : 'item/generated', textures: [layer0: "farmersdelight:items/${id}"]])
+            }
+        }
+        ['straw_bale_top', 'straw_bale_side'].each { texture ->
+            copy { from new File(sourceAssets, "textures/block/${texture}.png"); into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+        }
+        entries += 'tile.farmersdelight.straw_bale.name=Straw Bale'
+        entries += 'potion.farmersdelight.comfort=Comfort'
+        entries += 'potion.farmersdelight.nourishment=Nourishment'
+        entries += "itemGroup.farmersdelight=Farmer's Delight"
+        def lang = new File(destinationDir, "assets/farmersdelight/lang/${minecraftTarget == '1.12.2' ? 'en_us' : 'en_US'}.lang")
+        lang.parentFile.mkdirs()
+        lang.setText(entries.join('\n') + '\n', 'UTF-8')
+    }
+}
+jar {
+    manifest { attributes 'Implementation-Title': "Farmer's Delight Legacy", 'Implementation-Version': project.version }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+// The template sets the complete archive filename, avoiding Gradle's second version suffix.
+def productionName = "farmersdelight-${version}+mc${minecraftTarget}-forge.jar"
+tasks.named('jar') { archiveFileName = productionName.replace('.jar', '-dev.jar') }
+tasks.matching { it.name in ['remapJar', 'reobfJar'] }.configureEach { archiveFileName = productionName }

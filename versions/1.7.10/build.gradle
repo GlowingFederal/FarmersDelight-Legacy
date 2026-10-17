@@ -1,0 +1,13 @@
+plugins { id 'com.gtnewhorizons.gtnhconvention' }
+ext.minecraftTarget = '1.7.10'
+apply from: '../../build-logic/legacy.gradle'
+repositories {
+    maven { url = 'https://nexus.gtnewhorizons.com/repository/public/' }
+    maven { url = 'https://maven.covers1624.net' }
+}
+dependencies {
+    compileOnly('codechicken:NotEnoughItems:1.7.10-1.0.5.120:dev') { transitive = false }
+    compileOnly('codechicken:CodeChickenLib:1.7.10-1.1.3.140:dev') { transitive = false }
+}
+jar { manifest { attributes 'FMLCorePlugin': 'vectorwing.farmersdelight.legacy.bootstrap.EarlyLoader', 'FMLCorePluginContainsFMLMod': 'true' } }
+jar.finalizedBy 'reobfJar'
