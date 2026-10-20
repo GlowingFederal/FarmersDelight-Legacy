@@ -40,6 +40,12 @@ public final class LegacyFood extends ItemFood {
             player.dropItem(remainder, false);
         return stack;
     }
+    @Override public net.minecraft.util.EnumActionResult onItemUse(EntityPlayer player,World world,net.minecraft.util.math.BlockPos pos,net.minecraft.util.EnumHand hand,net.minecraft.util.EnumFacing side,float x,float y,float z) {
+        return definition.id.equals("onion") && CropSeeds.plant(Content.onions,player.getHeldItem(hand),player,world,pos,side) ? net.minecraft.util.EnumActionResult.SUCCESS : net.minecraft.util.EnumActionResult.PASS;
+    }
+    public void eatPlaced(EntityPlayer player, World world) {
+        if(!world.isRemote) { affect(player,world); player.getFoodStats().addStats(definition.nutrition,definition.saturation); }
+    }
     private void affect(EntityPlayer player, World world) {
         if (definition.id.equals("melon_popsicle")) player.extinguish();
         if ("heal".equals(definition.action)) player.heal(2.0F);

@@ -9,5 +9,6 @@ dependencies {
     compileOnly('codechicken:NotEnoughItems:1.7.10-1.0.5.120:dev') { transitive = false }
     compileOnly('codechicken:CodeChickenLib:1.7.10-1.1.3.140:dev') { transitive = false }
 }
-jar { manifest { attributes 'FMLCorePlugin': 'vectorwing.farmersdelight.legacy.bootstrap.EarlyLoader', 'FMLCorePluginContainsFMLMod': 'true' } }
+// GTNH's UniMixins convention registers the static MixinConfigs manifest entry.
+// Register it once; a second early loader would compete with that configuration.
 jar.finalizedBy 'reobfJar'

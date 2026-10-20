@@ -672,6 +672,79 @@ Comfort heals one health every 80 effect-duration ticks, ignores amplifiers, and
 
 Required 1.7.10 configurations: FD alone; Modern Regen alone; both without effects; both + Nourishment; both + Comfort; both + both effects. Run each with `naturalRegeneration` on/off and Regeneration present/absent. Include default Modern Regen and saturation regeneration disabled, plus a changed interval/cost setting. Use hunger 0, 17, 18, 19, 20; saturation 0, 0.5, 6; health 10/20 and full health. Record starting/ending health, hunger, saturation and exhaustion, pulse ticks, activity performed, effects/durations, and consumed food/returned containers. Include fast→fallback transitions, recovery to full health, exhaustion crossing 4, repeated meals, stacked/last-item/full-inventory/creative containers, effect expiry and relog. Nourishment activity refunds must total ≤0.1/tick; healing costs and Modern Regen timer must match the no-FD control. Comfort must add no heal while natural regeneration is eligible, and must supply only its intended 80-tick pulse when ineligible. Repeat FD-only on 1.12.2; do not imply Modern Regen support there.
 
+## N. Paired complete-port implementation checklist
+
+This extends the historical foundation milestone in section M. The original registered IDs, recipes and interactions remain enumerated in the appendices. “Implemented” below describes the production source, not acceptance of every player interaction. The complete-port milestone remains in progress.
+
+| Original feature | Forge 1.7.10 | Forge 1.12.2 | Adaptation / outstanding acceptance |
+|---|---|---|---|
+| Food catalog, four knife tiers, Comfort and Nourishment | Implemented | Implemented | Preserve foundation IDs, food data and regeneration ownership; full consumption/effect matrix remains required. |
+| Cutting Board inventory, processing, secondary/Fortune rolls, tool durability, retrieval, automation, dispenser, visuals | Implemented | Implemented | Native rendering and interactions; full client, tool and dispenser matrix remains required. |
+| Cooking Pot slots, matching, progress, heat, serving, XP, portable meals, GUI, automation and persistence | Implemented | Implemented | Packaged server-command checks produced two bowl servings on each target. GUI, shift-click, player XP, hopper and multiplayer checks remain required. |
+| Stove and placed Skillet | Implemented | Implemented | Native lighting/extinguishing, cached grilling recipes, independent slots, persistent progress and rendered ingredients; client/automation checks remain required. |
+| Handheld Skillet | Adapted | Implemented | 1.7.10 takes its ingredient from the next hotbar slot; 1.12.2 uses the other hand. Cooking reservation is persisted/refundable. |
+| Original recipe catalogs and viewer categories | Adapted | Adapted | Native metadata and genuine flowers/wood equivalents. Four NEI/JEI categories expose only active recipes; pot transfer supplies six inputs and serving containers while excluding the locked meal buffer. Native client acceptance remains required. |
+| Cabbages, tomatoes, onions, rice; seeds, harvesting and shears | Implemented | Implemented | Rice lower growth is separate from fluid metadata; source water restores on crop removal and drains on bucket use. Packaged checks confirmed persisted rice age and water restoration. Player bucket and harvesting checks remain required. |
+| Wild crop patches and climate generation | Adapted | Adapted | Deterministic native surface-world generation, configured per crop and clipped to the native shifted 16×16 population window. Explore new chunks in existing worlds; beetroot is absent on 1.7.10. Multi-biome sampling remains required. |
+| Organic Compost, Rich Soil, Rich Farmland, mushroom colonies | Implemented | Implemented | Native random ticks, rich-soil boost setting, hydration, protected farmland, compost comparator and colony shears behavior. Packaged servers confirmed vanilla mushroom support on rich soil. |
+| Apple/chocolate pies, roast chicken, stuffed pumpkin, shepherd’s pie | Implemented | Implemented | Remaining portions are persistent tile state because five serving states plus four directions exceed legacy metadata. Partial meals cannot become full meals when broken. Honey ham and berry cheesecake remain deferred with their missing ingredients, including their block/item registrations. |
+| Six native-wood pantries | Implemented | Implemented | 27-slot native containers, names, open/close feedback, sided inventory, comparator and break drops; native slab metadata plus wooden-trapdoor equivalent. Client and hopper checks remain required. |
+| Basket | Implemented | Implemented | 27-slot collector, six directions, eight-tick transfer cooldown, redstone disable, hollow collision and persistent contents. Directional capture, power and client checks remain required. |
+| Rotten tomato projectile, Backstabbing, full skillet combat | Implemented | Implemented | Native throwable/tracking, source behind-target test, native damage/repair/enchantments and narrowly scoped knockback Mixins. 1.7.10 retains native combat without attack-speed cooldowns. Player damage/knockback acceptance remains required. |
+| Pet feed and crop/seed animal breeding | Implemented | Implemented | Native wolves and tamed horses retain feed benefits; feed consumes one item and dog food returns one bowl. Native pig/chicken breeding and temptation accept FD crops/seeds. Absent modern mount types are deferred. |
+| Crates, rice bag/bale, tatami blocks/mats, canvas rug | Implemented | Implemented | Quantity-neutral compression, oriented bales, fall cushioning, paired tatami blocks and two-part mat placement/removal. Beetroot crate is deferred on 1.7.10. Piston, support and visual acceptance remain required. |
+| Rope, Safety Net, undyed and 16-color standing/wall canvas signs | Adapted | Adapted | Native climbing/extension, fall/bounce, support and native sign editor/packets with persisted dyed text. 1.7.10 keeps native sign text limits. Absent bells and general waterlogging are deferred. Client editing, orientation and bounce acceptance remain required. |
+| Chest loot and native farmer trades | Adapted | Adapted | Additive mineshaft/dungeon pools; source crop purchases on native farmers. 1.7.10 keeps existing loot weights and uses empty destination slots; its single native farmer profession has no career-level progression. Modern village-house chest families and wandering traders are deferred. |
+| Five village compost-heap templates | Adapted | Adapted | Source NBT palettes adapted to native blocks and old village components. Theme and native ground offset persist. Disabling new generation preserves structure registration and palette loading. Generated structures require visual and biome acceptance. |
+| Advancement tree | Adapted achievements | Adapted advancements | Source criteria/AND/OR and rewards retained where prerequisites exist; 1.7.10 persists criteria and uses event-indexed acquisition. Missing campfire/netherite milestones are deferred; raider tomato milestone uses native illagers only on 1.12.2. Client trees and player criterion/reward checks remain required. |
+| Soup stacking, configuration, client feedback, fuel | Implemented | Implemented | Optional stack limit 16 with one bowl per consumed soup; food/pet/pot tooltips, source effect icons and configurable overlays. Explicit source fuel ticks override native material shortcuts. Server recipe availability/Fortune settings synchronize to clients. |
+| Optional Modern Regen | Preserved | Not applicable | Native 1.7.10 implementation remains optional and owns regeneration. The Modern Regen project has no 1.12.2 target. Full player health/hunger/saturation/effect acceptance remains required. |
+| Other-mod recipe/API integrations | Deferred | Deferred | 34 Botany Pots/Create/Immersive Engineering recipe definitions and source CraftTweaker adapters require separately qualified native integrations. No hard dependency or pretend active recipe is introduced. |
+| Netherite, crimson/warped species, honey, sweet berries and missing mobs/items | Deferred | Deferred | Await optional backport compatibility. 1.7.10 also defers mutton/rabbit/beetroot prerequisites; equivalent existing logs and flowers remain usable. |
+
+#### Content identity and survival gates
+
+The Appendix 1 ledger remains the exhaustive 148-item/86-block/2-effect reference. All original IDs outside the following explicit exclusions have native implementations or the adaptations above; `wild_rice_upper` is an additional internal legacy block for the two-part wild plant.
+
+- Both targets defer these ten source item IDs: `crimson_pantry`, `warped_pantry`, `netherite_knife`, `nether_salad`, `honey_cookie`, `honey_glazed_ham`, `honey_glazed_ham_block`, `sweet_berry_cookie`, `sweet_berry_cheesecake`, `sweet_berry_cheesecake_slice`. The corresponding four source block IDs are `crimson_pantry`, `warped_pantry`, `honey_glazed_ham_block`, `sweet_berry_cheesecake`.
+- 1.7.10 additionally defers item/block IDs `beetroot_crate` and `wild_beetroots`. Existing foundation mutton-food IDs remain registered for save compatibility, but their recipes are deferred because vanilla mutton/rabbit prerequisites are absent.
+- The Stove mechanic is implemented, but its source crafting recipe requires a campfire and remains deferred on both targets. Cooking Pots and Skillets can use available fire/lava heat without it; 1.12.2 also supports native magma. No fabricated campfire recipe or replacement ingredient is added.
+- Basket crafting requires bamboo and remains deferred on both targets. The collector itself is fully implemented. Scaffolding's canvas recipe is deferred for the same missing prerequisite.
+- Stripped-log/wood outputs are absent. All affected cutting recipes remain deferred, rather than returning the input log and allowing unlimited bark. `paper_from_tree_bark` and `organic_compost_from_tree_bark` are deferred until bark has an active acquisition recipe. `organic_compost_from_rotten_flesh` remains available.
+- Native plants, dyes, fish metadata, six wood species and wooden trapdoors use explicit legacy equivalents. An equivalent input/output dye conversion that would multiply the same native item is deferred. Modern-only flowers, bamboo, kelp, scaffolding, leather horse armor, Nether vegetation and other absent inputs remain recipe-specific gates.
+- Registered `fruit_salad`, `grilled_salmon`, `noodle_soup` and `stuffed_pumpkin` production is deferred on both targets because it needs berries or kelp. On 1.7.10, the beetroot/mutton-dependent `mixed_salad`, `mutton_wrap`, `roasted_mutton_chops`, `shepherds_pie`, `ratatouille`, `vegetable_soup` and `pasta_with_mutton_chop` chains are also deferred. Master Chef excludes unavailable survival meals while retaining the other original requirements.
+
+Wild crops, knife harvesting, native animal ingredients, native crafting and cutting lead to the available pot/grill meals, feasts and storage. Seeds and rice are not added arbitrarily to grass drops. Fresh-world access and exploration of new chunks in existing worlds use the same deterministic generation; there is no retrogen. Native village heaps and the rotten-flesh compost recipe provide soil progression without tree bark.
+
+#### Validation and remaining acceptance
+
+Paired implementation checkpoints compiled and produced native remapped/reobfuscated JARs. Packaged server-command checks produced two cooked-rice bowl servings per target, persisted rice age and restored source water after removal, accepted vanilla mushrooms on rich soil, and persisted basket contents and feast portions. These are dedicated-server observations, not player interaction tests.
+
+Final paired `buildAll --offline --continue` succeeded against the final production sources. Both targets compiled, packaged and remapped/reobfuscated. There are no automated test sources; both native test tasks reported NO-SOURCE.
+
+| Final observed result | 1.7.10 | 1.12.2 |
+|---|---|---|
+| Production compilation and packaging | Passed; reobfuscated JAR | Passed; remapped JAR |
+| Packaged dedicated-server startup/reload without viewers or Modern Regen | Ready; clean stop | Ready; clean stop |
+| Optional Modern Regen 1.0.1.1 startup/reload | Ready; clean stop | No project target |
+| Source items registered / reference 148 | 136; 12 explicit exclusions above | 138; 10 explicit exclusions above |
+| Source blocks registered / reference 86 | 80 plus internal wild-rice upper block | 82 plus internal wild-rice upper block |
+| Original crafting definitions / 109 | 88 active, 21 deferred | 94 active, 15 deferred |
+| Original Cutting Board definitions / 97 | 54 active, 43 deferred | 63 active, 34 deferred |
+| Original Cooking Pot definitions / 24 | 17 active, 7 deferred | 22 active, 2 deferred |
+| Original smelting/smoking/blasting/campfire definitions / 28 | 23 adapted, 5 deferred | 28 adapted |
+| Other-mod recipe types / 34; netherite smithing / 1 | Deferred | Deferred |
+| Packaged JSON/model/texture references | No missing FD references | No missing FD references; Master Chef has 18 reachable criteria |
+| Native pig/chicken constructors with the breeding Mixins | Summoned successfully | Summoned successfully |
+
+These categories account for all 293 bundled source recipe definitions: 182 active/adapted and 111 deferred on 1.7.10; 207 active/adapted and 86 deferred on 1.12.2. Crafting totals include the six preserved foundation recipes and the Cutting Board recipe. Native vanilla grilling foods are additional to the source catalog. Smoking/blasting food routes use legacy furnaces when no native recipe already exists; placed and handheld grilling remain separate mechanics. The deferred maps and reasons are written to the native debug log for pack developers.
+
+Fresh 1.12.2 flat-world startup with seed `1110241383260505174` reproduced the previously warning-producing seed after the population-window correction and reported no cascading-generation warning. This is one bounded generation sample, not a multi-biome acceptance result. Existing Forge update-check/unsigned-loader warnings were not suppressed; they did not prevent ready state.
+
+Production artifacts are `versions/1.7.10/build/libs/farmersdelight-0.1.0-foundation.1+mc1.7.10-forge.jar` and `versions/1.12.2/build/libs/farmersdelight-0.1.0-foundation.1+mc1.12.2-forge.jar`. They retain the existing development version. The exact packaged JARs were installed in the disposable servers; no validation mods or test harnesses were added.
+
+Still required: actual client loading/visual review and NEI/JEI rendering/transfer; survival crafting and harvesting; pot shift-click, containers, XP and hopper transactions; handheld cancellation, enchanted tools and dispenser behavior; feast/full-inventory accounting; sign editing and mat/piston/support behavior; safety-net bounce and combat; village/biome generation sampling; two-client simultaneous interaction and observer synchronization; save/reload under active cooking; and the full Modern Regen health/hunger/saturation/natural-regeneration/Comfort/Nourishment matrix. The milestone's gameplay acceptance remains open until those checks are performed.
+
 ## Appendices: source ledgers
 
 The appendices below are part of this single audit document. They are static source evidence and implementation checklists. A listed recipe output or Java reference is **not** a proven reachable acquisition path; optional conditions, unsupported vanilla inputs, source defects and manual interactions must be applied as explained above. No generated source/test infrastructure is required to use these ledgers.

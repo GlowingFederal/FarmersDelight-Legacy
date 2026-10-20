@@ -22,7 +22,7 @@ dependencies {
     compileOnly 'mezz.jei:jei_1.12.2:4.16.1.302:api'
     runtimeOnly 'mezz.jei:jei_1.12.2:4.16.1.302'
 }
-// This one-method mapping is the same MCP/SRG boundary used by both native targets.
+// Explicit mappings for the native Mixin boundaries.
 def mixinSrg = layout.buildDirectory.file('generated/mapping/activity.srg')
 def mixinRefmap = layout.buildDirectory.file('generated/mixinResources/mixins.farmersdelight.refmap.json')
 tasks.register('generateMixinMapping') {
@@ -31,6 +31,14 @@ tasks.register('generateMixinMapping') {
         def target = mixinSrg.get().asFile
         target.parentFile.mkdirs()
         target.text = 'MD: net/minecraft/entity/player/EntityPlayer/addExhaustion (F)V net/minecraft/entity/player/EntityPlayer/func_71020_j (F)V\n'
+        target << 'MD: net/minecraft/entity/passive/EntityPig/<init> (Lnet/minecraft/world/World;)V net/minecraft/entity/passive/EntityPig/<init> (Lnet/minecraft/world/World;)V\n'
+        target << 'MD: net/minecraft/entity/passive/EntityChicken/<init> (Lnet/minecraft/world/World;)V net/minecraft/entity/passive/EntityChicken/<init> (Lnet/minecraft/world/World;)V\n'
+        target << 'MD: net/minecraft/entity/passive/EntityPig/isBreedingItem (Lnet/minecraft/item/ItemStack;)Z net/minecraft/entity/passive/EntityPig/func_70877_b (Lnet/minecraft/item/ItemStack;)Z\n'
+        target << 'MD: net/minecraft/entity/passive/EntityChicken/isBreedingItem (Lnet/minecraft/item/ItemStack;)Z net/minecraft/entity/passive/EntityChicken/func_70877_b (Lnet/minecraft/item/ItemStack;)Z\n'
+        target << 'MD: net/minecraft/item/ItemSoup/onItemUseFinish (Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/EntityLivingBase;)Lnet/minecraft/item/ItemStack; net/minecraft/item/ItemSoup/func_77654_b (Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/EntityLivingBase;)Lnet/minecraft/item/ItemStack;\n'
+        target << 'MD: net/minecraft/entity/EntityLivingBase/knockBack (Lnet/minecraft/entity/Entity;FDD)V net/minecraft/entity/EntityLivingBase/func_70653_a (Lnet/minecraft/entity/Entity;FDD)V\n'
+        target << 'MD: net/minecraft/enchantment/Enchantment/canApply (Lnet/minecraft/item/ItemStack;)Z net/minecraft/enchantment/Enchantment/func_92089_a (Lnet/minecraft/item/ItemStack;)Z\n'
+        target << 'MD: net/minecraft/block/BlockMushroom/canBlockStay (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z net/minecraft/block/BlockMushroom/func_180671_f (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z\n'
         mixinRefmap.get().asFile.parentFile.mkdirs()
     }
 }

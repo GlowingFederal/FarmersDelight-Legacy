@@ -11,6 +11,10 @@ import net.minecraft.block.Block; import net.minecraft.block.material.Material;
 public final class Knife extends ItemSword {
     private final ToolMaterial material;
     public Knife(ToolMaterial material) { super(material); this.material = material; }
+    @Override public int getItemEnchantability() { return material == ToolMaterial.STONE ? 5 : super.getItemEnchantability(); }
+    @Override public boolean getIsRepairable(ItemStack knife, ItemStack repair) {
+        return material == ToolMaterial.STONE ? repair.getItem() == net.minecraft.init.Items.flint : super.getIsRepairable(knife, repair);
+    }
     @Override public java.util.Set<String> getToolClasses(ItemStack stack) { return java.util.Collections.singleton("farmersdelight_knife"); }
     @Override public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) { stack.damageItem(1, attacker); return true; }
     @Override public float func_150893_a(ItemStack stack, Block block) {
@@ -23,11 +27,11 @@ public final class Knife extends ItemSword {
     }
     @Override public Multimap<String, AttributeModifier> getItemAttributeModifiers() {
         Multimap<String, AttributeModifier> modifiers = super.getItemAttributeModifiers();
-        
+
         String damage = SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName();
         modifiers.removeAll(damage);
         modifiers.put(damage, new AttributeModifier(field_111210_e, "Knife damage", 0.5F + material.getDamageVsEntity(), 0));
-        
+
         return modifiers;
     }
 }

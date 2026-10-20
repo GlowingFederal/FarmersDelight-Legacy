@@ -8,12 +8,28 @@ import net.minecraft.init.Items;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent; import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent; import net.minecraft.block.BlockCake; import net.minecraft.util.EnumActionResult;
 public final class FoodEvents {
+    @SubscribeEvent public void horseFeed(PlayerInteractEvent.EntityInteract event) {
+        EntityPlayer player=event.getEntityPlayer();
+        ItemStack held=event.getItemStack();
+        net.minecraft.entity.Entity raw=event.getTarget();
+        if(!(raw instanceof net.minecraft.entity.passive.AbstractHorse) || Stacks.empty(held) || held.getItem()!=Content.ITEMS.get("horse_feed")) return;
+        net.minecraft.entity.passive.AbstractHorse horse=(net.minecraft.entity.passive.AbstractHorse)raw;
+        if(!horse.isEntityAlive() || !horse.isTame()) return;
+        event.setCanceled(true);
+        event.setCancellationResult(EnumActionResult.SUCCESS);
+        if(player.world.isRemote) return;
+        horse.setHealth(horse.getMaxHealth());
+        horse.addPotionEffect(new PotionEffect(net.minecraft.init.MobEffects.SPEED,6000,1));
+        horse.addPotionEffect(new PotionEffect(net.minecraft.init.MobEffects.JUMP_BOOST,6000,0));
+        if(!player.capabilities.isCreativeMode) Stacks.shrink(held,1);
+        horse.world.playSound(null,horse.posX,horse.posY,horse.posZ,net.minecraft.init.SoundEvents.ENTITY_HORSE_EAT,net.minecraft.util.SoundCategory.PLAYERS,0.8F,0.8F);
+    }
     @SubscribeEvent public void foodFinished(LivingEntityUseItemEvent.Finish event) {
         if (event.getEntityLiving().world.isRemote) return; ItemStack food = event.getItem();
-        if (food != null && food.getItem() == Items.MUSHROOM_STEW)
+        if (Settings.comfortSoups && food != null && food.getItem() == Items.MUSHROOM_STEW)
             event.getEntityLiving().addPotionEffect(new PotionEffect(Content.comfort, 3600, 0));
-        if (food.getItem() == Items.BEETROOT_SOUP || food.getItem() == Items.RABBIT_STEW) event.getEntityLiving().addPotionEffect(new PotionEffect(Content.comfort, food.getItem() == Items.RABBIT_STEW ? 6000 : 3600, 0));
-        if (food.getItem() == Items.RABBIT_STEW) event.getEntityLiving().addPotionEffect(new PotionEffect(net.minecraft.init.MobEffects.JUMP_BOOST, 200, 1));
+        if (Settings.comfortSoups && (food.getItem() == Items.BEETROOT_SOUP || food.getItem() == Items.RABBIT_STEW)) event.getEntityLiving().addPotionEffect(new PotionEffect(Content.comfort, food.getItem() == Items.RABBIT_STEW ? 6000 : 3600, 0));
+        if (Settings.rabbitJump && food.getItem() == Items.RABBIT_STEW) event.getEntityLiving().addPotionEffect(new PotionEffect(net.minecraft.init.MobEffects.JUMP_BOOST, 200, 1));
     }
     @SubscribeEvent public void cake(PlayerInteractEvent.RightClickBlock event) {
         EntityPlayer player = event.getEntityPlayer(); net.minecraft.util.math.BlockPos pos = event.getPos(); net.minecraft.world.World world = player.world; ItemStack held = player.getHeldItem(event.getHand());
@@ -44,5 +60,5 @@ public final class FoodEvents {
             if (!player.inventory.addItemStackToInventory(bowl)) player.dropItem(bowl, false);
         }
     }
-    
+
 }

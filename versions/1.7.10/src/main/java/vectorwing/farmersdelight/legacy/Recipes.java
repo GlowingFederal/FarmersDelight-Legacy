@@ -12,6 +12,8 @@ import vectorwing.farmersdelight.legacy.api.RecipeRegistry;
 public final class Recipes {
     public static final RecipeRegistry<FoundationRecipe> REGISTRY = new RecipeRegistry<FoundationRecipe>();
     public static void register() {
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Content.cuttingBoard), "/##", "/##",
+                '/', net.minecraft.init.Items.stick, '#', "plankWood"));
         net.minecraftforge.oredict.RecipeSorter.register("farmersdelight:foundation_shapeless", NativeShapeless.class,
                 net.minecraftforge.oredict.RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
         FoundationRecipe[] recipes;

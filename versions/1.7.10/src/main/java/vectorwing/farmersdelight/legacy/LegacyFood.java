@@ -24,7 +24,7 @@ public final class LegacyFood extends ItemFood {
     @Override public int getMaxItemUseDuration(ItemStack stack) { return definition.fast ? 16 : 32; }
     @Override public EnumAction getItemUseAction(ItemStack stack) { return definition.action == null ? EnumAction.eat : EnumAction.drink; }
     @Override public ItemStack onEaten(ItemStack stack, World world, EntityPlayer player) {
-        
+
         if (!world.isRemote) {
             affect(player, world);
             player.getFoodStats().addStats(definition.nutrition, definition.saturation);
@@ -38,6 +38,12 @@ public final class LegacyFood extends ItemFood {
         if (!world.isRemote && remainder != null && !player.inventory.addItemStackToInventory(remainder))
             player.dropPlayerItemWithRandomChoice(remainder, false);
         return stack;
+    }
+    @Override public boolean onItemUse(ItemStack stack,EntityPlayer player,World world,int x,int y,int z,int side,float hx,float hy,float hz) {
+        return definition.id.equals("onion") && CropSeeds.plant(Content.onions,stack,player,world,x,y,z,side);
+    }
+    public void eatPlaced(EntityPlayer player, World world) {
+        if(!world.isRemote) { affect(player,world); player.getFoodStats().addStats(definition.nutrition,definition.saturation); Progression.consumed(player,new ItemStack(this)); }
     }
     private void affect(EntityPlayer player, World world) {
         if (definition.id.equals("melon_popsicle")) player.extinguish();

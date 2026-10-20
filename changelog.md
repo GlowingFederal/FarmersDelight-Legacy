@@ -628,3 +628,20 @@
 - Add the shared food catalog, four native knife tiers, basic materials and Straw Bale registration, exact ingredient/OreDictionary memberships, duplicate-rejecting recipe registration, initial crafting recipes, and optional JEI/NEI presentation. Gate unavailable honey, sweet-berry and Nether-vegetation foods.
 - Implement native consumables with survival container returns, one-effect milk/cocoa curing and server-owned effects. Nourishment reduces activity exhaustion without refunding natural regeneration costs; Comfort supplies slow healing only outside eligible natural regeneration. Modern Regen remains optional and owns its hunger state and timers.
 - Adopt paired foundation → cutting → cooking → farming/serving → secondary-system milestones, then 1.8.9 and 1.6.4; addon support follows equivalent feature-gated paired acceptance.
+
+## 2026-10-18 11:13 — Correct foundation textures and Nourishment loading
+- Use the existing straw_bale_end texture for the 1.7.10 pillar end icons and the 1.12.2 block model, alongside the original side texture.
+- Require both Straw Bale textures during resource packaging so a missing source texture fails the build instead of producing a missing face in-game.
+- Register the 1.7.10 Nourishment Mixin once through UniMixins' static configuration, removing the competing empty configuration and redundant early loader that prevented the exhaustion hook from applying.
+
+## 2026-10-18 16:40 — Restore legacy cooking, farming and shared meals
+- Add native Cutting Boards with tool processing, secondary drops, Fortune, automation, dispenser support and ingredient rendering on both versions.
+- Add the Cooking Pot inventory, heat-based cooking, serving containers, portable meal storage, experience, GUI and sided automation. Add six-position Stoves and placed/handheld Skillets with native heat and lighting interactions.
+- Adapt the original cutting, cooking, crafting and grilling recipe catalogs to native item names and metadata. Use available wood and flower equivalents; defer recipes whose required items or mobs are absent.
+- Add plantable cabbage, tomato, onion and rice crops, configurable wild patches, rich soils, compost conversion and mushroom colonies. Rice retains source water through harvesting and handles bucket drainage separately.
+- Add placed pies and four-serving feasts with persistent remaining portions, serving-container costs, leftovers and knife slicing. Add six native-wood pantries and directional, redstone-controlled collection baskets with persistent inventories.
+- Add crates, rice bags and bales, paired tatami mats, canvas rugs, climbable extending ropes, bouncing Safety Nets and all seventeen canvas-sign backgrounds with native editing and dyed text.
+- Add thrown rotten tomatoes, Backstabbing, skillet combat and enchantments, native pet feed and breeding support. Restore source fuel values, safe optional soup stacking, food tooltips, effect icons and configurable status overlays.
+- Add additive dungeon/mineshaft loot, native farmer purchases, biome-adapted village compost heaps and native advancements or achievements. Disabling new compost heaps preserves existing structure loading.
+- Add optional NEI/JEI processing categories and safe pot ingredient transfer. Synchronize server-controlled crate availability and cutting Fortune settings; keep unavailable recipes out of active viewer lists.
+- Keep wild-crop placement inside the native shifted population window. Retain the existing Modern Regen ownership and optional loading contract.

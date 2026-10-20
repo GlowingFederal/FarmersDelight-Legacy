@@ -12,6 +12,10 @@ import net.minecraft.inventory.EntityEquipmentSlot; import net.minecraft.block.s
 public final class Knife extends ItemSword {
     private final ToolMaterial material;
     public Knife(ToolMaterial material) { super(material); this.material = material; }
+    @Override public int getItemEnchantability() { return material == ToolMaterial.STONE ? 5 : super.getItemEnchantability(); }
+    @Override public boolean getIsRepairable(ItemStack knife, ItemStack repair) {
+        return material == ToolMaterial.STONE ? repair.getItem() == net.minecraft.init.Items.FLINT : super.getIsRepairable(knife, repair);
+    }
     @Override public java.util.Set<String> getToolClasses(ItemStack stack) { return java.util.Collections.singleton("farmersdelight_knife"); }
     @Override public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) { stack.damageItem(1, attacker); return true; }
     @Override public float getDestroySpeed(ItemStack stack, IBlockState state) {

@@ -23,15 +23,43 @@ repositories { mavenCentral() }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 def catalog = file('../../common/src/main/resources/farmersdelight/foods.json')
 def sourceAssets = file('../../src/main/resources/assets/farmersdelight')
+def generatedAssets = file('../../src/generated/resources/assets/farmersdelight')
+def sourceRecipes = file('../../src/generated/resources/data/farmersdelight/recipes')
+def handwrittenRecipes = file('../../src/main/resources/data/farmersdelight/recipes')
+def sourceData = file('../../src/generated/resources/data')
 processResources {
     inputs.file catalog
     inputs.dir sourceAssets
+    inputs.dir generatedAssets
+    inputs.dir sourceRecipes
+    inputs.dir handwrittenRecipes
+    inputs.dir sourceData
+    inputs.dir file('../../src/main/resources/data/farmersdelight/loot_tables/chests')
+    inputs.dir file('../../src/main/resources/data/farmersdelight/structures')
     inputs.property('modVersion', project.version)
     filesMatching('mcmod.info') { expand(modVersion: project.version, minecraftTarget: minecraftTarget) }
     doLast {
+        def original = new TreeMap()
+        [handwrittenRecipes, sourceRecipes].each { recipeRoot ->
+            fileTree(recipeRoot).matching { include '**/*.json' }.files.each { recipeFile ->
+                def id = recipeRoot.toPath().relativize(recipeFile.toPath()).toString().replace('\\', '/').replaceAll(/\.json$/, '')
+                if (original.containsKey('farmersdelight:' + id)) throw new GradleException("Duplicate source recipe: ${id}")
+                original['farmersdelight:' + id] = new JsonSlurper().parse(recipeFile)
+            }
+        }
+        def recipeCatalog = new File(destinationDir, 'farmersdelight/source_recipes.json')
+        recipeCatalog.parentFile.mkdirs()
+        recipeCatalog.setText(groovy.json.JsonOutput.toJson(original), 'UTF-8')
+        def tags = new TreeMap()
+        fileTree(sourceData).matching { include '*/tags/items/**/*.json' }.files.each { tagFile ->
+            def path = sourceData.toPath().relativize(tagFile.toPath()).toString().replace('\\', '/')
+            def parts = path.split('/tags/items/')
+            tags[parts[0] + ':' + parts[1].replaceAll(/\.json$/, '')] = new JsonSlurper().parse(tagFile)
+        }
+        new File(destinationDir, 'farmersdelight/source_tags.json').setText(groovy.json.JsonOutput.toJson(tags), 'UTF-8')
         def foods = new JsonSlurper().parse(catalog)
         def ids = foods.collect { it.id } + ['rice', 'rice_panicle', 'straw', 'canvas', 'tree_bark',
-                'flint_knife', 'iron_knife', 'golden_knife', 'diamond_knife']
+                'flint_knife', 'iron_knife', 'golden_knife', 'diamond_knife', 'rotten_tomato', 'horse_feed']
         def language = new JsonSlurper().parse(new File(sourceAssets, 'lang/en_us.json'))
         def entries = []
         ids.each { id ->
@@ -45,11 +73,366 @@ processResources {
                 model.text = groovy.json.JsonOutput.toJson([parent: id.endsWith('_knife') ? 'item/handheld' : 'item/generated', textures: [layer0: "farmersdelight:items/${id}"]])
             }
         }
-        ['straw_bale_top', 'straw_bale_side'].each { texture ->
-            copy { from new File(sourceAssets, "textures/block/${texture}.png"); into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+        ['straw_bale_end', 'straw_bale_side'].each { texture ->
+            def source = new File(sourceAssets, "textures/block/${texture}.png")
+            if (!source.isFile()) throw new GradleException("Missing production block texture: ${texture}")
+            copy { from source; into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+        }
+        ['cutting_board', 'cooking_pot_bottom', 'cooking_pot_top', 'cooking_pot_side', 'cooking_pot_parts', 'cooking_pot_handle', 'cooking_pot_tray_top', 'cooking_pot_tray_side',
+         'skillet_side', 'skillet_top', 'skillet_bottom', 'stove_side', 'stove_top', 'stove_top_on', 'stove_bottom', 'stove_front', 'stove_front_on'].each { texture ->
+            def source = new File(sourceAssets, "textures/block/${texture}.png")
+            if (!source.isFile()) throw new GradleException("Missing production block texture: ${texture}")
+            copy { from source; into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+            def animation = new File(sourceAssets, "textures/block/${texture}.png.mcmeta")
+            if (animation.isFile()) copy { from animation; into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+        }
+        copy { from new File(sourceAssets, 'sounds/block/cutting_board'); into "${destinationDir}/assets/farmersdelight/sounds/block/cutting_board" }
+        copy { from new File(sourceAssets, 'sounds/block/cooking_pot'); into "${destinationDir}/assets/farmersdelight/sounds/block/cooking_pot" }
+        copy { from new File(sourceAssets, 'sounds/block/skillet'); into "${destinationDir}/assets/farmersdelight/sounds/block/skillet" }
+        copy { from new File(sourceAssets, 'textures/gui/cooking_pot.png'); into "${destinationDir}/assets/farmersdelight/textures/gui" }
+        copy { from new File(sourceAssets, 'textures/gui/fd_icons.png'); into "${destinationDir}/assets/farmersdelight/textures/gui" }
+        copy { from new File(sourceAssets, 'textures/mob_effect'); into "${destinationDir}/assets/farmersdelight/textures/mob_effect" }
+        def sounds = new File(destinationDir, 'assets/farmersdelight/sounds.json')
+        sounds.text = groovy.json.JsonOutput.toJson([
+                'block.cutting_board.knife': [sounds: ['farmersdelight:block/cutting_board/knife1', 'farmersdelight:block/cutting_board/knife2']],
+                'block.cooking_pot.boil': [sounds: ['farmersdelight:block/cooking_pot/boil_water1', 'farmersdelight:block/cooking_pot/boil_water2']],
+                'block.skillet.sizzle': [sounds: ['farmersdelight:block/skillet/sizzle1', 'farmersdelight:block/skillet/sizzle2', 'farmersdelight:block/skillet/sizzle3']]])
+        ['cutting_board', 'cooking_pot', 'cooking_pot_handle', 'cooking_pot_tray', 'skillet'].each { name ->
+            def model = new File(destinationDir, "assets/farmersdelight/models/block/${name}.json")
+            model.parentFile.mkdirs()
+            model.text = new File(sourceAssets, "models/block/${name}.json").getText('UTF-8').replace('farmersdelight:block/', 'farmersdelight:blocks/').replace('block/thin_block', 'block/block')
+        }
+        ['stove', 'stove_on'].each { name ->
+            def model = new File(destinationDir, "assets/farmersdelight/models/block/${name}.json")
+            model.parentFile.mkdirs()
+            model.text = new File(generatedAssets, "models/block/${name}.json").getText('UTF-8').replace('farmersdelight:block/', 'farmersdelight:blocks/')
+        }
+        def farmBlocks = ['cabbages','tomatoes','onions','rice_crop','rice_upper_crop','wild_rice','wild_rice_upper',
+                          'rich_soil','rich_soil_farmland','organic_compost','brown_mushroom_colony','red_mushroom_colony'] +
+                          ['cabbages','tomatoes','onions','carrots','potatoes','beetroots'].collect { 'wild_' + it }
+        def farmModel = { String name -> name == 'wild_rice_upper' ? 'wild_rice_top' : name }
+        def farmTexture = { String name -> name == 'wild_rice' ? 'wild_rice_bottom' : farmModel(name) }
+        fileTree(new File(sourceAssets,'textures/block')).matching {
+            include 'cabbages_stage*.png','tomatoes_stage*.png','onions_stage*.png','rice_stage*.png','rice_supporting.png',
+                    'rice_upper_crop_stage*.png','wild_*.png','rich_soil*.png','organic_compost_stage*.png','*_mushroom_colony_stage*.png'
+        }.files.each { texture -> copy { from texture; into "${destinationDir}/assets/farmersdelight/textures/blocks" } }
+        copy { from new File(sourceAssets,'textures/block/wild_rice_top.png'); into "${destinationDir}/assets/farmersdelight/textures/items"; rename { 'wild_rice.png' } }
+        ['cabbage_seeds','tomato_seeds'].each { id ->
+            copy { from new File(sourceAssets,"textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
+            entries += "item.farmersdelight.${id}.name=${language['item.farmersdelight.' + id]}"
+        }
+        farmBlocks.each { id ->
+            def title = language['block.farmersdelight.' + (id == 'wild_rice_upper' ? 'wild_rice' : id)] ?: id
+            entries += "tile.farmersdelight.${id}.name=${title}"
+            entries += "item.farmersdelight.${id}.name=${title}"
+        }
+        if(minecraftTarget == '1.12.2') {
+            def writeJson = { String path,Object value ->
+                def out = new File(destinationDir,'assets/farmersdelight/' + path)
+                out.parentFile.mkdirs()
+                out.setText(groovy.json.JsonOutput.toJson(value),'UTF-8')
+            }
+            def nativeModel = { Object model ->
+                if(model.textures) model.textures = model.textures.collectEntries { k,v ->
+                    [(k): v.replace('farmersdelight:block/','farmersdelight:blocks/').replace('minecraft:block/','minecraft:blocks/')]
+                }
+                if(model.parent?.startsWith('minecraft:block/')) model.parent=model.parent.replace('minecraft:','')
+                model
+            }
+            [sourceAssets,generatedAssets].each { root ->
+                fileTree(new File(root,'models/block')).matching {
+                    include 'crop_cross.json','bush_crop.json','cabbages_stage*.json','tomatoes_stage*.json','onions_stage*.json',
+                            'rice_stage*.json','rice_supporting.json','rice_upper_crop_stage*.json','wild_*.json',
+                            'rich_soil*.json','organic_compost_*.json','*_mushroom_colony_stage*.json'
+                }.files.each { source -> writeJson('models/block/' + source.name,nativeModel(new JsonSlurper().parse(source))) }
+            }
+            def cross = new JsonSlurper().parse(new File(sourceAssets,'models/block/crop_cross.json'))
+            def waterRice = { String name,String texture ->
+                def model = [ambientocclusion:false,textures:[particle:"farmersdelight:blocks/${texture}",cross:"farmersdelight:blocks/${texture}",water:'minecraft:blocks/water_still'],
+                             elements: new JsonSlurper().parseText(groovy.json.JsonOutput.toJson(cross.elements))]
+                def faces=[:]
+                ['up','down','north','south','east','west'].each { face -> faces[face]=[texture:'#water',tintindex:0,cullface:face] }
+                model.elements += [from:[0,0,0],to:[16,14.222,16],faces:faces]
+                writeJson("models/block/${name}.json",model)
+            }
+            (0..3).each { age -> waterRice("rice_stage${age}","rice_stage${age}") }
+            waterRice('rice_supporting','rice_supporting')
+            waterRice('wild_rice_bottom','wild_rice_bottom')
+            farmBlocks.each { id ->
+                def variants=[:]
+                def model = { String name -> [model:'farmersdelight:' + name] }
+                if(id in ['cabbages','tomatoes','onions']) {
+                    (0..7).each { age ->
+                        int stage=id=='cabbages' ? age : id=='onions' ? (int)(age/2) : [0,0,1,1,2,2,3,4][age]
+                        variants['age='+age]=model(id+'_stage'+stage)
+                    }
+                } else if(id in ['rice_crop','wild_rice']) {
+                    (0..3).each { age -> [false,true].each { supporting ->
+                        variants["age=${age},supporting=${supporting}"]=model(id=='wild_rice' ? 'wild_rice_bottom' : supporting && age==3 ? 'rice_supporting' : 'rice_stage'+age)
+                    } }
+                } else if(id in ['rice_upper_crop','wild_rice_upper'] || id.endsWith('_colony')) {
+                    (0..3).each { age -> variants['age='+age]=model(id=='wild_rice_upper' ? 'wild_rice_top' : id+'_stage'+age) }
+                } else if(id=='rich_soil_farmland') {
+                    (0..7).each { moisture -> variants['moisture='+moisture]=model(moisture>0 ? 'rich_soil_farmland_moist' : 'rich_soil_farmland') }
+                } else if(id in ['organic_compost','rich_soil']) {
+                    (0..7).each { age -> variants['composting='+age]=model(id=='rich_soil' ? id : id+'_'+age) }
+                } else variants.normal=model(farmModel(id))
+                writeJson("blockstates/${id}.json",[variants:variants])
+            }
+            writeJson('models/block/rich_soil.json',[parent:'block/cube_all',textures:[all:'farmersdelight:blocks/rich_soil']])
+            (farmBlocks - ['cabbages','tomatoes','onions','rice_crop','rice_upper_crop','wild_rice_upper']).each { id ->
+                def plant=id.startsWith('wild_') || id.endsWith('_colony')
+                writeJson("models/item/${id}.json",plant ? [parent:'item/generated',textures:[layer0:'farmersdelight:blocks/' + (id.endsWith('_colony') ? id+'_stage3' : id=='wild_rice' ? 'wild_rice_top' : farmTexture(id))]]
+                         : [parent:'farmersdelight:block/' + (id=='organic_compost' ? id+'_0' : id)])
+            }
+            ['cabbage_seeds','tomato_seeds'].each { id -> writeJson("models/item/${id}.json",[parent:'item/generated',textures:[layer0:'farmersdelight:items/'+id]]) }
+        }
+        def mealIds=['apple_pie','chocolate_pie','sweet_berry_cheesecake','roast_chicken_block','stuffed_pumpkin_block','honey_glazed_ham_block','shepherds_pie_block']
+        def resolveMealModel
+        resolveMealModel = { String name ->
+            def file=new File(sourceAssets,"models/block/${name}.json")
+            def model=new JsonSlurper().parse(file)
+            if(model.parent?.startsWith('farmersdelight:block/')) {
+                def inherited=resolveMealModel(model.parent.substring('farmersdelight:block/'.length()))
+                model.textures=(inherited.textures ?: [:]) + (model.textures ?: [:])
+                if(!model.elements) model.elements=inherited.elements
+                model.parent='block/block'
+            }
+            model
+        }
+        mealIds.each { id ->
+            copy { from new File(sourceAssets,"textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
+            entries += "tile.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: language['item.farmersdelight.'+id] ?: id}"
+            def variants=[:]
+            (0..4).each { remaining ->
+                boolean pie=!id.endsWith('_block')
+                def suffix=pie ? remaining==4 ? '' : '_slice'+Math.min(3,4-remaining) : remaining==0 && id!='stuffed_pumpkin_block' ? '_leftover' : '_stage'+Math.min(3,4-remaining)
+                String name=id+suffix
+                def model=resolveMealModel(name)
+                model.textures?.each { key,texture ->
+                    if(texture.startsWith('farmersdelight:block/')) {
+                        String image=texture.substring('farmersdelight:block/'.length())+'.png'
+                        copy { from new File(sourceAssets,'textures/block/'+image); into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+                    }
+                }
+                model.textures=model.textures.collectEntries { key,texture -> [(key):texture.replace('farmersdelight:block/','farmersdelight:blocks/')] }
+                def output=new File(destinationDir,"assets/farmersdelight/models/block/${name}.json")
+                output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(model)
+                ['north':0,'east':90,'south':180,'west':270].each { facing,angle ->
+                    variants["facing=${facing},servings=${remaining}"]=[model:'farmersdelight:'+name,y:angle]
+                }
+            }
+            if(minecraftTarget=='1.12.2') {
+                def state=new File(destinationDir,"assets/farmersdelight/blockstates/${id}.json"); state.parentFile.mkdirs()
+                state.text=groovy.json.JsonOutput.toJson([variants:variants])
+                def item=new File(destinationDir,"assets/farmersdelight/models/item/${id}.json")
+                item.text=groovy.json.JsonOutput.toJson([parent:'item/generated',textures:[layer0:'farmersdelight:items/'+id]])
+            }
+        }
+        def pantryWoods=['oak','spruce','birch','jungle','acacia','dark_oak']
+        (pantryWoods.collectMany { wood -> ['side','top','front','front_open'].collect { wood+'_pantry_'+it } } + ['basket_top','basket_side','basket_bottom','basket_handle']).each { texture ->
+            copy { from new File(sourceAssets,"textures/block/${texture}.png"); into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+        }
+        def basketModel=new JsonSlurper().parse(new File(sourceAssets,'models/block/basket.json'))
+        basketModel.textures=basketModel.textures.collectEntries { key,texture -> [(key):texture.replace('farmersdelight:block/','farmersdelight:blocks/')] }
+        new File(destinationDir,'assets/farmersdelight/models/block/basket.json').text=groovy.json.JsonOutput.toJson(basketModel)
+        entries += 'tile.farmersdelight.basket.name=Basket'
+        entries += 'container.farmersdelight.basket=Basket'
+        entries += 'container.farmersdelight.pantry=Pantry'
+        pantryWoods.each { wood -> entries += "tile.farmersdelight.${wood}_pantry.name=${language['block.farmersdelight.'+wood+'_pantry']}" }
+        if(minecraftTarget=='1.12.2') {
+            def writeStorage = { String path,Object json ->
+                def output=new File(destinationDir,'assets/farmersdelight/'+path); output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(json)
+            }
+            pantryWoods.each { wood ->
+                def variants=[:]
+                [false,true].each { opened ->
+                    String name=wood+'_pantry'+(opened ? '_open' : '')
+                    writeStorage("models/block/${name}.json",[parent:'block/orientable',textures:[side:"farmersdelight:blocks/${wood}_pantry_side",top:"farmersdelight:blocks/${wood}_pantry_top",front:"farmersdelight:blocks/${wood}_pantry_front"+(opened ? '_open' : '')]])
+                    ['north':0,'east':90,'south':180,'west':270,'up':0,'down':0].each { facing,rotation ->
+                        variants["facing=${facing},open=${opened}"]=[model:'farmersdelight:'+name,y:rotation]
+                    }
+                }
+                writeStorage("blockstates/${wood}_pantry.json",[variants:variants])
+                writeStorage("models/item/${wood}_pantry.json",[parent:'farmersdelight:block/'+wood+'_pantry'])
+            }
+            def variants=[:]
+            ['down':[180,0],'up':[0,0],'north':[90,0],'south':[270,0],'west':[90,270],'east':[90,90]].each { facing,rotation ->
+                [false,true].each { opened -> variants["facing=${facing},open=${opened}"]=[model:'farmersdelight:basket',x:rotation[0],y:rotation[1]] }
+            }
+            writeStorage('blockstates/basket.json',[variants:variants])
+            writeStorage('models/item/basket.json',[parent:'farmersdelight:block/basket'])
+        }
+        def packedIds=['carrot_crate','potato_crate','beetroot_crate','cabbage_crate','tomato_crate','onion_crate','rice_bag','rice_bale']
+        fileTree(new File(sourceAssets,'textures/block')).matching {
+            include '*_crate_*.png','crate_bottom.png','rice_bag_*.png','rice_bale_*.png','rope.png','safety_net.png'
+        }.files.each { texture -> copy { from texture; into "${destinationDir}/assets/farmersdelight/textures/blocks" } }
+        (packedIds+['rope','safety_net']).each { id -> entries += "tile.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}" }
+        if(minecraftTarget=='1.12.2') {
+            def writeUtility = { String path,Object json ->
+                def output=new File(destinationDir,'assets/farmersdelight/'+path); output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(json)
+            }
+            packedIds.each { id ->
+                def source=new File(generatedAssets,"models/block/${id}.json")
+                if(!source.isFile()) source=new File(sourceAssets,"models/block/${id}.json")
+                def model=new JsonSlurper().parse(source)
+                model.parent=model.parent.replace('minecraft:','')
+                model.textures=model.textures.collectEntries { key,texture -> [(key):texture.replace('farmersdelight:block/','farmersdelight:blocks/')] }
+                writeUtility("models/block/${id}.json",model)
+                def variants=[:]
+                ['down':[180,0],'up':[0,0],'north':[90,0],'south':[90,180],'west':[90,270],'east':[90,90]].each { face,rotation ->
+                    variants['facing='+face]=[model:'farmersdelight:'+id,x:id=='rice_bale' ? rotation[0] : 0,y:id=='rice_bale' ? rotation[1] : 0]
+                }
+                writeUtility("blockstates/${id}.json",[variants:variants])
+                writeUtility("models/item/${id}.json",[parent:'farmersdelight:block/'+id])
+            }
+            ['rope_post','rope_side','safety_net'].each { name ->
+                def model=new JsonSlurper().parse(new File(sourceAssets,"models/block/${name}.json"))
+                model.textures=model.textures.collectEntries { key,texture -> [(key):texture.replace('farmersdelight:block/','farmersdelight:blocks/')] }
+                writeUtility("models/block/${name}.json",model)
+            }
+            def multipart=[[apply:[model:'farmersdelight:rope_post']]]
+            ['north':0,'east':90,'south':180,'west':270].each { direction,rotation ->
+                multipart += [when:[(direction):'true'],apply:[model:'farmersdelight:rope_side',y:rotation]]
+            }
+            writeUtility('blockstates/rope.json',[multipart:multipart])
+            writeUtility('models/item/rope.json',[parent:'farmersdelight:block/rope_post'])
+            writeUtility('blockstates/safety_net.json',[variants:[normal:[model:'farmersdelight:safety_net']]])
+            writeUtility('models/item/safety_net.json',[parent:'farmersdelight:block/safety_net'])
+        }
+        copy { from new File(sourceAssets,'textures/entity/signs'); into "${destinationDir}/assets/farmersdelight/textures/entity/signs" }
+        (['']+['white','orange','magenta','light_blue','yellow','lime','pink','gray','light_gray','cyan','purple','blue','brown','green','red','black']).each { color ->
+            String id=(color ? color+'_' : '')+'canvas_sign'
+            copy { from new File(sourceAssets,"textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
+            entries += "item.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}"
+            entries += "tile.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}"
+            if(minecraftTarget=='1.12.2') {
+                def model=new File(destinationDir,"assets/farmersdelight/models/item/${id}.json")
+                model.text=groovy.json.JsonOutput.toJson([parent:'item/generated',textures:[layer0:'farmersdelight:items/'+id]])
+                [id,id.replace('canvas_sign','canvas_wall_sign')].each { blockId ->
+                    def state=new File(destinationDir,"assets/farmersdelight/blockstates/${blockId}.json")
+                    state.text=groovy.json.JsonOutput.toJson([multipart:[[apply:[model:'farmersdelight:canvas_sign_particle']]]])
+                }
+            }
+        }
+        if(minecraftTarget=='1.12.2') {
+            new File(destinationDir,'assets/farmersdelight/models/block/canvas_sign_particle.json').text=groovy.json.JsonOutput.toJson([textures:[particle:'farmersdelight:blocks/canvas_rug'],elements:[]])
+        }
+        def tatamiModels=['tatami_half','tatami_even','tatami_odd','tatami_mat_foot','tatami_mat_head','tatami_mat_half','canvas_rug']
+        def writeTatami = { String path,Object json ->
+            def output=new File(destinationDir,'assets/farmersdelight/'+path); output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(json)
+        }
+        tatamiModels.each { name ->
+            def model=new JsonSlurper().parse(new File(sourceAssets,"models/block/${name}.json"))
+            model.textures=model.textures.collectEntries { key,texture ->
+                if(texture.startsWith('farmersdelight:block/')) copy { from new File(sourceAssets,'textures/block/'+texture.substring('farmersdelight:block/'.length())+'.png'); into "${destinationDir}/assets/farmersdelight/textures/blocks" }
+                [(key):texture.replace('farmersdelight:block/','farmersdelight:blocks/')]
+            }
+            model.parent=model.parent ? model.parent.replace('minecraft:','').replace('block/thin_block','block/block') : 'block/block'
+            if(!model.elements && minecraftTarget=='1.7.10') {
+                def faces=[:]; ['up','down','north','south','east','west'].each { faces[it]=[texture:'#all',uv:[0,0,16,16]] }
+                model.elements=[[from:[0,0,0],to:[16,16,16],faces:faces]]
+            }
+            writeTatami("models/block/${name}.json",model)
+        }
+        ['tatami','half_tatami_mat','full_tatami_mat','canvas_rug'].each { id ->
+            entries += "tile.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}"
+            if(id in ['full_tatami_mat','half_tatami_mat']) {
+                copy { from new File(sourceAssets,"textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
+            }
+            if(minecraftTarget=='1.12.2') {
+                def variants=[:]
+                if(id=='tatami') {
+                    ['down':[180,0],'up':[0,0],'north':[90,0],'south':[90,180],'west':[90,270],'east':[90,90]].each { face,rotation ->
+                        [false,true].each { paired ->
+                            variants["facing=${face},paired=${paired}"]=[model:'farmersdelight:'+(paired ? face in ['down','north','west'] ? 'tatami_even' : 'tatami_odd' : 'tatami_half'),x:rotation[0],y:rotation[1]]
+                        }
+                    }
+                } else {
+                    ['south':0,'west':90,'north':180,'east':270].each { face,rotation ->
+                        [false,true].each { head ->
+                            String model=id=='canvas_rug' ? id : id=='half_tatami_mat' ? 'tatami_mat_half' : head ? 'tatami_mat_head' : 'tatami_mat_foot'
+                            variants["facing=${face},head=${head}"]=[model:'farmersdelight:'+model,y:rotation]
+                        }
+                    }
+                }
+                writeTatami("blockstates/${id}.json",[variants:variants])
+                writeTatami("models/item/${id}.json",id in ['full_tatami_mat','half_tatami_mat'] ? [parent:'item/generated',textures:[layer0:'farmersdelight:items/'+id]]
+                            : [parent:'farmersdelight:block/'+(id=='tatami' ? 'tatami_half' : id)])
+            }
+        }
+        def legacyChestLoot=[:]
+        ['fd_abandoned_mineshaft','fd_simple_dungeon'].each { name ->
+            def loot=new JsonSlurper().parse(file("../../src/main/resources/data/farmersdelight/loot_tables/chests/${name}.json"))
+            legacyChestLoot[name]=loot
+            if(minecraftTarget=='1.12.2') {
+                def legacy=new JsonSlurper().parseText(groovy.json.JsonOutput.toJson(loot))
+                legacy.pools.eachWithIndex { pool,index ->
+                    pool.name='farmersdelight:'+name+'_'+index
+                    pool.entries.eachWithIndex { entry,entryIndex ->
+                        entry.type=entry.type.replace('minecraft:','')
+                        entry.entryName='farmersdelight:'+name+'_'+index+'_'+entryIndex
+                        entry.functions?.each { it.function=it.function.replace('minecraft:','') }
+                    }
+                }
+                def output=new File(destinationDir,"assets/farmersdelight/loot_tables/chests/${name}.json")
+                output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(legacy)
+            }
+        }
+        new File(destinationDir,'farmersdelight/source_loot.json').text=groovy.json.JsonOutput.toJson(legacyChestLoot)
+        copy { from file('../../src/main/resources/data/farmersdelight/structures/village/houses'); include '*.nbt'; into "${destinationDir}/farmersdelight/structures" }
+        def advancementSource=new TreeMap()
+        fileTree(file('../../src/generated/resources/data/farmersdelight/advancements/main')).matching { include '*.json' }.files.each { source ->
+            advancementSource[source.name.replace('.json','')]=new JsonSlurper().parse(source)
+        }
+        new File(destinationDir,'farmersdelight/source_advancements.json').text=groovy.json.JsonOutput.toJson(advancementSource)
+        advancementSource.each { name,definition ->
+            def display=definition.display
+            entries += "achievement.farmersdelight.${name}=${language[display.title.translate] ?: name}"
+            entries += "achievement.farmersdelight.${name}.desc=${language[display.description.translate] ?: name}"
+        }
+        language.each { key,value -> if(key.startsWith('farmersdelight.advancement.') || key.startsWith('farmersdelight.tooltip.') || key.startsWith('farmersdelight.container.') || key.startsWith('farmersdelight.block.cutting_board.')) entries += "${key}=${value}" }
+        entries += 'farmersdelight.tooltip.skillet.controls=Cook over heat; sneak-use to place.'
+        entries += minecraftTarget=='1.7.10' ? 'farmersdelight.tooltip.skillet.hand=Held cooking takes food from the next hotbar slot.' : 'farmersdelight.tooltip.skillet.hand=Held cooking takes food from the other hand.'
+        if(minecraftTarget=='1.12.2') {
+            def removed=['place_campfire','obtain_netherite_knife'] as Set
+            advancementSource.each { name,definition ->
+                if(removed.contains(name)) return
+                def advancement=new JsonSlurper().parseText(groovy.json.JsonOutput.toJson(definition))
+                if(name=='master_chef') advancement.display.icon.item='farmersdelight:roast_chicken'
+                if(advancement.display.background) advancement.display.background='minecraft:textures/blocks/brick.png'
+                advancement.criteria=advancement.criteria.findAll { criterion,rule ->
+                    def conditions=rule.conditions ?: [:]
+                    // Registered foundation foods can still have deferred survival production chains.
+                    if(name=='master_chef' && conditions.item?.item in ['farmersdelight:noodle_soup','farmersdelight:grilled_salmon','farmersdelight:stuffed_pumpkin','farmersdelight:honey_glazed_ham']) return false
+                    !(conditions.item?.item in ['farmersdelight:honey_glazed_ham','farmersdelight:netherite_knife']) &&
+                    !(conditions.items?.any { it.item=='farmersdelight:netherite_knife' }) &&
+                    !(conditions.block in ['minecraft:sweet_berry_bush','farmersdelight:honey_glazed_ham_block'])
+                }
+                advancement.criteria.each { criterion,rule ->
+                    if(rule.trigger=='farmersdelight:use_cutting_board' || name=='hit_raider_with_rotten_tomato') { rule.trigger='minecraft:impossible'; rule.remove('conditions') }
+                    if(rule.conditions?.block=='minecraft:sugar_cane') rule.conditions.block='minecraft:reeds'
+                    if(rule.conditions?.effects?.containsKey('farmersdelight:nourished')) {
+                        rule.conditions.effects['farmersdelight:nourishment']=rule.conditions.effects.remove('farmersdelight:nourished')
+                    }
+                }
+                advancement.requirements=advancement.requirements.collect { group -> group.findAll { advancement.criteria.containsKey(it) } }.findAll { !it.isEmpty() }
+                while(advancement.parent && removed.contains(advancement.parent.tokenize('/').last())) {
+                    advancement.parent=advancementSource[advancement.parent.tokenize('/').last()].parent
+                }
+                def output=new File(destinationDir,"assets/farmersdelight/advancements/main/${name}.json")
+                output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(advancement)
+            }
         }
         entries += 'tile.farmersdelight.straw_bale.name=Straw Bale'
+        entries += 'tile.farmersdelight.cutting_board.name=Cutting Board'
+        entries += 'tile.farmersdelight.cooking_pot.name=Cooking Pot'
+        entries += 'container.farmersdelight.cooking_pot=Cooking Pot'
+        entries += 'tile.farmersdelight.stove.name=Stove'
+        entries += 'tile.farmersdelight.skillet.name=Skillet'
+        entries += 'item.farmersdelight.skillet.name=Skillet'
         entries += 'potion.farmersdelight.comfort=Comfort'
+        entries += 'enchantment.farmersdelight.backstabbing=Backstabbing'
         entries += 'potion.farmersdelight.nourishment=Nourishment'
         entries += "itemGroup.farmersdelight=Farmer's Delight"
         def lang = new File(destinationDir, "assets/farmersdelight/lang/${minecraftTarget == '1.12.2' ? 'en_us' : 'en_US'}.lang")

@@ -4,7 +4,13 @@
   "package": "vectorwing.farmersdelight.legacy.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "PlayerExhaustionMixin"
+    "PlayerExhaustionMixin",
+    "SoupItemMixin",
+    "PigFoodMixin",
+    "ChickenFoodMixin",
+    "MushroomSoilMixin",
+    "ToolKnockbackMixin",
+    "SkilletEnchantmentsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

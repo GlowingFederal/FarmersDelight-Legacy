@@ -12,6 +12,8 @@ import net.minecraft.util.ResourceLocation;
 public final class Recipes {
     public static final RecipeRegistry<FoundationRecipe> REGISTRY = new RecipeRegistry<FoundationRecipe>();
     public static void register() {
+        GameRegistry.findRegistry(IRecipe.class).register(new ShapedOreRecipe(new ResourceLocation("farmersdelight", "cutting_board"), new ItemStack(Content.cuttingBoard), "/##", "/##",
+                '/', net.minecraft.init.Items.STICK, '#', "plankWood").setRegistryName("farmersdelight", "cutting_board"));
         FoundationRecipe[] recipes;
         try (InputStreamReader reader = new InputStreamReader(Recipes.class.getResourceAsStream("/farmersdelight/foundation_recipes.json"), StandardCharsets.UTF_8)) {
             recipes = new Gson().fromJson(reader, FoundationRecipe[].class);
