@@ -1,34 +1,66 @@
 plugins { id 'base' }
+apply from: 'build-logic/artifacts.gradle'
 // Native wrappers keep Forge plugins and daemons isolated.
-def targets = ['1.12.2': 21, '1.7.10': 25]
+def targets = ['1.6.4': 21, '1.7.10': 25, '1.8.9': 21, '1.12.2': 21]
+
+def cleanRelease = tasks.register('cleanRelease', Delete) {
+    delete layout.buildDirectory.dir('release')
+}
 def builds = targets.collect { mc, jdk ->
     tasks.register('build' + mc.replace('.', '_'), Exec) {
         group = 'build'
+        dependsOn cleanRelease
         workingDir rootDir
         if (System.getProperty('os.name').toLowerCase().contains('windows')) commandLine 'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
                 file('scripts/run-gradle.ps1'), '-ProjectDirectory', file("versions/${mc}"),
-                '-JavaVersion', jdk.toString(), *(jdk == 25 ? ['-EnableNativeAccess'] : []), 'build'
-        else commandLine 'sh', file("versions/${mc}/gradlew"), 'build'
+                '-JavaVersion', jdk.toString(), *(jdk == 25 ? ['-EnableNativeAccess'] : []), 'build',
+                *(gradle.startParameter.offline ? ['--offline'] : [])
+        else commandLine 'sh', file("versions/${mc}/gradlew"), 'build',
+                *(gradle.startParameter.offline ? ['--offline'] : [])
     }
 }
-builds[1].configure { mustRunAfter builds[0] }
-tasks.register('buildAll') {
+(1..<builds.size()).each { index -> builds[index].configure { mustRunAfter builds[index-1] } }
+
+tasks.register('release', Sync) {
     group = 'build'
+    description = 'Build all four native targets and collect only their verified distribution JARs.'
     dependsOn builds
-    doLast {
+    into layout.buildDirectory.dir('release')
+    targets.keySet().each { mc ->
+        from file("versions/${mc}/build/release/${distributionName(mc)}")
+    }
+    doFirst {
         targets.keySet().each { mc ->
-            def artifacts = fileTree("versions/${mc}/build/libs").matching { include "farmersdelight-*+mc${mc}-forge.jar" }.files
-            if (artifacts.empty) throw new GradleException("Missing production artifact for ${mc}")
-            artifacts.each { artifact ->
-                def zip = new java.util.zip.ZipFile(artifact)
-                try {
-                    ['mcmod.info', 'farmersdelight/foods.json', 'vectorwing/farmersdelight/legacy/Foundation.class',
-                     'vectorwing/farmersdelight/legacy/api/EffectRules.class'].each { entry ->
-                        if (!zip.getEntry(entry)) throw new GradleException("${artifact}: missing ${entry}")
-                    }
-                } finally { zip.close() }
-            }
+            def artifact = file("versions/${mc}/build/release/${distributionName(mc)}")
+            if (!artifact.isFile()) throw new GradleException("Missing verified distribution: ${artifact}")
+        }
+    }
+    doLast {
+        def expected = targets.keySet().collect { distributionName(it) }.toSet()
+        if (destinationDir.listFiles()*.name.toSet() != expected) {
+            throw new GradleException("Unexpected release contents in ${destinationDir}")
         }
     }
 }
+tasks.register('buildAll') {
+    group = 'build'
+    dependsOn 'release'
+}
 tasks.named('build') { dependsOn 'buildAll' }
+
+// Verification and cleanup use the same isolated wrappers without staging or publishing.
+['test', 'clean'].each { action ->
+    def nativeTasks=targets.collect { mc,jdk ->
+        tasks.register(action + mc.replace('.', '_'),Exec) {
+            group=action=='test' ? 'verification' : 'build'
+            workingDir rootDir
+            if(System.getProperty('os.name').toLowerCase().contains('windows')) commandLine 'powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',
+                file('scripts/run-gradle.ps1'),'-ProjectDirectory',file("versions/${mc}"),'-JavaVersion',jdk.toString(),
+                *(jdk==25 ? ['-EnableNativeAccess'] : []),action,*(gradle.startParameter.offline ? ['--offline'] : [])
+            else commandLine 'sh',file("versions/${mc}/gradlew"),action,*(gradle.startParameter.offline ? ['--offline'] : [])
+        }
+    }
+    (1..<nativeTasks.size()).each { index -> nativeTasks[index].configure { mustRunAfter nativeTasks[index-1] } }
+    tasks.register(action+'All') { group=action=='test' ? 'verification' : 'build'; dependsOn nativeTasks }
+}
+tasks.named('clean') { dependsOn 'cleanAll' }

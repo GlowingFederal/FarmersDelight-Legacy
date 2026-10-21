@@ -1,0 +1,102 @@
+package vectorwing.farmersdelight.legacy;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+
+public abstract class GrillingTile extends InventoryTile  {
+    public final int[] progress;
+    private final GrillingRecipes.Recipe[] recipes;
+    private final String[] savedRecipes;
+    private boolean dirtyRecipes = true;
+    protected final boolean stove;
+    protected GrillingTile(boolean stove) {
+        super(stove ? 6 : 1); this.stove = stove; progress = new int[inventory.length];
+        recipes = new GrillingRecipes.Recipe[inventory.length]; savedRecipes = new String[inventory.length];
+        java.util.Arrays.fill(savedRecipes, "");
+    }
+    protected int fireAspect() { return 0; }
+    @Override public int getInventoryStackLimit() { return stove ? 1 : 64; }
+    @Override public void onInventoryChanged() { dirtyRecipes = true; super.onInventoryChanged(); }
+    @Override public boolean isItemValidForSlot(int slot, ItemStack stack) { return GrillingRecipes.find(stack) != null; }
+    public boolean blocked() {
+        if (!stove) return false;
+        net.minecraft.block.Block above = NativeRegistry.at(worldObj,xCoord, yCoord + 1, zCoord);
+        net.minecraft.util.AxisAlignedBB box = above.getCollisionBoundingBoxFromPool(worldObj, xCoord, yCoord + 1, zCoord);
+        return box != null && box.intersectsWith(net.minecraft.util.AxisAlignedBB.getBoundingBox(xCoord + 0.1875, yCoord + 1, zCoord + 0.1875, xCoord + 0.8125, yCoord + 1.0625, zCoord + 0.8125));
+    }
+    public boolean heated() { return stove ? (worldObj.getBlockMetadata(xCoord,yCoord,zCoord) & 4) != 0 : Heat.heated(worldObj, xCoord, yCoord, zCoord, false); }
+    public boolean add(ItemStack held, boolean creative) {
+        if (Stacks.empty(held) || GrillingRecipes.find(held) == null || blocked()) return false;
+        for (int i = 0; i < inventory.length; i++) {
+            int room = Math.min(getInventoryStackLimit(), held.getMaxStackSize()) - Stacks.size(inventory[i]);
+            if (room > 0 && (Stacks.empty(inventory[i]) || Stacks.same(inventory[i], held))) {
+                int amount = Math.min(room, stove ? 1 : Stacks.size(held));
+                if (Stacks.empty(inventory[i])) inventory[i] = Stacks.copy(held, amount);
+                else Stacks.count(inventory[i], Stacks.size(inventory[i]) + amount);
+                if (!creative) Stacks.shrink(held, amount);
+                progress[i] = 0; changed(); return true;
+            }
+        }
+        return false;
+    }
+    @Override public void updateEntity() {
+        if (worldObj == null) return;
+        if (worldObj.isRemote) {
+            if (heated() && (stove || !Stacks.empty(inventory[0])) && worldObj.rand.nextInt(8) == 0)
+                worldObj.spawnParticle(stove ? "flame" : "smoke", xCoord + 0.5, yCoord + (stove ? 0.3 : 0.25), zCoord + 0.5, 0, 0.01, 0);
+            return;
+        }
+        if (blocked()) {
+            boolean any = false;
+            for (int i = 0; i < inventory.length; i++) if (!Stacks.empty(inventory[i])) {
+                ItemStack input = inventory[i]; inventory[i] = Stacks.none(); progress[i] = 0; drop(input); any = true;
+            }
+            if (any) changed();
+            return;
+        }
+        if (dirtyRecipes) {
+            for (int i = 0; i < inventory.length; i++) {
+                recipes[i] = GrillingRecipes.find(inventory[i]);
+                String id = recipes[i] == null ? "" : recipes[i].id;
+                if (!id.equals(savedRecipes[i])) progress[i] = 0;
+                savedRecipes[i] = id;
+            }
+            dirtyRecipes = false;
+        }
+        boolean hot = heated(), progressed = false, cooked = false;
+        if (hot && worldObj.rand.nextInt(100) == 0)
+            worldObj.playSoundEffect(xCoord+0.5,yCoord+0.5,zCoord+0.5,stove ? "fire.fire" : "farmersdelight:block.skillet.sizzle",0.4F,1F);
+        for (int i = 0; i < inventory.length; i++) {
+            GrillingRecipes.Recipe recipe = recipes[i];
+            if (recipe == null || Stacks.empty(inventory[i])) { progress[i] = 0; continue; }
+            if (!hot) { if (progress[i] > 0) { progress[i] = Math.max(0, progress[i] - 2); progressed = true; } continue; }
+            progressed = true;
+            if (++progress[i] >= (stove ? recipe.time : GrillingRecipes.skilletTime(recipe.time, fireAspect()))) {
+                ItemStack result = recipe.output.copy(), remainder = CookingRecipes.remainder(Stacks.copy(inventory[i], 1));
+                Stacks.shrink(inventory[i], 1); if (Stacks.empty(inventory[i])) inventory[i] = Stacks.none();
+                progress[i] = 0; drop(result); drop(remainder); cooked = true;
+            }
+        }
+        if (cooked) changed(); else if (progressed) super.onInventoryChanged();
+    }
+    public void drop(ItemStack stack) {
+        if (Stacks.empty(stack) || worldObj.isRemote) return;
+        EntityItem entity = new EntityItem(worldObj, xCoord + 0.5, yCoord + (stove ? 1.1 : 0.3), zCoord + 0.5, stack);
+        entity.motionX = 0; entity.motionY = 0.1; entity.motionZ = 0;
+        worldObj.spawnEntityInWorld(entity);
+    }
+    @Override public void readFromNBT(NBTTagCompound nbt) {
+        super.readFromNBT(nbt); int[] saved = nbt.getIntArray("CookingTimes");
+        for (int i = 0; i < progress.length; i++) {
+            progress[i] = i < saved.length ? Math.max(0, Math.min(32766, saved[i])) : 0;
+            savedRecipes[i] = nbt.getString("Recipe" + i);
+        }
+        dirtyRecipes = true;
+    }
+    @Override public void writeToNBT(NBTTagCompound nbt) {
+        super.writeToNBT(nbt); nbt.setIntArray("CookingTimes", progress);
+        for (int i = 0; i < progress.length; i++) nbt.setString("Recipe" + i, savedRecipes[i]);
+
+    }
+}

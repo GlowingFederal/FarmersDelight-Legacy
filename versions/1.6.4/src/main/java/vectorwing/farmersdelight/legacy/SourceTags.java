@@ -1,0 +1,62 @@
+package vectorwing.farmersdelight.legacy;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
+/** Resolves source tags against native items and explicit OreDictionary boundaries. */
+public final class SourceTags {
+    private static final JsonObject TAGS = new com.google.gson.JsonParser().parse(new InputStreamReader(
+            SourceTags.class.getResourceAsStream("/farmersdelight/source_tags.json"), StandardCharsets.UTF_8)).getAsJsonObject();
+    public static List<ItemStack> candidates(String tag) { return collect(tag, new HashSet<String>()); }
+    private static List<ItemStack> collect(String tag, Set<String> path) {
+        if (!path.add(tag)) throw new IllegalArgumentException("Tag cycle: " + tag);
+        List<ItemStack> result = new ArrayList<ItemStack>();
+        if (TAGS.has(tag)) {
+            for (JsonElement value : TAGS.getAsJsonObject(tag).getAsJsonArray("values")) {
+                String id = value.isJsonPrimitive() ? value.getAsString() : value.getAsJsonObject().get("id").getAsString();
+                if (id.startsWith("#")) result.addAll(collect(id.substring(1), path));
+                else { ItemStack stack = Stacks.resolve(id); if (!Stacks.empty(stack)) result.add(stack); }
+            }
+        }
+        if (tag.equals("minecraft:planks")) {
+            for (int i = 0; i < 4; i++) result.add(new ItemStack(Block.planks, 1, i));
+        }
+        if (tag.equals("minecraft:logs") || tag.equals("minecraft:logs_that_burn")) {
+            for (String wood : new String[] {"oak", "spruce", "birch", "jungle"})
+                result.add(Stacks.resolve("minecraft:" + wood + "_log"));
+        }
+        String ore = null;
+        if (tag.startsWith("forge:crops/")) {
+            String crop = tag.substring("forge:crops/".length()); ore = "crop" + Character.toUpperCase(crop.charAt(0)) + crop.substring(1);
+        } else if(tag.startsWith("forge:dyes/")) {
+            String color=tag.substring("forge:dyes/".length());
+            ItemStack dye=Stacks.resolve("minecraft:"+color+"_dye");
+            if(!Stacks.empty(dye)) result.add(dye);
+            StringBuilder name=new StringBuilder("dye");
+            for(String word:color.split("_")) if(!word.isEmpty()) name.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+            ore=name.toString();
+        } else if (tag.equals("forge:ingots/iron")) ore = "ingotIron";
+        else if (tag.equals("forge:ingots/gold")) ore = "ingotGold";
+        else if (tag.equals("forge:nuggets/iron")) ore = "nuggetIron";
+        else if (tag.equals("forge:eggs")) ore = "listAllegg";
+        else if (tag.equals("forge:milk")) ore = "listAllmilk";
+        else if (tag.equals("forge:tools/knives")) ore = "toolKnife";
+        else if (tag.equals("forge:shears")) result.add(new ItemStack(Item.shears));
+        if (ore != null) for (ItemStack stack : OreDictionary.getOres(ore)) {
+            if (stack.getItemDamage() != OreDictionary.WILDCARD_VALUE) result.add(stack.copy());
+        }
+        path.remove(tag);
+        return result;
+    }
+    private SourceTags() {}
+}

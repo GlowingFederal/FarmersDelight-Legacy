@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.7.11",
+  "package": "vectorwing.farmersdelight.legacy.mixin",
+  "compatibilityLevel": "JAVA_7",
+  "mixins": [
+    "PlayerExhaustionMixin",
+    "SoupItemMixin",
+    "PigFoodMixin",
+    "ChickenFoodMixin",
+    "FurnaceFuelMixin",
+    "ChestLootMixin",
+    "MushroomSoilMixin",
+    "ToolKnockbackMixin",
+    "SkilletEnchantmentsMixin",
+    "SafetyNetBounceMixin",
+    "PlayerFinishMixin",
+    "ItemPlacementMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "mixins.farmersdelight.refmap.json"
+}

@@ -22,7 +22,7 @@ public final class ServingBlock extends BlockContainer {
         super(Material.cloth); this.id=id; this.pie=pie; this.serving=serving;
         leftovers=!pie && !id.equals("stuffed_pumpkin_block");
         setBlockName("farmersdelight."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
-        setBlockTextureName("farmersdelight:"+id);
+        setBlockTextureName("farmersdelight:"+(pie ? id+"_top" : id.equals("stuffed_pumpkin_block") ? "stuffed_pumpkin_bottom" : id.equals("shepherds_pie_block") ? "shepherds_pie_top" : id.replace("_block","")+"_body"));
     }
     public TileEntity createNewTileEntity(World world,int meta) { return new ServingTile(); }
     public static int portions(TileEntity tile) { return tile instanceof ServingTile ? ((ServingTile)tile).remaining : 0; }

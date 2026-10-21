@@ -8,6 +8,8 @@ public final class ClientProxy extends vectorwing.farmersdelight.legacy.CommonPr
         } });
     }
     @Override public void preInit() {
+        if(cpw.mods.fml.common.Loader.isModLoaded("NotEnoughItems"))
+            vectorwing.farmersdelight.legacy.integration.nei.NEIFarmersDelightConfig.registerHandlerInfo();
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(new ClientFeedback());
         cpw.mods.fml.client.registry.ClientRegistry.bindTileEntitySpecialRenderer(vectorwing.farmersdelight.legacy.CanvasSignTile.class,new CanvasSignRenderer());
         cpw.mods.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler(vectorwing.farmersdelight.legacy.RottenTomato.class,

@@ -1,6 +1,5 @@
 package vectorwing.farmersdelight.legacy.api;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.io.InputStreamReader;
@@ -18,7 +17,7 @@ public final class SourceRecipes {
     private static Map<String, JsonObject> load() {
         try (InputStreamReader reader = new InputStreamReader(SourceRecipes.class.getResourceAsStream(
                 "/farmersdelight/source_recipes.json"), StandardCharsets.UTF_8)) {
-            JsonObject root = new Gson().fromJson(reader, JsonObject.class);
+            JsonObject root = new com.google.gson.JsonParser().parse(reader).getAsJsonObject();
             Map<String, JsonObject> result = new LinkedHashMap<String, JsonObject>();
             for (Map.Entry<String, JsonElement> entry : root.entrySet()) result.put(entry.getKey(), entry.getValue().getAsJsonObject());
             return Collections.unmodifiableMap(result);

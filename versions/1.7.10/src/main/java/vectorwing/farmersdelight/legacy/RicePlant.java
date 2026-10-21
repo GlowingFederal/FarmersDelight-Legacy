@@ -46,6 +46,13 @@ public final class RicePlant extends BlockContainer implements IGrowable,ISheara
         if(world.isRemote || ground(world.getBlock(x,y-1,z)) && (!wild || world.getBlock(x,y+1,z)==Content.wildRiceUpper)) return;
         dropBlockAsItem(world,x,y,z,0,0); world.setBlockToAir(x,y,z);
     }
+    @Override public boolean removedByPlayer(World world,net.minecraft.entity.player.EntityPlayer player,int x,int y,int z,boolean harvest) {
+        boolean removed=super.removedByPlayer(world,player,x,y,z,harvest);
+        Block replacement=world.getBlock(x,y,z);
+        // The water-restoration callback replaces the requested air. Preserve the
+        // successful harvest result so the native player path still emits its drop.
+        return removed || !world.isRemote && (replacement==Blocks.water || replacement==Blocks.flowing_water);
+    }
     public void breakBlock(World world,int x,int y,int z,Block block,int meta) {
         RiceTile tile=tile(world,x,y,z); boolean restore=tile==null || !tile.draining;
         super.breakBlock(world,x,y,z,block,meta);

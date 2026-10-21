@@ -1,0 +1,38 @@
+// Mixin 0.7.11 retains its relocated ASM, avoiding changes to Forge's own ASM.
+repositories { maven { url = 'https://repo.spongepowered.org/maven/' } }
+configurations { embeddedMixin }
+dependencies {
+    annotationProcessor 'com.google.code.gson:gson:2.2.4'
+    annotationProcessor 'com.google.guava:guava:17.0'
+    annotationProcessor 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+    embeddedMixin('org.spongepowered:mixin:0.7.11-20180703.121122-1') { transitive = false }
+}
+configurations.compileOnly.extendsFrom(configurations.embeddedMixin)
+configurations.runtimeOnly.extendsFrom(configurations.embeddedMixin)
+configurations.annotationProcessor.extendsFrom(configurations.embeddedMixin)
+def mixinSrg = layout.buildDirectory.file('generated/mapping/activity.srg')
+def mixinRefmap = layout.buildDirectory.file('generated/mixinResources/mixins.farmersdelight.refmap.json')
+tasks.register('generateMixinMapping') {
+    inputs.file file('src/main/mappings/mixins.srg')
+    outputs.file mixinSrg
+    doLast {
+        def source = file('src/main/mappings/mixins.srg')
+        def out = mixinSrg.get().asFile; out.parentFile.mkdirs()
+        out.text = source.getText('UTF-8')
+        mixinRefmap.get().asFile.parentFile.mkdirs()
+    }
+}
+compileJava {
+    dependsOn 'generateMixinMapping'
+    inputs.file mixinSrg; outputs.file mixinRefmap
+    options.compilerArgs += ["-AreobfSrgFile=${mixinSrg.get().asFile}", "-AoutRefMapFile=${mixinRefmap.get().asFile}"]
+}
+processResources { dependsOn compileJava; from(mixinRefmap) }
+jar {
+    from({ configurations.embeddedMixin.collect { zipTree(it) } }) {
+        include 'org/spongepowered/**', 'META-INF/services/org.spongepowered.*', 'LICENSE.txt'
+        rename { it == 'LICENSE.txt' ? 'LICENSE-Mixin.txt' : it }
+    }
+    manifest { attributes 'FMLCorePlugin': 'vectorwing.farmersdelight.legacy.bootstrap.EarlyMixins',
+            'FMLCorePluginContainsFMLMod': 'true', 'MixinConfigs': 'mixins.farmersdelight.json' }
+}

@@ -1,0 +1,21 @@
+plugins { id 'java'; id 'xyz.wagyourtail.unimined' version '1.4.1' }
+ext.minecraftTarget = '1.8.9'
+apply from: '../../build-logic/legacy.gradle'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+tasks.withType(JavaCompile).configureEach { options.release = 8 }
+unimined.minecraft {
+    version '1.8.9'
+    mappings { mcp('stable', '22-1.8.9') }
+    runs {
+        config('client') { javaVersion = JavaVersion.VERSION_1_8; jvmArgs '-Dfml.coreMods.load=vectorwing.farmersdelight.legacy.bootstrap.EarlyMixins', '-Dmixin.env.disableRefMap=true' }
+        config('server') { javaVersion = JavaVersion.VERSION_1_8; standardInput = System.in; jvmArgs '-Dfml.coreMods.load=vectorwing.farmersdelight.legacy.bootstrap.EarlyMixins', '-Dmixin.env.disableRefMap=true' }
+    }
+    minecraftForge { loader '11.15.1.2318-1.8.9' }
+}
+apply from: '../../build-logic/early-mixins.gradle'
+jar.finalizedBy 'remapJar'
+repositories { maven { url = 'https://maven.covers1624.net' } }
+dependencies {
+    compileOnly('codechicken:NotEnoughItems:1.8-1.0.5.104:dev') { transitive = false }
+    compileOnly('codechicken:CodeChickenLib:1.8-1.1.2.139:dev') { transitive = false }
+}

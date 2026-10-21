@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "farmersdelight:blocks/straw_bale_end",
+    "side": "farmersdelight:blocks/straw_bale_side"
+  }
+}

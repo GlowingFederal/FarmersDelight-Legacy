@@ -4,7 +4,7 @@ Audit date: 2026-10-17. Targets: Forge 1.6.4, 1.7.10, 1.8.9, and 1.12.2.
 
 This records the source audit and gameplay contract. The revised paired-port strategy below supersedes the original target order; implementation lives under `versions/1.12.2` and `versions/1.7.10`. Audit findings and original source ledgers remain reference evidence, not runtime certification. Counts and findings describe the local source snapshots below. Remote-tracking branches were inspected without checking them out or fetching updates; their names do not certify the latest upstream state. No Minecraft client/server, Gradle build, automated gameplay test, or recipe viewer was run. Static resource checks establish file/reference coverage, not runtime acquisition or visual correctness.
 
-Navigation: [Inventory](#b-ecosystem-inventory-before-subsystem-analysis) · [FD architecture](#c-farmers-delight-architecture-map) · [Addons](#d-addon-by-addon-audit-and-generation-comparison) · [Compatibility matrix](#f-legacy-feature-and-content-compatibility-matrix) · [Roadmap/tests](#k-exact-phased-roadmap-and-acceptance-strategy) · [First milestone](#m-recommended-first-coding-milestone) · [Source ledgers](#appendices-source-ledgers).
+Navigation: [Inventory](#b-ecosystem-inventory-before-subsystem-analysis) · [FD architecture](#c-farmers-delight-architecture-map) · [Addons](#d-addon-by-addon-audit-and-generation-comparison) · [Compatibility matrix](#f-legacy-feature-and-content-compatibility-matrix) · [Roadmap/tests](#k-exact-phased-roadmap-and-acceptance-strategy) · [First milestone](#m-recommended-first-coding-milestone) · [Four-target baseline](#o-four-target-beta-baseline-and-registration-contract) · [Source ledgers](#appendices-source-ledgers).
 
 ## A. Executive summary
 
@@ -744,6 +744,105 @@ Fresh 1.12.2 flat-world startup with seed `1110241383260505174` reproduced the p
 Production artifacts are `versions/1.7.10/build/libs/farmersdelight-0.1.0-foundation.1+mc1.7.10-forge.jar` and `versions/1.12.2/build/libs/farmersdelight-0.1.0-foundation.1+mc1.12.2-forge.jar`. They retain the existing development version. The exact packaged JARs were installed in the disposable servers; no validation mods or test harnesses were added.
 
 Still required: actual client loading/visual review and NEI/JEI rendering/transfer; survival crafting and harvesting; pot shift-click, containers, XP and hopper transactions; handheld cancellation, enchanted tools and dispenser behavior; feast/full-inventory accounting; sign editing and mat/piston/support behavior; safety-net bounce and combat; village/biome generation sampling; two-client simultaneous interaction and observer synchronization; save/reload under active cooking; and the full Modern Regen health/hunger/saturation/natural-regeneration/Comfort/Nourishment matrix. The milestone's gameplay acceptance remains open until those checks are performed.
+
+## O. Four-target beta baseline and registration contract
+
+### Scope and behavioral reference
+
+The maintained 1.7.10 and 1.12.2 ports are co-primary behavioral references. This port preserves their completed systems and the current NEI layout and release-staging changes. The original 1.16.5 `src/` tree remains an uncompiled source/assets reference. Sections C, F, N and the Appendix ledgers cover its 148 source items, 86 blocks, two effects and 293 recipe definitions. Newer upstream additions are not silently treated as part of the 1.16.5 baseline.
+
+`common/` owns platform-neutral food/recipe definitions, ingredient predicates, shapeless matching, effect rules, fuel rules and source identities. Native inventory/state/lifecycle implementations remain independent under `versions/<minecraft>/`; no compiled mod depends on another target JAR. The existing native growth and processing owners are reused rather than introducing a second machine implementation.
+
+The table describes implemented source coverage, with explicit native content gates. It is not a claim that every player interaction has passed runtime acceptance.
+
+| Feature family / reference behavior | 1.6.4 | 1.7.10 | 1.8.9 | 1.12.2 |
+|---|---|---|---|---|
+| Items and food: catalog values, effects, stack limits, eating/drinking, bowl/bottle returns | Native food catalog; missing content recipes deferred | Same baseline | Same; rabbit/mutton ingredients available | Same; beetroot/rabbit/mutton available |
+| Crops, planting and harvesting: cabbage, tomato, onion, two-part rice, shears and mature tomato picking | Native metadata and Forge bonemeal event | Native metadata and growable hooks | Native crop states; separate rice upper age property | Native crop states |
+| Wild vegetation and acquisition | Native five vegetable patches plus rice; no beetroot | Same | Same | Adds native wild beetroot |
+| Blocks and decorative variants: crates, bales, pantries, basket, mats, rug, rope, net, colored signs | Four available wood species; explicit numeric IDs | Six native wood species | Six native wood species, baked models | Same; beetroot crate |
+| Cooking and processing: Cutting Board, Cooking Pot, Stove, placed/held Skillet | Complete legacy baseline; next hotbar ingredient | Same | Same | Same; offhand ingredient |
+| Crafting and preparation: exact recipes, chance/Fortune/tool damage, input matching, remainders | Shared catalogs with native names/metadata and explicit gates | Same | Same | Same |
+| Comfort and Nourishment | Native effects; activity exhaustion hook; optional Modern Regen | Same | Same | Native effects; no Modern Regen target |
+| Entity interactions: pet feed, pig/chicken breeding/temptation, knife loot, rotten tomatoes, Backstabbing | Existing native animals and combat | Same | Adds native rabbit hide; native rabbit-stew effects | Later native mobs where implemented |
+| World generation | Bounded native population window and biome conditions; native village heaps | Same | Same | Same |
+| Loot and trades | Additive dungeon/mineshaft pools; native farmer purchases | Same | Additive native pools; native farmer career/level purchases | Native loot-table hooks and farmer careers |
+| GUIs and inventories | Original pot artwork/slots, server container, progress sync, shift-click, sided inventories | Same | Same | Same plus item-handler capabilities |
+| Rendering, particles and sounds | Prepared legacy models/TESRs, icon sprites, native sound-load registration, potion atlas icons | Prepared legacy models/TESRs | Native states, 1.8 model schema, pane variants and TESRs | Native states/models/TESRs |
+| Automation and interoperability | Pot sided slot rules, basket cooldown/redstone, dispenser tools, Forge tool registry and exact Ore Dictionary memberships | Same | Same, native Forge APIs | Same plus native capabilities |
+| Recipe viewers and transfer | Optional native NEI categories and overlay handlers | Optional NEI, including current page improvements | Optional native NEI categories/overlay handlers | Optional JEI categories/transfer |
+| Progression | Server-persisted criteria, numeric native achievements and once-only XP rewards | Native achievements | Native achievements | Native advancements |
+
+### Content gates and adaptations
+
+No missing mobs, mutton, beetroot, bamboo, campfires, honey, sweet berries, Nether vegetation, netherite, bells or general waterlogging are backported for recipe availability. Unsupported definitions stay in the deferred catalogs with reasons. Stove and Basket mechanics exist, while their campfire/bamboo crafting prerequisites remain deferred. Stripped-log outputs are absent; log cutting must not turn unchanged logs into an unlimited bark source. The rotten-flesh compost route remains available.
+
+The 1.6.4 target additionally rejects later fish/flower/wood metadata instead of registering invalid variants. Its pantries use oak, spruce, birch and jungle. Source village templates use available jungle wood for unavailable later wood palettes, within structure adaptation only; this does not create global Ore Dictionary equivalence or make unavailable recipes active. Later mob-dependent food IDs retained by the established catalog do not imply obtainable recipes.
+
+Source CraftTweaker adapters and the 34 Botany Pots/Create/Immersive Engineering recipe definitions remain deferred on all legacy targets. The native viewers do not list deferred processing definitions as active recipes. NEI is compile-only and is never bundled or required for a server. Native NEI distribution/dependency compatibility and actual transfer still require a functioning client.
+
+Comfort remains supplemental; Nourishment intercepts player activity exhaustion and does not refund direct natural-regeneration charges. Modern Regen remains the optional owner of its own regeneration, hunger state and costs. A startup check with Modern Regen is distinct from player effect/health/hunger acceptance.
+
+### Native compatibility boundaries
+
+- **1.6.4:** Unimined 1.4.1 / Forge 9.11.1.1345, JDK 21 build process, JDK 17 `--release 7` compiler, Java 8 game runtime. Stock Forge's ASM 4.1 remains unchanged. Explicit vanilla identities use actual native block/item fields and metadata. Numeric registration, older FML packets/connections/player/crafting callbacks, native bonemeal, primitive block IDs, older tile NBT packets and inventory hooks remain local to this target. Portable workstation harvests preserve tile data before the old removal callback destroys it.
+- **1.8.9:** Unimined 1.4.1 / Forge 11.15.1.2318, Java 8 distribution/runtime. Native `BlockPos`, block states, property serialization, inventory/container callbacks and item models are used. The rice upper is a native bush with its own 0–3 age property because 1.8's `BlockCrops` hard-codes a different property. Rope multipart assets are expanded to native pane variants. Native farmer careers use a narrow Mixin at trade-list population because that Forge version exposes no public trade-extension method.
+- **Mixin bootstrap:** The two new targets embed pinned SpongePowered Mixin 0.7.11 with its relocated ASM, whose classes are Java 5/6 compatible. Its service classes load from the parent launch loader before transformations; no launcher or stock Forge library is replaced. 1.6.4 includes Java-7-compatible Log4j 2.12.4 for Mixin. Its already generated refmap preserves FML runtime class names through Unimined packaging, rather than being remapped a second time to the obsolete `net.minecraft.src` class layer. Development runs disable the production SRG refmap while running mapped classes. Existing UniMixins and MixinBooter setups on the maintained targets are preserved.
+- **Threading and networking:** Native world/container threads own inventory, growth, processing, drops and effects. The 1.6 packet is a bounded server-to-client recipe-settings snapshot; client-originated snapshots are rejected, and application is queued to the client tick. The 1.8 snapshot is scheduled on the client thread. Native inventory, tile, sign, container and entity packets carry gameplay state. The 1.6.4 achievement identities are registered in pre-initialization before local statistics are loaded; recipe-dependent criteria are resolved after optional integrations.
+- **Performance:** Input changes invalidate pot recipe selection; cutting inputs are indexed and grilling selections are cached per slot. Idle machines keep their existing small constant-time checks. Heat uses native object identities, world generation is clipped to its population window, and prepared models/textures are resolved on initialization/resource reload rather than reparsed per frame. These are architectural/source properties, not measured frame-rate or server-performance claims.
+
+### Registration and save contract
+
+The [1.6.4 registry manifest](versions/1.6.4/src/main/resources/farmersdelight/registry164.json) is the authoritative frozen default allocation, keyed by logical registry name, not constructor order. Its block slots start at 3000, separate item slots at 5000, and achievement offsets at 8000 (effective native stat IDs are `5242880 + offset`). ItemBlock numeric IDs equal their block IDs. FML 1.6.4 requires ItemBlocks to track blocks; hidden crop/sign forms register under `<block_name>_technical` to avoid colliding with separately registered seeds/sign items, and remain outside the creative tab. Rope, Skillet and Tatami therefore use their native ItemBlock slots; reserved gaps are intentional. The `block`, `item` and `achievement` configuration categories preserve named overrides; clients and server must agree. Startup rejects occupied, duplicate and out-of-range slots. Future additions must receive new explicit entries without renumbering existing names. Existing-world numeric changes require a deliberate save migration.
+
+1.8.9 uses stable `farmersdelight:<name>` identities matching the maintained legacy target where content exists. The following metadata contracts apply to the new targets:
+
+| State | Persisted representation |
+|---|---|
+| Cabbage/tomato/onion | Age 0–7 |
+| Rice lower | Water metadata remains separate; tile `Age` 0–3 |
+| Rice upper / mushroom colony | Age 0–3 |
+| Rich farmland / compost | Moisture / composting stage 0–7 |
+| Cutting Board / serving block | Four horizontal directions |
+| Cooking Pot | Low two facing bits; support bits select normal, tray or handle |
+| Stove / Skillet | Low two facing bits; mask `4` indicates lit |
+| Pantry / Basket | Native facing metadata; Basket supports six directions |
+| Tatami / full mat | Tatami: native six-face value in low three bits, paired mask `8`. Full mat: horizontal facing in low two bits, head mask `4`; placement/removal is owned by the server |
+| Standing / wall canvas signs | Rotation 0–15 / native horizontal face; persisted text/color use native tile packets |
+| Shared meals | Direction in metadata; tile `Servings` 0–4, so partial meals cannot become full ones on reload |
+
+Tile identities remain `farmersdelight:cutting_board`, `cooking_pot`, `stove`, `skillet`, `rice`, `serving`, `pantry`, `basket`, and `canvas_sign`. Inventory contents, cooking progress/recipe identity/container, stored meals, recipe XP counts, skillet reservation/payment state, basket cooldown, feast portions and sign text/color remain serialized by their authoritative native owner. Rice removal recognizes its source-water replacement as a successful player harvest, preserving the native drop callback instead of treating the changed chunk replacement as a failed removal. No cross-Minecraft world conversion is promised.
+
+### Beta validation and acceptance
+
+**2026-10-20 implementation checkpoint:** all four targets compile, produce native production archives and reach dedicated-server ready state. This is a beta candidate implementation; the player acceptance gate below remains open. No builds were published.
+
+A clean four-target `clean testAll buildAll` checkpoint passed. After the final rice harvest return correction, `testAll buildAll` recompiled the affected native sources and passed again. Every native test task reported `NO-SOURCE`; there is no automated gameplay suite. Compilation, native remap/reobfuscation, packaging and runtime evidence are separate:
+
+| Target | Final compilation | Native automated tests | Final production packaging | Final packaged dedicated server | Development client initialization |
+|---|---|---|---|---|---|
+| 1.6.4 / Forge 9.11.1.1345 | Passed; maximum class major 51 | NO-SOURCE | Unimined remap and release verification passed | Ready, existing world reopened, saved and stopped; Modern Regen absent/present | Mod loading and native icon/texture loading passed after achievement-lifecycle correction |
+| 1.7.10 / Forge 10.13.4.1614 | Passed; maximum class major 52 | NO-SOURCE | Native reobfuscation and release verification passed | Ready, existing world reopened, saved and stopped; UniMixins and Modern Regen present | Mod loading and atlas initialization passed |
+| 1.8.9 / Forge 11.15.1.2318 | Passed; maximum class major 52 | NO-SOURCE | Unimined remap and release verification passed | Ready, saved machine state reopened, saved and stopped; Modern Regen absent/present | Mod loading and model/texture atlas initialization passed |
+| 1.12.2 / Forge 14.23.5.2859 | Passed; maximum class major 52 | NO-SOURCE | Unimined remap and release verification passed | Ready, existing world reopened, saved and stopped; MixinBooter present | Mod loading, native model atlas and JEI initialization passed |
+
+All server runs used Java 8 and unchanged native Forge libraries. The tested server copies matched the staged distribution SHA-256 hashes. Archive inspection found exactly four staged distributions, correct mod metadata/version, no duplicate ZIP entries, valid referenced Farmer's Delight models/textures, required licenses and the intended class-version limits. The final native harvest overrides are present in all four production archives. The new targets boot without NEI installed. Client initialization was performed with the native development tasks, not a packaged launcher profile; no Farmer's Delight missing texture/model errors remained in the corrected startup logs. The final rice-removal return correction was then compiled and checked on the packaged servers; actual player harvesting remains an acceptance item.
+
+Default native catalogs observed at startup (active / deferred):
+
+| Catalog | 1.6.4 | 1.7.10 | 1.8.9 | 1.12.2 |
+|---|---|---|---|---|
+| Cooking Pot | 17 / 7 | 17 / 7 | 19 / 5 | 22 / 2 |
+| Cutting Board | 42 / 55 | 54 / 43 | 61 / 36 | 63 / 34 |
+| Additional source crafting, excluding the shared foundation recipes | 77 / 25 | 81 / 21 | 83 / 19 | 87 / 15 |
+
+The differences reflect native wood, flowers, fish, mobs and later content gates, not empty workstation implementations. Optional ingredient providers and configuration can change catalog availability.
+
+**Observed 1.8.9 machine/persistence smoke:** three rice and three bowls produced exactly three cooked-rice servings. A save at `CookTime=91`, with one completed serving and two remaining inputs/containers, resumed after restart and finished with three servings, no remaining input bowls and three recorded recipe completions. Subsequent final-artifact restarts preserved those three servings, a basket's eleven rice, a feast's two remaining portions and the dispenser knife's damage. A powered native dispenser processed one porkchop into two bacon, emptied the board and charged one knife durability. Rice lower age 3 persisted across restart; native destruction restored source water. Administrative replacement commands have different semantics from destruction and are not used as evidence of player harvesting.
+
+**Remaining release gate and known limitations:** no known remaining critical startup or packaging defect was found in the checks above. This does not certify every player interaction. Still required are survival acquisition/crafting and player harvesting; food/container/Comfort/Nourishment behavior with vanilla hunger and the full Modern Regen health/hunger/saturation/regeneration matrix; visual review of all world/inventory states, particles, signs and GUIs at multiple scales; native 1.6.4/1.8.9 NEI distribution/dependency loading, recipe pages/usages and actual transfer; pot shift-click, full-inventory/remainder/XP handling and hopper transactions; 1.6.4 processing/save-reload with players; disconnects during open containers; two-client simultaneous interaction/observer synchronization; biome/village generation samples; and combat, skillet cancellation, mats/pistons and safety-net behavior. Startup resource loading is not visual or GUI acceptance. No performance benchmark or long-running server soak was performed.
+
+The original unavailable-content and integration gates above remain intentional limitations. Do not describe this milestone as unrestricted 1.16.5 parity or approved public-beta release readiness until the player acceptance gate is completed. Candidate artifacts are staged as `build/release/farmersdelight-0.1.0+mc<minecraft>.jar`; installation uses one matching target JAR only.
 
 ## Appendices: source ledgers
 

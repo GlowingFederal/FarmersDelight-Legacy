@@ -1,0 +1,94 @@
+plugins { id 'java'; id 'xyz.wagyourtail.unimined' version '1.4.1' }
+ext.minecraftTarget = '1.6.4'
+apply from: '../../build-logic/legacy.gradle'
+// JDK 17 still supplies the Java 7 API signature set for --release 7.
+// Gradle itself continues to run on JDK 21; game runs use Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+compileJava.options.release.set(7)
+compileTestJava.options.release.set(8)
+
+// Isolate the legacy remapper settings from Unimined's default global Minecraft cache.
+unimined.useGlobalCache = false
+// FMLSanityChecker URL-decodes literal '+' in Unimined's JAR filename.
+// Copy the unchanged runtime JAR to a safe name; keep certificate checks visible.
+def runtimeJars = [:]
+def runtimeCopies = [:]
+['client', 'server'].each { side ->
+    runtimeJars[side] = objects.fileCollection()
+    runtimeCopies[side] = tasks.register("prepare${side.capitalize()}ForgeRuntime", Copy) {
+        from provider {
+            tasks.named("run${side.capitalize()}").get()
+            runtimeJars[side]
+        }
+        into layout.buildDirectory.dir("forge164-runtime/${side}")
+        rename { 'minecraft-forge.jar' }
+        doFirst {
+            if (runtimeJars[side].files.size() != 1) {
+                throw new GradleException('Expected one Forge 1.6.4 runtime Minecraft JAR')
+            }
+        }
+    }
+    tasks.matching { it.name == "preRun${side.capitalize()}" }.configureEach {
+        dependsOn runtimeCopies[side]
+    }
+}
+
+unimined.minecraft {
+    version '1.6.4'
+    // Keep Forge's stock ASM 4.1. Distributed mod classes must be major 51 or lower.
+    runs {
+        all {
+            def side = name == 'runClient' ? 'client' : 'server'
+            def originalClasspath = classpath
+            def minecraftJar = originalClasspath.filter {
+                it.name.startsWith('forge-1.6.4-') && it.name.endsWith('.jar')
+            }
+            runtimeJars[side].from(minecraftJar)
+            classpath = originalClasspath - minecraftJar + files(
+                    layout.buildDirectory.file("forge164-runtime/${side}/minecraft-forge.jar"))
+        }
+        config('client') { javaVersion = JavaVersion.VERSION_1_8; jvmArgs '-Dfml.coreMods.load=vectorwing.farmersdelight.legacy.bootstrap.EarlyMixins', '-Dmixin.env.disableRefMap=true' }
+        config('server') {
+            jvmArgs '-Dfml.coreMods.load=vectorwing.farmersdelight.legacy.bootstrap.EarlyMixins', '-Dmixin.env.disableRefMap=true'
+            javaVersion = JavaVersion.VERSION_1_8
+            standardInput = System.in
+            if (project.hasProperty('devServerPort')) {
+                def port = project.property('devServerPort').toString()
+                args '--port', port
+                workingDir project.file("run/server-${port}")
+            }
+        }
+    }
+    minecraftForge { loader '9.11.1.1345' }
+    minecraftRemapper.config {
+        ignoreConflicts(true)
+        // FML's ASM4 visitors cannot consume synthesized Java 8 MethodParameters.
+        skipLocalVariableMapping(true)
+        renameInvalidLocals(false)
+    }
+}
+jar.finalizedBy 'remapJar'
+configurations { embeddedLogging }
+configurations.compileOnly.extendsFrom(configurations.embeddedLogging)
+configurations.runtimeOnly.extendsFrom(configurations.embeddedLogging)
+apply from: '../../build-logic/early-mixins.gradle'
+jar { from({ configurations.embeddedLogging.collect { zipTree(it) } }) { exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/DEPENDENCIES', 'META-INF/versions/**' } }
+
+repositories { maven { url = 'https://maven.covers1624.net' } }
+dependencies {
+    compileOnly('codechicken:NotEnoughItems:1.6.4-1.6.1.9:dev') { transitive = false }
+    embeddedLogging('org.apache.logging.log4j:log4j-api:2.12.4') { transitive = false }
+    embeddedLogging('org.apache.logging.log4j:log4j-core:2.12.4') { transitive = false }
+}
+
+jar {
+    from({ zipTree(configurations.embeddedLogging.files.find { it.name.startsWith('log4j-api-') }) }) {
+        include 'META-INF/LICENSE','META-INF/NOTICE'
+        eachFile { path='META-INF/'+name+'-Log4j.txt' }
+        includeEmptyDirs=false
+    }
+}
+
+// The AP refmap already uses FML's packaged runtime names. Unimined's generic
+// Mixin pass would change them to the obsolete net.minecraft.src SRG class layer.
+tasks.named('remapJar') { mixinRemap { off() } }

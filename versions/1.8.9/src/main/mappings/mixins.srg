@@ -1,0 +1,13 @@
+MD: net/minecraft/entity/player/EntityPlayer/addExhaustion (F)V net/minecraft/entity/player/EntityPlayer/func_71020_j (F)V
+MD: net/minecraft/entity/passive/EntityPig/<init> (Lnet/minecraft/world/World;)V net/minecraft/entity/passive/EntityPig/<init> (Lnet/minecraft/world/World;)V
+MD: net/minecraft/entity/passive/EntityChicken/<init> (Lnet/minecraft/world/World;)V net/minecraft/entity/passive/EntityChicken/<init> (Lnet/minecraft/world/World;)V
+MD: net/minecraft/entity/passive/EntityPig/isBreedingItem (Lnet/minecraft/item/ItemStack;)Z net/minecraft/entity/passive/EntityPig/func_70877_b (Lnet/minecraft/item/ItemStack;)Z
+MD: net/minecraft/entity/passive/EntityChicken/isBreedingItem (Lnet/minecraft/item/ItemStack;)Z net/minecraft/entity/passive/EntityChicken/func_70877_b (Lnet/minecraft/item/ItemStack;)Z
+MD: net/minecraft/item/ItemSoup/onItemUseFinish (Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack; net/minecraft/item/ItemSoup/func_77654_b (Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;
+MD: net/minecraft/block/BlockMushroom/canBlockStay (Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z net/minecraft/block/BlockMushroom/func_180671_f (Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z
+MD: net/minecraft/entity/EntityLivingBase/knockBack (Lnet/minecraft/entity/Entity;FDD)V net/minecraft/entity/EntityLivingBase/func_70653_a (Lnet/minecraft/entity/Entity;FDD)V
+MD: net/minecraft/enchantment/Enchantment/canApply (Lnet/minecraft/item/ItemStack;)Z net/minecraft/enchantment/Enchantment/func_92089_a (Lnet/minecraft/item/ItemStack;)Z
+MD: net/minecraft/tileentity/TileEntityFurnace/getItemBurnTime (Lnet/minecraft/item/ItemStack;)I net/minecraft/tileentity/TileEntityFurnace/func_145952_a (Lnet/minecraft/item/ItemStack;)I
+MD: net/minecraft/util/WeightedRandomChestContent/generateChestContents (Ljava/util/Random;Ljava/util/List;Lnet/minecraft/inventory/IInventory;I)V net/minecraft/util/WeightedRandomChestContent/func_76293_a (Ljava/util/Random;Ljava/util/List;Lnet/minecraft/inventory/IInventory;I)V
+MD: net/minecraft/entity/Entity/moveEntity (DDD)V net/minecraft/entity/Entity/func_70091_d (DDD)V
+MD: net/minecraft/entity/passive/EntityVillager/populateBuyingList ()V net/minecraft/entity/passive/EntityVillager/func_175554_c ()V

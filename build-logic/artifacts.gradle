@@ -1,0 +1,9 @@
+// Shared by the coordinator and every isolated native build.
+def releaseProperties = new Properties()
+def releasePropertiesFile = new File(buildscript.sourceFile.parentFile.parentFile, 'version.properties')
+releasePropertiesFile.withInputStream { releaseProperties.load(it) }
+version = releaseProperties.getProperty('version')?.trim()
+if (!(version ==~ /\d+\.\d+\.\d+(?:\.\d+)?/)) {
+    throw new GradleException('version.properties must contain a numeric release version, without internal milestone labels')
+}
+ext.distributionName = { String minecraft -> "farmersdelight-${project.version}+mc${minecraft}.jar" }

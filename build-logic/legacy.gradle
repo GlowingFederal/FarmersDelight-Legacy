@@ -1,10 +1,8 @@
 import groovy.json.JsonSlurper
 
 group = 'vectorwing.farmersdelight'
-def release = new Properties()
-file('../../version.properties').withInputStream { release.load(it) }
-version = release.getProperty('version')
-base.archivesName = "farmersdelight-${version}+mc${minecraftTarget}-forge"
+apply from: '../../build-logic/artifacts.gradle'
+base.archivesName = 'farmersdelight'
 sourceSets.main.java.srcDir '../../common/src/main/java'
 sourceSets.main.resources.srcDir '../../common/src/main/resources'
 def generatedJava = layout.buildDirectory.dir('generated/farmersdelight/java')
@@ -67,7 +65,7 @@ processResources {
             if (!new File(destinationDir, "assets/farmersdelight/textures/items/${id}.png").isFile())
                 throw new GradleException("Missing production texture: ${id}")
             entries += "item.farmersdelight.${id}.name=${language['item.farmersdelight.' + id] ?: id}"
-            if (minecraftTarget == '1.12.2') {
+            if (minecraftTarget in ['1.8.9', '1.12.2']) {
                 def model = new File(destinationDir, "assets/farmersdelight/models/item/${id}.json")
                 model.parentFile.mkdirs()
                 model.text = groovy.json.JsonOutput.toJson([parent: id.endsWith('_knife') ? 'item/handheld' : 'item/generated', textures: [layer0: "farmersdelight:items/${id}"]])
@@ -126,7 +124,7 @@ processResources {
             entries += "tile.farmersdelight.${id}.name=${title}"
             entries += "item.farmersdelight.${id}.name=${title}"
         }
-        if(minecraftTarget == '1.12.2') {
+        if(minecraftTarget in ['1.8.9', '1.12.2']) {
             def writeJson = { String path,Object value ->
                 def out = new File(destinationDir,'assets/farmersdelight/' + path)
                 out.parentFile.mkdirs()
@@ -222,7 +220,7 @@ processResources {
                     variants["facing=${facing},servings=${remaining}"]=[model:'farmersdelight:'+name,y:angle]
                 }
             }
-            if(minecraftTarget=='1.12.2') {
+            if(minecraftTarget in ['1.8.9','1.12.2']) {
                 def state=new File(destinationDir,"assets/farmersdelight/blockstates/${id}.json"); state.parentFile.mkdirs()
                 state.text=groovy.json.JsonOutput.toJson([variants:variants])
                 def item=new File(destinationDir,"assets/farmersdelight/models/item/${id}.json")
@@ -240,7 +238,7 @@ processResources {
         entries += 'container.farmersdelight.basket=Basket'
         entries += 'container.farmersdelight.pantry=Pantry'
         pantryWoods.each { wood -> entries += "tile.farmersdelight.${wood}_pantry.name=${language['block.farmersdelight.'+wood+'_pantry']}" }
-        if(minecraftTarget=='1.12.2') {
+        if(minecraftTarget in ['1.8.9','1.12.2']) {
             def writeStorage = { String path,Object json ->
                 def output=new File(destinationDir,'assets/farmersdelight/'+path); output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(json)
             }
@@ -268,7 +266,7 @@ processResources {
             include '*_crate_*.png','crate_bottom.png','rice_bag_*.png','rice_bale_*.png','rope.png','safety_net.png'
         }.files.each { texture -> copy { from texture; into "${destinationDir}/assets/farmersdelight/textures/blocks" } }
         (packedIds+['rope','safety_net']).each { id -> entries += "tile.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}" }
-        if(minecraftTarget=='1.12.2') {
+        if(minecraftTarget in ['1.8.9','1.12.2']) {
             def writeUtility = { String path,Object json ->
                 def output=new File(destinationDir,'assets/farmersdelight/'+path); output.parentFile.mkdirs(); output.text=groovy.json.JsonOutput.toJson(json)
             }
@@ -306,7 +304,7 @@ processResources {
             copy { from new File(sourceAssets,"textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
             entries += "item.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}"
             entries += "tile.farmersdelight.${id}.name=${language['block.farmersdelight.'+id] ?: id}"
-            if(minecraftTarget=='1.12.2') {
+            if(minecraftTarget in ['1.8.9','1.12.2']) {
                 def model=new File(destinationDir,"assets/farmersdelight/models/item/${id}.json")
                 model.text=groovy.json.JsonOutput.toJson([parent:'item/generated',textures:[layer0:'farmersdelight:items/'+id]])
                 [id,id.replace('canvas_sign','canvas_wall_sign')].each { blockId ->
@@ -315,7 +313,7 @@ processResources {
                 }
             }
         }
-        if(minecraftTarget=='1.12.2') {
+        if(minecraftTarget in ['1.8.9','1.12.2']) {
             new File(destinationDir,'assets/farmersdelight/models/block/canvas_sign_particle.json').text=groovy.json.JsonOutput.toJson([textures:[particle:'farmersdelight:blocks/canvas_rug'],elements:[]])
         }
         def tatamiModels=['tatami_half','tatami_even','tatami_odd','tatami_mat_foot','tatami_mat_head','tatami_mat_half','canvas_rug']
@@ -329,7 +327,7 @@ processResources {
                 [(key):texture.replace('farmersdelight:block/','farmersdelight:blocks/')]
             }
             model.parent=model.parent ? model.parent.replace('minecraft:','').replace('block/thin_block','block/block') : 'block/block'
-            if(!model.elements && minecraftTarget=='1.7.10') {
+            if(!model.elements && minecraftTarget in ['1.6.4','1.7.10']) {
                 def faces=[:]; ['up','down','north','south','east','west'].each { faces[it]=[texture:'#all',uv:[0,0,16,16]] }
                 model.elements=[[from:[0,0,0],to:[16,16,16],faces:faces]]
             }
@@ -340,7 +338,7 @@ processResources {
             if(id in ['full_tatami_mat','half_tatami_mat']) {
                 copy { from new File(sourceAssets,"textures/item/${id}.png"); into "${destinationDir}/assets/farmersdelight/textures/items" }
             }
-            if(minecraftTarget=='1.12.2') {
+            if(minecraftTarget in ['1.8.9','1.12.2']) {
                 def variants=[:]
                 if(id=='tatami') {
                     ['down':[180,0],'up':[0,0],'north':[90,0],'south':[90,180],'west':[90,270],'east':[90,90]].each { face,rotation ->
@@ -393,7 +391,7 @@ processResources {
         }
         language.each { key,value -> if(key.startsWith('farmersdelight.advancement.') || key.startsWith('farmersdelight.tooltip.') || key.startsWith('farmersdelight.container.') || key.startsWith('farmersdelight.block.cutting_board.')) entries += "${key}=${value}" }
         entries += 'farmersdelight.tooltip.skillet.controls=Cook over heat; sneak-use to place.'
-        entries += minecraftTarget=='1.7.10' ? 'farmersdelight.tooltip.skillet.hand=Held cooking takes food from the next hotbar slot.' : 'farmersdelight.tooltip.skillet.hand=Held cooking takes food from the other hand.'
+        entries += minecraftTarget!='1.12.2' ? 'farmersdelight.tooltip.skillet.hand=Held cooking takes food from the next hotbar slot.' : 'farmersdelight.tooltip.skillet.hand=Held cooking takes food from the other hand.'
         if(minecraftTarget=='1.12.2') {
             def removed=['place_campfire','obtain_netherite_knife'] as Set
             advancementSource.each { name,definition ->
@@ -435,17 +433,192 @@ processResources {
         entries += 'enchantment.farmersdelight.backstabbing=Backstabbing'
         entries += 'potion.farmersdelight.nourishment=Nourishment'
         entries += "itemGroup.farmersdelight=Farmer's Delight"
+        if(minecraftTarget in ['1.6.4','1.7.10','1.8.9']) {
+            [
+                cooking:'Cooking Pot',cutting:'Cutting Board',grilling:'Skillet / Stove',crafting:"Farmer's Delight Crafting",
+                seconds:'%s s',xp:'%s XP',heated_batch:'Heat below - one batch',
+                cook_time:'Cooking time: %s',experience:'%s XP per completed batch; collected by players.',
+                meal_buffer:'Meals wait in the pot until served.',batch_output:'Batch output: %s portions.',
+                heat_sources:'Heat: fire, lava, or a lit Stove.',heat_conductor:'One hopper may conduct heat.',
+                serving_containers:'Supply containers to serve portions.',no_container:'No serving container needed.',
+                serving_cost:'One %s is consumed per portion.',remainder:'Ingredient container returned: %s',
+                tool_use:'%s - tool durability',tool_retained:'Tool is kept; uses one durability operation.',
+                fortune:'Fortune: +%s%% per level',chance:'Chance per item: %s%%',independent_rolls:'Each item is rolled separately.',
+                'tool.knife':'Knife','tool.axe':'Axe','tool.pickaxe':'Pickaxe','tool.shovel':'Shovel','tool.shears':'Shears',
+                stove_time:'Stove: %s',skillet_time:'Heated Skillet: %s',fire_aspect:'Fire Aspect speeds Skillet',
+                stove_clear:"Keep the Stove's cooking surface clear.",
+                handheld:'Held Skillet: food from the next hotbar slot.',
+                shaped:'Shaped',shapeless:'Shapeless'
+            ].each { key,value -> entries += "farmersdelight.nei.${key}=${value}" }
+        }
+        if(minecraftTarget=='1.6.4') {
+            ['cutting_board','skillet'].each { workstation ->
+                copy { from new File(sourceAssets,'sounds/block/'+workstation); into "${destinationDir}/assets/farmersdelight/sound/block/${workstation}" }
+            }
+            [1,2].each { index ->
+                copy { from new File(sourceAssets,"sounds/block/cooking_pot/boil_water${index}.ogg"); into "${destinationDir}/assets/farmersdelight/sound/block/cooking_pot"; rename { "boil${index}.ogg" } }
+            }
+            ['comfort','nourished'].each { name ->
+                def atlas=new java.awt.image.BufferedImage(256,256,java.awt.image.BufferedImage.TYPE_INT_ARGB)
+                def graphics=atlas.createGraphics()
+                graphics.drawImage(javax.imageio.ImageIO.read(new File(sourceAssets,"textures/mob_effect/${name}.png")),0,198,18,18,null)
+                graphics.dispose()
+                javax.imageio.ImageIO.write(atlas,'png',new File(destinationDir,"assets/farmersdelight/textures/mob_effect/${name}_inventory.png"))
+            }
+        }
+        if(minecraftTarget in ['1.8.9','1.12.2']) {
+            fileTree(new File(destinationDir,'assets/farmersdelight/models')).matching { include '**/*.json' }.files.each { modelFile ->
+                def model=new JsonSlurper().parse(modelFile)
+                if(model.parent in ['block/template_farmland','minecraft:block/template_farmland']) model.parent='block/farmland'
+                if(model.parent in ['block/orientable_with_bottom','minecraft:block/orientable_with_bottom']) {
+                    model.parent='block/cube'
+                    model.textures += [down:model.textures.bottom,up:model.textures.top,north:model.textures.front,east:model.textures.side,south:model.textures.side,west:model.textures.side,particle:model.textures.front]
+                }
+                if(minecraftTarget=='1.8.9') {
+                    // 1.8 rejects geometry and a parent together.
+                    if(model.elements && model.parent) model.remove('parent')
+                    if(!model.parent && !model.elements) model.parent='builtin/entity'
+                    if(model.parent=='item/handheld' && !model.display) model.display=[
+                        thirdperson:[rotation:[0,90,-35],translation:[0,1.25,-3.5],scale:[0.85,0.85,0.85]],
+                        firstperson:[rotation:[0,-135,25],translation:[0,4,2],scale:[1.7,1.7,1.7]]]
+                    if(model.parent in ['item/generated','item/handheld']) model.parent='builtin/generated'
+                    if(model.display) {
+                        ['thirdperson_righthand':'thirdperson','firstperson_righthand':'firstperson'].each { source,target ->
+                            if(model.display[source]) model.display[target]=model.display[source]
+                        }
+                    }
+                }
+                modelFile.text=groovy.json.JsonOutput.toJson(model)
+            }
+        }
+        if(minecraftTarget=='1.8.9') {
+            def writeNative={ String path,Object value ->
+                def file=new File(destinationDir,'assets/farmersdelight/'+path);file.parentFile.mkdirs();file.text=groovy.json.JsonOutput.toJson(value)
+            }
+            def post=new JsonSlurper().parse(new File(destinationDir,'assets/farmersdelight/models/block/rope_post.json'))
+            def side=new JsonSlurper().parse(new File(destinationDir,'assets/farmersdelight/models/block/rope_side.json'))
+            def variants=[:]
+            (0..15).each { mask ->
+                def combined=new JsonSlurper().parseText(groovy.json.JsonOutput.toJson(post))
+                combined.textures=(post.textures ?: [:])+(side.textures ?: [:]); combined.remove('parent')
+                def properties=[:]
+                ['north','east','south','west'].eachWithIndex { face,index ->
+                    boolean connected=(mask & (1<<index))!=0;properties[face]=connected
+                    if(connected) {
+                        def elements=new JsonSlurper().parseText(groovy.json.JsonOutput.toJson(side.elements))
+                        elements.each { element ->
+                            (0..<index).each {
+                                def from=element.from,to=element.to
+                                element.from=[16-to[2],from[1],from[0]];element.to=[16-from[2],to[1],to[0]]
+                                def faces=element.faces
+                                element.faces=faces.collectEntries { direction,definition ->
+                                    def rotated=['north':'east','east':'south','south':'west','west':'north'][direction] ?: direction
+                                    [(rotated):definition]
+                                }
+                            }
+                        }
+                        combined.elements+=elements
+                    }
+                }
+                writeNative("models/block/rope_${mask}.json",combined)
+                variants[properties.sort().collect { k,v -> k+'='+v }.join(',')]=[model:"farmersdelight:rope_${mask}"]
+            }
+            writeNative('blockstates/rope.json',[variants:variants])
+            (['']+['white','orange','magenta','light_blue','yellow','lime','pink','gray','light_gray','cyan','purple','blue','brown','green','red','black']).each { color ->
+                String id=(color ? color+'_' : '')+'canvas_sign';def states=[:]
+                ['north','south','east','west'].each { face -> (0..15).each { rotation -> states["facing=${face},rotation=${rotation}"]=[model:'farmersdelight:canvas_sign_particle'] } }
+                [id,id.replace('canvas_sign','canvas_wall_sign')].each { blockId -> writeNative("blockstates/${blockId}.json",[variants:states]) }
+            }
+        }
         def lang = new File(destinationDir, "assets/farmersdelight/lang/${minecraftTarget == '1.12.2' ? 'en_us' : 'en_US'}.lang")
         lang.parentFile.mkdirs()
         lang.setText(entries.join('\n') + '\n', 'UTF-8')
     }
 }
 jar {
+    from('../../LICENSE') { into 'META-INF'; rename { 'LICENSE-FarmersDelight.txt' } }
     manifest { attributes 'Implementation-Title': "Farmer's Delight Legacy", 'Implementation-Version': project.version }
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
-// The template sets the complete archive filename, avoiding Gradle's second version suffix.
-def productionName = "farmersdelight-${version}+mc${minecraftTarget}-forge.jar"
-tasks.named('jar') { archiveFileName = productionName.replace('.jar', '-dev.jar') }
-tasks.matching { it.name in ['remapJar', 'reobfJar'] }.configureEach { archiveFileName = productionName }
+// Explicit names never inherit project/module names or plugin-added version suffixes.
+// Leave toolchain archives (patched Minecraft and the development launcher) native.
+tasks.withType(AbstractArchiveTask).matching {
+    it.name in ['jar', 'remapJar', 'reobfJar', 'sourcesJar', 'sourceJar', 'javadocJar', 'devJar']
+}.configureEach {
+    archiveBaseName = 'farmersdelight'
+    archiveVersion = "${project.version}+mc${minecraftTarget}"
+    destinationDirectory = layout.buildDirectory.dir('auxiliary')
+}
+tasks.named('jar') {
+    archiveFileName = distributionName(minecraftTarget).replace('.jar', '-dev.jar')
+    destinationDirectory = layout.buildDirectory.dir('devlibs')
+}
+tasks.matching { it.name in ['remapJar', 'reobfJar'] }.configureEach {
+    archiveFileName = distributionName(minecraftTarget)
+    destinationDirectory = layout.buildDirectory.dir('libs')
+}
+
+def cleanRelease = tasks.register('cleanRelease', Delete) {
+    delete layout.buildDirectory.dir('release')
+}
+// Resolve lazily: Unimined creates remapJar after this shared script is applied.
+def productionJar = providers.provider {
+    tasks.named(minecraftTarget == '1.7.10' ? 'reobfJar' : 'remapJar').get()
+}
+tasks.register('release', Sync) {
+    group = 'build'
+    description = 'Verify and stage only the reobfuscated distribution JAR.'
+    dependsOn cleanRelease, productionJar
+    from productionJar.flatMap { it.archiveFile }
+    into layout.buildDirectory.dir('release')
+    doFirst {
+        def artifact = productionJar.get().archiveFile.get().asFile
+        if (artifact.name != distributionName(minecraftTarget)) throw new GradleException("Unexpected distribution name: ${artifact}")
+        def zip = new java.util.zip.ZipFile(artifact)
+        try {
+            ['mcmod.info', 'farmersdelight/foods.json', 'farmersdelight/source_recipes.json',
+             'vectorwing/farmersdelight/legacy/Foundation.class', 'vectorwing/farmersdelight/legacy/BuildVersion.class',
+             'vectorwing/farmersdelight/legacy/api/EffectRules.class', 'assets/farmersdelight/textures/items/flint_knife.png',
+             'mixins.farmersdelight.json', 'mixins.farmersdelight.refmap.json'].each { entry ->
+                if (!zip.getEntry(entry)) throw new GradleException("${artifact}: missing ${entry}")
+            }
+            def readEntry = { String entry -> zip.getInputStream(zip.getEntry(entry)).withCloseable { it.getText('UTF-8') } }
+            def metadata = new JsonSlurper().parseText(readEntry('mcmod.info'))
+            if (metadata.size() != 1 || metadata[0].modid != 'farmersdelight' ||
+                    metadata[0].version != project.version.toString() || metadata[0].mcversion != minecraftTarget) {
+                throw new GradleException("${artifact}: incorrect mod metadata")
+            }
+            def manifest = zip.getInputStream(zip.getEntry('META-INF/MANIFEST.MF')).withCloseable { new java.util.jar.Manifest(it) }
+            if (manifest.mainAttributes.getValue('Implementation-Version') != project.version.toString() ||
+                    !manifest.mainAttributes.getValue('MixinConfigs')?.contains('mixins.farmersdelight.json')) {
+                throw new GradleException("${artifact}: incorrect manifest")
+            }
+            def refmap = new JsonSlurper().parseText(readEntry('mixins.farmersdelight.refmap.json'))
+            if (!refmap.mappings?.values()?.any { it.values().any { value -> value.contains('func_71020_j') } }) {
+                throw new GradleException("${artifact}: missing production Mixin mappings")
+            }
+            def knife = zip.getInputStream(zip.getEntry('vectorwing/farmersdelight/legacy/Knife.class')).withCloseable {
+                new String(it.bytes, java.nio.charset.StandardCharsets.ISO_8859_1)
+            }
+            if (!knife.contains('func_77659_a') || knife.contains('onItemRightClick')) {
+                throw new GradleException("${artifact}: Knife is not reobfuscated to SRG names")
+            }
+            def names = new HashSet()
+            zip.entries().each { entry ->
+                if (!names.add(entry.name)) throw new GradleException("${artifact}: duplicate ${entry.name}")
+                if (entry.name.endsWith('.java') || entry.name.startsWith('net/minecraft/') ||
+                        entry.name.startsWith('org/spongepowered/') && minecraftTarget in ['1.7.10','1.12.2']) throw new GradleException("${artifact}: bundled development dependency/source ${entry.name}")
+                if (entry.name.endsWith('.class')) {
+                    zip.getInputStream(entry).withCloseable { stream ->
+                        def data = new DataInputStream(stream)
+                        if (data.readInt() != (int) 0xCAFEBABE) throw new GradleException("Invalid class: ${entry.name}")
+                        data.readUnsignedShort()
+                        if (data.readUnsignedShort() > (minecraftTarget == '1.6.4' ? 51 : 52)) throw new GradleException("Not Java 8 compatible: ${entry.name}")
+                    }
+                }
+            }
+        } finally { zip.close() }
+    }
+}
+tasks.named('build') { dependsOn 'release' }
