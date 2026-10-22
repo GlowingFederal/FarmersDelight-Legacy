@@ -34,7 +34,8 @@ public final class Content {
     public static final Map<String, Block> PANTRIES = new LinkedHashMap<String, Block>();
 
     public static void register() {
-        comfort = new LegacyEffect(Settings.comfortId, "comfort"); nourishment = new LegacyEffect(Settings.nourishmentId, "nourishment");
+        Foundation.POTIONS.allocate();
+        comfort = new LegacyEffect("comfort"); nourishment = new LegacyEffect("nourishment");
 
         strawBale = new StrawBale();
         GameRegistry.registerBlock(strawBale, "straw_bale"); ITEMS.put("straw_bale", Item.getItemFromBlock(strawBale));

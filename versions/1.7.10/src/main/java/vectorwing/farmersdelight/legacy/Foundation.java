@@ -10,12 +10,25 @@ import net.minecraftforge.common.MinecraftForge;
      acceptedMinecraftVersions = "[1.7.10]", dependencies = "required-after:unimixins@[0.3.1,)")
 public final class Foundation {
     public static final String MODID = "farmersdelight";
+    public static final PotionIdRegistry POTIONS = new PotionIdRegistry(MODID);
     @Mod.Instance(MODID) public static Foundation instance;
     @SidedProxy(clientSide = "vectorwing.farmersdelight.legacy.client.ClientProxy", serverSide = "vectorwing.farmersdelight.legacy.CommonProxy")
     public static CommonProxy proxy;
+    @Mod.EventHandler public void construct(cpw.mods.fml.common.event.FMLConstructionEvent event) {
+        Settings.reservePotions(new java.io.File(cpw.mods.fml.common.Loader.instance().getConfigDir(), "farmersdelight.cfg"));
+    }
+    @cpw.mods.fml.common.network.NetworkCheckHandler
+    public boolean checkNetwork(java.util.Map<String,String> remote,cpw.mods.fml.relauncher.Side side) {
+        if (!remote.containsKey(MODID)) return side == cpw.mods.fml.relauncher.Side.SERVER;
+        return BuildVersion.VERSION.equals(remote.get(MODID)) && POTIONS.matches(remote);
+    }
+    @Mod.EventHandler public void loadComplete(cpw.mods.fml.common.event.FMLLoadCompleteEvent event) {
+        POTIONS.verify();
+    }
     @Mod.EventHandler public void preInit(FMLPreInitializationEvent event) {
         Settings.load(event.getSuggestedConfigurationFile());
         Content.register();
+        MinecraftForge.EVENT_BUS.register(POTIONS);
         MinecraftForge.EVENT_BUS.register(new FoodEvents());
         MinecraftForge.EVENT_BUS.register(new WorkstationEvents());
         MinecraftForge.EVENT_BUS.register(new FarmingEvents());

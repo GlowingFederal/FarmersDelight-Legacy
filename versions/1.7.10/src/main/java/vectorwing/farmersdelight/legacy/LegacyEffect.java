@@ -5,15 +5,19 @@ import net.minecraft.entity.player.EntityPlayer;
 import vectorwing.farmersdelight.legacy.api.EffectRules;
 public final class LegacyEffect extends Potion {
     private final boolean healing;
+    public LegacyEffect(String name) { this(Foundation.POTIONS.id(name), name); }
+    /** Legacy constructor remains valid only for the canonical named allocation. */
     public LegacyEffect(int id, String name) {
-        super(free(id), false, 0);
+        super(allocated(id, name), false, 0);
         healing = name.equals("comfort");
         setPotionName("potion.farmersdelight." + name);
+        Foundation.POTIONS.track(name, this);
 
     }
-    private static int free(int id) {
-        if (id <= 0 || id >= potionTypes.length || potionTypes[id] != null)
-            throw new IllegalStateException("Farmer's Delight potion ID " + id + " is occupied; configure unused comfortId/nourishmentId on client and server");
+    private static int allocated(int supplied, String name) {
+        int id = Foundation.POTIONS.id(name);
+        if (supplied != id || potionTypes[id] != null)
+            throw new IllegalStateException("Farmer's Delight potion " + name + " must use its vacant canonical allocation " + id);
         return id;
     }
     @cpw.mods.fml.relauncher.SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)

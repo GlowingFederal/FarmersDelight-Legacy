@@ -34,7 +34,12 @@ All four include Cutting Boards, Cooking Pots, placed and handheld Skillets, Sto
 
 Modern Regen is optional on 1.6.4, 1.7.10 and 1.8.9. FD keeps its regeneration and hunger ownership intact; it also operates without Modern Regen. The Modern Regen project has no 1.12.2 target. Startup compatibility does not certify the complete player health/hunger/effects matrix.
 
-Every target uses `farmersdelight.cfg`. `effects.enableComfort` and `effects.enableNourishment` default to true. On 1.6.4, 1.7.10 and 1.8.9, `effects.comfortId=30`, `effects.nourishmentId=31` and `enchantments.backstabbingId=80` must be unused slots and agree between client and server. Startup rejects occupied IDs. Comfort supplies slow healing outside eligible natural regeneration; Nourishment reduces activity exhaustion by up to 0.1 per tick while preserving regeneration charges.
+Every target uses `farmersdelight.cfg`. `effects.enableComfort` and `effects.enableNourishment` default to true.
+On 1.6.4 and 1.8.9, `effects.comfortId=30`, `effects.nourishmentId=31` and `enchantments.backstabbingId=80` must
+be unused slots and agree between client and server. On 1.7.10, potion IDs default to `-1` for persistent automatic
+allocation; existing explicit IDs are imported and preserved. Backstabbing still uses its configured enchantment ID.
+Startup rejects occupied IDs. Comfort supplies slow healing outside eligible natural regeneration; Nourishment
+reduces activity exhaustion by up to 0.1 per tick while preserving regeneration charges.
 
 The 1.6.4 target additionally reserves named numeric block, item and achievement IDs. Configure collisions before creating a world, keep the configuration with the save, and use the same IDs on clients and server. Do not change existing-world IDs without a save migration. The frozen [registry manifest](versions/1.6.4/src/main/resources/farmersdelight/registry164.json) and [metadata contract](ECOSYSTEM-PORT-AUDIT.md#registration-and-save-contract) document their defaults.
 
@@ -47,6 +52,21 @@ Right-click a Cutting Board to place one ingredient, use the appropriate tool to
 Skillets cook over heat when placed or held. Sneak-use to place one. Handheld cooking uses food in the other hand on 1.12.2 and the next hotbar slot on 1.6.4, 1.7.10 and 1.8.9. Stoves cook six single ingredients and provide reusable heat; light with flint and steel or a fire charge, and extinguish with water or a shovel.
 
 JEI and NEI show available crafting, cutting, pot and grilling recipes. Native wood and flower equivalents are used where appropriate. Recipes needing absent content are deferred, including the Stove recipe's campfire ingredient and log stripping's stripped-log outputs. Bark-based recipes are deferred with that acquisition path; rotten flesh remains an alternative for Organic Compost. Honey, sweet berries, Nether vegetation and netherite are absent on all four targets. The 1.6.4 and 1.7.10 targets also lack rabbits and mutton; 1.6.4 lacks later fish variants and two later wood species. Beetroot is absent before 1.12.2.
+
+
+On **1.7.10**, keep `config/legacy-potion-ids.properties` with your modpack and world backups and distribute the same
+file to clients and server. Updated EFR-R cooperates with this allocator, but neither mod requires the other.
+Both mods reserve existing overrides before selecting free native potion slots and retain saved allocations when
+effects are disabled or mods are temporarily removed. The Forge handshake rejects different active mappings before
+player effect packets arrive. Each world records a snapshot in `data/legacy-potion-ids.properties` and refuses to
+load if a recorded allocation changes or disappears. Keep legacy configuration files during upgrade so older worlds
+inherit their established IDs. Do not delete or regenerate the allocation file for an existing world.
+
+Automatic allocation uses the live registry capacity and native signed-byte IDs 1..127; a full table fails explicitly.
+Unmodified mods can still impose conflicting hardcoded IDs. Resolve such conflicts deliberately rather than
+reassigning saved effects. An installation that never successfully loaded EFR-R's new Nautilus/Dolphin effects
+alongside FD can set only EFR-R's conflicting `nautilusBreathID` / `dolphinGraceID` overrides to `-1` before its
+first allocator-enabled launch, preserving FD's established IDs. Both client and server need updated mod JARs.
 
 ### Configuration and compatibility
 

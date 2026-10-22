@@ -13,7 +13,15 @@ public final class Settings {
     public static final java.util.Set<String> soupItems=new java.util.HashSet<String>();
     public static final java.util.Set<String> darkSignBackgrounds=new java.util.HashSet<String>();
     public static final java.util.Map<String,Integer> wildRarity = new java.util.LinkedHashMap<String,Integer>();
-    public static int comfortId = 30, nourishmentId = 31;
+    public static int comfortId = -1, nourishmentId = -1;
+    public static void reservePotions(File file) {
+        Configuration config = new Configuration(file);
+        config.load();
+        java.util.Map<String,Integer> requests = new java.util.TreeMap<String,Integer>();
+        requests.put("comfort", config.get("effects", "comfortId", -1).getInt(-1));
+        requests.put("nourishment", config.get("effects", "nourishmentId", -1).getInt(-1));
+        Foundation.POTIONS.reserve(requests);
+    }
     public static int backstabbingId=80;
     public static void load(File file) {
         Configuration config = new Configuration(file);
@@ -43,8 +51,8 @@ public final class Settings {
         cuttingFortuneBonus = config.getFloat("fortuneBonus", "cuttingBoard", 0.1F, 0, 1, "Additional chance per Fortune level, rolled independently for every output item.");
         comfort = config.getBoolean("enableComfort", "effects", true, "Enable supplemental Comfort healing.");
         nourishment = config.getBoolean("enableNourishment", "effects", true, "Reduce activity exhaustion by at most 0.1 per tick; regeneration costs are preserved.");
-        comfortId = config.getInt("comfortId", "effects", 30, 1, net.minecraft.potion.Potion.potionTypes.length - 1, "Unused potion slot; must match client and server.");
-        nourishmentId = config.getInt("nourishmentId", "effects", 31, 1, net.minecraft.potion.Potion.potionTypes.length - 1, "Unused potion slot; must match client and server.");
+        comfortId = config.getInt("comfortId", "effects", -1, -1, Short.MAX_VALUE, "-1 uses persistent automatic allocation; existing explicit IDs are preserved. Keep config/legacy-potion-ids.properties with saves and identical on clients/server.");
+        nourishmentId = config.getInt("nourishmentId", "effects", -1, -1, Short.MAX_VALUE, "-1 uses persistent automatic allocation; existing explicit IDs are preserved. Keep config/legacy-potion-ids.properties with saves and identical on clients/server.");
         localVanillaCrates=vanillaCrates; localFortuneBonus=cuttingFortuneBonus;
         if (config.hasChanged()) config.save();
     }

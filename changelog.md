@@ -47,3 +47,8 @@
 - Register 1.6.4 numeric achievements before local client statistics load, then resolve recipe-dependent criteria after integrations; validate IDs in the native achievement range.
 - Remap the existing optional 1.12.2 JEI runtime for development launches so its production method names resolve against the mapped game.
 - Preserve successful player harvesting when rice restores its source water on all four targets, allowing the native harvest path to emit crop drops after the replacement callback.
+
+## 2026-10-21 22:08 — Persist automatic 1.7.10 potion allocations
+- Replace Comfort/Nourishment's fixed defaults with persistent named allocation shared with updated EFR-R. Reserve legacy explicit overrides during construction, allocate against the native registry, and retain reservations across restarts, disabled effects and modpack changes.
+- Validate registration ownership, saved-world allocation snapshots and early Forge handshake mappings. Reject incompatible or missing saved allocations before gameplay and client/server mapping differences before player potion packets arrive.
+- Preserve native effects, existing configured potion IDs, entity registration and other Minecraft targets. Document allocation-file distribution, legacy upgrade requirements, capacity limits and explicit first-start repair for the former EFR-R collision.
