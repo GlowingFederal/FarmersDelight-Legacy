@@ -4,7 +4,9 @@
   "package": "vectorwing.farmersdelight.legacy.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "PotionArrayAccessor",
     "PotionHandshakeMixin",
+    "PotionSaveMigrationMixin",
     "PlayerExhaustionMixin",
     "SoupItemMixin",
     "PigFoodMixin",

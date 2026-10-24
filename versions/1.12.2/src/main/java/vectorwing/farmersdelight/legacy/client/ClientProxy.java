@@ -28,6 +28,9 @@ public final class ClientProxy extends CommonProxy {
     @Override public vectorwing.farmersdelight.legacy.GuiHandler guiHandler() { return new ClientGuiHandler(); }
 
     @SubscribeEvent public void models(ModelRegistryEvent event) {
+        net.minecraft.client.renderer.block.statemap.StateMap riceMap=new net.minecraft.client.renderer.block.statemap.StateMap.Builder().ignore(net.minecraft.block.BlockLiquid.LEVEL).build();
+        net.minecraftforge.client.model.ModelLoader.setCustomStateMapper(Content.riceCrop,riceMap);
+        net.minecraftforge.client.model.ModelLoader.setCustomStateMapper(Content.wildRice,riceMap);
         for (Item item : Content.ITEMS.values()) ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
     @SubscribeEvent public void colors(net.minecraftforge.client.event.ColorHandlerEvent.Block event) {

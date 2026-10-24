@@ -29,7 +29,7 @@ public final class RicePlant extends BlockContainer implements IGrowable,ISheara
     public RicePlant(boolean wild) {
         super(Material.WATER); this.wild=wild; setTickRandomly(true); setHardness(0);
         setTranslationKey("farmersdelight."+(wild ? "wild_rice" : "rice_crop"));
-        setDefaultState(blockState.getBaseState().withProperty(AGE,0).withProperty(SUPPORTING,false));
+        setDefaultState(blockState.getBaseState().withProperty(AGE,0).withProperty(SUPPORTING,false).withProperty(net.minecraft.block.BlockLiquid.LEVEL,0));
     }
     public TileEntity createNewTileEntity(World world,int meta) { return new RiceTile(); }
     private static boolean ground(Block block) { return block==Blocks.DIRT || block==Blocks.GRASS || block==Blocks.FARMLAND || block==Content.richSoil || block==Content.richFarmland; }
@@ -49,7 +49,7 @@ public final class RicePlant extends BlockContainer implements IGrowable,ISheara
     public boolean canCollideCheck(IBlockState state,boolean liquid) { return true; }
     public boolean isReplaceable(IBlockAccess world,BlockPos pos) { return false; }
     private RiceTile tile(IBlockAccess world,BlockPos pos) { TileEntity tile=world.getTileEntity(pos); return tile instanceof RiceTile ? (RiceTile)tile : null; }
-    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this,AGE,SUPPORTING); }
+    protected BlockStateContainer createBlockState() { return new BlockStateContainer(this,AGE,SUPPORTING,net.minecraft.block.BlockLiquid.LEVEL); }
     public IBlockState getStateFromMeta(int meta) { return getDefaultState(); }
     public int getMetaFromState(IBlockState state) { return 0; }
     public IBlockState getActualState(IBlockState state,IBlockAccess world,BlockPos pos) { RiceTile tile=tile(world,pos); return state.withProperty(AGE,tile==null ? 0 : tile.age).withProperty(SUPPORTING,world.getBlockState(pos.up()).getBlock()==Content.riceUpper); }

@@ -28,14 +28,14 @@ public final class Stacks {
     }
     public static ItemStack resolve(String modernId) {
         if ((modernId.equals("farmersdelight:mutton_chops") || modernId.equals("farmersdelight:cooked_mutton_chops"))
-                && net.minecraft.item.Item.itemRegistry.getObject("minecraft:mutton") == null) return none();
+                && empty(resolve(modernId.equals("farmersdelight:mutton_chops") ? "minecraft:mutton" : "minecraft:cooked_mutton"))) return none();
         String id = LegacyNames.ITEMS.containsKey(modernId) ? LegacyNames.ITEMS.get(modernId) : modernId;
         int metadata = 0;
         int marker = id.indexOf('@');
         if (marker >= 0) { metadata = Integer.parseInt(id.substring(marker + 1)); id = id.substring(0, marker); }
         if(id.equals("minecraft:cooked_fish")) id="minecraft:cooked_fished";
         Item item = (Item) Item.itemRegistry.getObject(id);
-        return item == null  ? none() : new ItemStack(item, 1, metadata);
+        return item == null ? UABCompatibility.resolve(modernId) : new ItemStack(item, 1, metadata);
     }
     public static ItemStack result(JsonObject json) {
         ItemStack stack = resolve(json.get("item").getAsString());

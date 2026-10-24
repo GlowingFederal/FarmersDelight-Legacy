@@ -23,11 +23,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public final class GrillBlock extends BlockContainer {
+public class GrillBlock extends BlockContainer {
     public static final PropertyDirection FACING = net.minecraft.block.BlockHorizontal.FACING;
     public static final PropertyBool LIT = PropertyBool.create("lit");
     private static final AxisAlignedBB PAN = new AxisAlignedBB(1D/16,0,1D/16,15D/16,0.25,15D/16);
     private final boolean stove;
+    public final boolean isStove() { return stove; }
     public GrillBlock(boolean stove) {
         super(Material.IRON); this.stove=stove;
         setTranslationKey("farmersdelight."+(stove ? "stove" : "skillet")); setCreativeTab(Content.TAB);

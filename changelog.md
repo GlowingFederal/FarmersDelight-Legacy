@@ -1,17 +1,17 @@
 # Changelog
 
-## 2026-10-17 08:19 — Paired legacy foundation
+## 2026-10-17 08:19 â€” Paired legacy foundation
 - Establish isolated Forge 1.12.2 and 1.7.10 targets using the ExampleMod toolchain pins, with a root paired build coordinator. Preserve the original 1.16.5 source/assets and former build configuration as the behavioral reference.
 - Add the shared food catalog, four native knife tiers, basic materials and Straw Bale registration, exact ingredient/OreDictionary memberships, duplicate-rejecting recipe registration, initial crafting recipes, and optional JEI/NEI presentation. Gate unavailable honey, sweet-berry and Nether-vegetation foods.
 - Implement native consumables with survival container returns, one-effect milk/cocoa curing and server-owned effects. Nourishment reduces activity exhaustion without refunding natural regeneration costs; Comfort supplies slow healing only outside eligible natural regeneration. Modern Regen remains optional and owns its hunger state and timers.
-- Adopt paired foundation → cutting → cooking → farming/serving → secondary-system milestones, then 1.8.9 and 1.6.4; addon support follows equivalent feature-gated paired acceptance.
+- Adopt paired foundation â†’ cutting â†’ cooking â†’ farming/serving â†’ secondary-system milestones, then 1.8.9 and 1.6.4; addon support follows equivalent feature-gated paired acceptance.
 
-## 2026-10-18 11:13 — Correct foundation textures and Nourishment loading
+## 2026-10-18 11:13 â€” Correct foundation textures and Nourishment loading
 - Use the existing straw_bale_end texture for the 1.7.10 pillar end icons and the 1.12.2 block model, alongside the original side texture.
 - Require both Straw Bale textures during resource packaging so a missing source texture fails the build instead of producing a missing face in-game.
 - Register the 1.7.10 Nourishment Mixin once through UniMixins' static configuration, removing the competing empty configuration and redundant early loader that prevented the exhaustion hook from applying.
 
-## 2026-10-18 16:40 — Restore legacy cooking, farming and shared meals
+## 2026-10-18 16:40 â€” Restore legacy cooking, farming and shared meals
 - Add native Cutting Boards with tool processing, secondary drops, Fortune, automation, dispenser support and ingredient rendering on both versions.
 - Add the Cooking Pot inventory, heat-based cooking, serving containers, portable meal storage, experience, GUI and sided automation. Add six-position Stoves and placed/handheld Skillets with native heat and lighting interactions.
 - Adapt the original cutting, cooking, crafting and grilling recipe catalogs to native item names and metadata. Use available wood and flower equivalents; defer recipes whose required items or mobs are absent.
@@ -23,19 +23,19 @@
 - Add optional NEI/JEI processing categories and safe pot ingredient transfer. Synchronize server-controlled crate availability and cutting Fortune settings; keep unavailable recipes out of active viewer lists.
 - Keep wild-crop placement inside the native shifted population window. Retain the existing Modern Regen ownership and optional loading contract.
 
-## 2026-10-20 02:06 — Improve NEI recipe pages and workstation usages
+## 2026-10-20 02:06 â€” Improve NEI recipe pages and workstation usages
 - Add recessed ingredient/result slots, processing arrows and a compact Cooking Pot layout that distinguishes stored meals, serving containers and finished output.
 - Show cooking times, batch experience, container returns, cutting chances, Fortune bonuses and tool durability information. Label shaped and shapeless crafting recipes and explain Skillet heat and Fire Aspect behavior.
 - Register GTNH NEI category dimensions, icons and multiple recipes per page. Viewing Cooking Pot, Cutting Board, Skillet or Stove usages now lists the corresponding processing recipes, including carried or enchanted workstations.
 - Keep Cooking Pot ingredient transfer aligned with the native slots and exclude its locked meal buffer.
 
-## 2026-10-20 14:15 — Normalize legacy release artifacts
+## 2026-10-20 14:15 â€” Normalize legacy release artifacts
 - Use the established 0.1.0 release version without the internal foundation milestone suffix, shared by archive names, mod metadata and compiled version constants.
 - Centralize public filenames as farmersdelight-<version>+mc<minecraft>.jar, independent of project names and Forge/plugin archive suffixes.
 - Stage only the verified native remap/reobfuscation outputs for root buildAll, build and release tasks in build/release, clearing stale staged artifacts before building. Native build/release tasks stage one target locally; keep development and auxiliary archives separate.
 - Reject incomplete archives, incorrect release metadata, missing production Mixin mappings, development-named bytecode and classes incompatible with Java 8 during release staging. Preserve the existing native toolchains and development launch setup.
 
-## 2026-10-20 19:20 — Add native 1.6.4 and 1.8.9 beta targets
+## 2026-10-20 19:20 â€” Add native 1.6.4 and 1.8.9 beta targets
 - Extend the isolated multiversion build to four independent Forge distributions, including aggregate clean/test/build tasks and verified release staging. Preserve the established 1.7.10 and 1.12.2 targets and the 0.1.0 release naming.
 - Port the maintained food, crops, wild vegetation, soils, cooking and cutting, stove/skillet, serving, storage, decoration, combat, acquisition and progression systems against each target's native APIs. Keep unavailable vanilla-content recipes deferred without adding replacement mobs or ingredients.
 - Add frozen, configurable 1.6.4 numeric block/item/achievement allocations, native legacy inventories and packets, metadata rendering, sound registration and save handling. Adapt village palettes to available native wood and soil.
@@ -48,7 +48,42 @@
 - Remap the existing optional 1.12.2 JEI runtime for development launches so its production method names resolve against the mapped game.
 - Preserve successful player harvesting when rice restores its source water on all four targets, allowing the native harvest path to emit crop drops after the replacement callback.
 
-## 2026-10-21 22:08 — Persist automatic 1.7.10 potion allocations
+## 2026-10-21 22:08 â€” Persist automatic 1.7.10 potion allocations
 - Replace Comfort/Nourishment's fixed defaults with persistent named allocation shared with updated EFR-R. Reserve legacy explicit overrides during construction, allocate against the native registry, and retain reservations across restarts, disabled effects and modpack changes.
 - Validate registration ownership, saved-world allocation snapshots and early Forge handshake mappings. Reject incompatible or missing saved allocations before gameplay and client/server mapping differences before player potion packets arrive.
 - Preserve native effects, existing configured potion IDs, entity registration and other Minecraft targets. Document allocation-file distribution, legacy upgrade requirements, capacity limits and explicit first-start repair for the former EFR-R collision.
+
+## 2026-10-23 16:10 â€” Add native addon integration hooks
+- Allow addons to add namespaced recipe catalogs and additive ingredient tags during initialization, before the 1.7.10 and 1.12.2 processors freeze their inputs. Reuse the existing crafting, cooking, cutting and grilling implementations and viewers without bundling core classes in addons.
+- Extend native foods with optional additional effects while retaining existing nutrition, containers, consumption and effect behavior. Keep platform APIs in the two native targets.
+- Advance the dependency version to 1.0.2 so addons can declare the required API revision. Missing content recipes remain deferred with their original ingredient requirements.
+
+2026-10-23 16:25 â€” Preserve water-level compatibility for rice
+
+- Expose native source-water level zero on 1.8.9 and 1.12.2 rice states so flowing liquids can inspect their water material without failing on a missing property. Keep crop ages in their existing tile data and preserve source-water restoration.
+- Ignore the liquid-level property when selecting crop models so existing growth/support variants retain their appearance.
+
+2026-10-23 17:15 — Complete native addon processor and display contracts
+
+- Resolve addon survival acquisition before recipes freeze, including declared native conversions such as cheese aging. Keep original missing inputs and containers deferred for their real providers, including future UAB.
+- Support exact item cutting tools, namespaced recipe types, addon stove heat, additional food effects and tooltips, qualified feast servings, and native 1.7.10 metadata model sets. Preserve existing FD registration, saves and processing behavior.
+
+2026-10-23 22:14 — Add optional Universal Adaptive Backporter compatibility on 1.7.10
+
+- Recognize enabled UAB meat, crops, berries, honey, flowers, fungi and End ingredients in the original core and addon recipes, preserving exact legacy metadata and deferring missing prerequisites.
+- Support rice on UAB mud, knife bonuses from rabbits and shulkers, and existing soup stacking/effect settings for UAB beetroot soup and rabbit stew.
+- Add simple ecosystem compatibility switches for recipes, mob drops and world generation. Keep UAB optional, retain saved identities, and leave other Minecraft implementations unchanged.
+- Expand potion capacity to the native signed-byte range when cohosting etfuturum, preserving existing allocations and larger ID extensions so default UAB and Delight effects can initialize together.
+- Resolve UAB stripped logs and Nether wood variants for original axe processing and tree-bark acquisition; recognize native reeds under the brewing catalog's sugar-cane name.
+- Recognize enabled kelp, dried kelp and sea pickles in UAB revisions providing them, unlocking original aquatic cooking and fermentation recipes while safely deferring them with older providers.
+
+2026-10-24 02:16 — Keep 1.7.10 potion capacity independent of UAB
+
+- Expand the native potion table to at least 128 slots when the shared allocator reserves effects, including Brewin' and Chewin' packs without UAB or a potion ID extender. Preserve occupied entries, existing saved allocations and larger third-party tables.
+- Keep automatic IDs within the native signed-byte range and retain explicit config imports, saved-world checks and client/server mapping checks. Manual IDs through 127 no longer fail solely because UAB is absent.
+
+2026-10-24 02:37 — Migrate saved potion effects when configured IDs change
+
+- Apply explicit 1.7.10 Comfort/Nourishment ID changes, including swaps, to the canonical allocation instead of rejecting them. Keep automatic allocations persistent and reject occupied or duplicate targets.
+- Before reading world metadata, convert recorded active effects and custom potion items across player saves, integrated-player metadata, region files, inventories and unloaded dimensions using each world's previous mapping. Preserve durations, amplifiers, ambient flags and unrelated NBT.
+- Stage and verify converted files, retain original backups under data/potion-id-migrations, and resume interrupted transactions before loading the world. Commit its mapping only after every converted file is installed; retain the existing client/server mapping checks.

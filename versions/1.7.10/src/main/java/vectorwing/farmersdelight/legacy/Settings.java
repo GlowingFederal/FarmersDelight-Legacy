@@ -26,6 +26,7 @@ public final class Settings {
     public static void load(File file) {
         Configuration config = new Configuration(file);
         config.load();
+        UABCompatibility.configure(config);
         foodTooltips=config.getBoolean("foodEffectTooltip","client",true,"Show food effects, pet feeding benefits and portable pot contents.");
         comfortOverlay=config.getBoolean("comfortHealthOverlay","client",true,"Show a heart sheen while Comfort can supply healing.");
         nourishmentOverlay=config.getBoolean("nourishmentHungerOverlay","client",true,"Show gilded hunger icons while Nourishment is active.");
@@ -51,8 +52,8 @@ public final class Settings {
         cuttingFortuneBonus = config.getFloat("fortuneBonus", "cuttingBoard", 0.1F, 0, 1, "Additional chance per Fortune level, rolled independently for every output item.");
         comfort = config.getBoolean("enableComfort", "effects", true, "Enable supplemental Comfort healing.");
         nourishment = config.getBoolean("enableNourishment", "effects", true, "Reduce activity exhaustion by at most 0.1 per tick; regeneration costs are preserved.");
-        comfortId = config.getInt("comfortId", "effects", -1, -1, Short.MAX_VALUE, "-1 uses persistent automatic allocation; existing explicit IDs are preserved. Keep config/legacy-potion-ids.properties with saves and identical on clients/server.");
-        nourishmentId = config.getInt("nourishmentId", "effects", -1, -1, Short.MAX_VALUE, "-1 uses persistent automatic allocation; existing explicit IDs are preserved. Keep config/legacy-potion-ids.properties with saves and identical on clients/server.");
+        comfortId = config.getInt("comfortId", "effects", -1, -1, Short.MAX_VALUE, "-1 keeps persistent automatic allocation. Changing an explicit ID migrates recorded world effects on next load, with backups. Restart and match client/server IDs. Keep config/legacy-potion-ids.properties with saves.");
+        nourishmentId = config.getInt("nourishmentId", "effects", -1, -1, Short.MAX_VALUE, "-1 keeps persistent automatic allocation. Changing an explicit ID migrates recorded world effects on next load, with backups. Restart and match client/server IDs. Keep config/legacy-potion-ids.properties with saves.");
         localVanillaCrates=vanillaCrates; localFortuneBonus=cuttingFortuneBonus;
         if (config.hasChanged()) config.save();
     }

@@ -2627,3 +2627,48 @@ All checked-out Java files were enumerated for dependencies, side-specific impor
 - Compared ref `upstream/oceans_delight_1.18.2`: 823fb9ec4f3fbeba771f97366f2f9f8f4f43c47b | 2023-03-28 | Change to 1.18.2
 - Compared ref `upstream/oceans_delight_1.20`: 43c54c4b40ad321d0d4f5381018ee3322bc5fe86 | 2023-07-18 | updated stuff
 - Compared ref `upstream/oceans_delight_1.21_neoforge`: 70fe769a71b0ff584b8a0164af62e4cb9fd8699a | 2026-05-03 | 1.21 Neoforge
+
+
+## P. Native addon integration (2026-10-23)
+
+The requested addon targets are Forge 1.7.10 and 1.12.2. The original addon `src/` trees remain references; isolated target source and independent distribution builds live under each addon's `versions/` directories. Missing modern items and dependencies are reserved for future UAB support: preserve exact prerequisites and defer recipes, without invented substitute ingredients or environmental acquisition paths.
+
+Farmer's Delight Legacy 1.0.2 exposes `SourceRecipes.addCatalog(namespace, owner, resource)` and target-native `SourceTags.addCatalog(owner, resource)`. Addons call both during FML initialization. FD freezes the catalogs during post-initialization and its existing native processors compile recipes after all addon initialization. Namespaced recipe collisions and replacing tags fail loudly. Addons do not package FD classes. `FoodDefinition.effects` optionally adds effects through the existing native food consumption behavior, preserving the original single-effect fields.
+
+| Addon feature | 1.7.10 | 1.12.2 | Implementation boundary |
+|---|---|---|---|
+| Corn: 14 foods, edible plantable kernels, 3 block items | Native | Native | FD nutrition, effects and container handling; native registration |
+| Corn: eight-stage lower and upper stalk | Metadata | Block state | Upper begins after lower age 4; independent aging, bonemeal and crop drops |
+| Corn: wild plants and shears acquisition | Native | Native | Configured temperate overworld clusters, bounded to the current chunk |
+| Corn: crafting, pot, cutting and grilling | FD processors | FD processors | Original 39-resource catalog and additive tags; unavailable prerequisites defer |
+| Corn: sweet-berry stuffing/pumpkin recipes | Deferred | Deferred | Await original sweet berries through a future provider such as UAB |
+| Corn: modern Create / IE serializers | Deferred | Deferred | No legacy adapters; source recipes retained |
+| Corn: modern chest tables / composter / TFC metadata | Unavailable | Unavailable | No replacement chests, composting or nutrition simulation invented |
+| Ocean: 22 registered items, foods and Guardian Soup feast | Native | Native | Original food/effect contracts and four persistent servings |
+| Ocean: squid knife drops and tentacle processing | Native | Native | Native death/drop callbacks and FD processors |
+| Ocean: guardian / elder guardian acquisition | Deferred | Native | No replacement guardian mobs on 1.7.10 |
+| Ocean: kelp, seagrass, honey and pickle chains | Deferred | Deferred | Original prerequisites retained; dependent stuffed-cod recipe deferred |
+| End: 53 registered items, seven blocks and four knives | Native | Native | Original nutrition, effects, materials, servings and repair identities |
+| End: dragon knife drops, stove processing and feasts | Native | Native | Native mob drops, six-slot stove, heat integration and persistent servings |
+| End: native shulkers, endermites, chorus and outer-island succulent generation | Deferred | Native | No replacement mobs, chorus acquisition or outer islands on 1.7.10 |
+| End: campfire stove recipe and Farmer's Respite brewing | Deferred | Deferred | Missing original content/dependency; no substitute recipes |
+| Brewin: 33 registered items, seven blocks and three status effects | Native | Native | Source-derived food contract; native potion allocation/registry |
+| Brewin: eight-slot keg, duration, temperature, serving, XP and persistence | Native | Native | Actual server-side processing; distinct ingredient/liquid/buffer/container/output slots |
+| Brewin: automation, portable internal batches and native screens | Native | Native | Top inserts ingredient/liquid; other sides serve/extract output; buffer is locked |
+| Brewin: cheese aging, wheel/pizza portions and item-mat display | Native | Native | Four portions; partial break drops preserve remaining quantity; one persistent mat item |
+| Brewin: honeycomb keg/cheese and dependent survival paths | Deferred | Deferred | Await real honeycomb through future UAB; creative machines remain functional |
+| Brewin: tankard / tankard-dependent fermentation recipes | Deferred | Native | Tankard's original iron nugget is unavailable on 1.7.10 |
+| Brewin: kelp, honey, berries, pickle, turtle-egg and tea recipes | Deferred | Deferred | Exact unavailable inputs and dependent alcohol chains remain deferred |
+| Fermentation recipe viewer and transfer | Optional NEI | Optional JEI | Uses actual registered recipes, liquid slot and serving-container input; excludes the locked buffer |
+| Modern Regen | Optional | Optional | Addons do not own its regeneration timers or healing logic |
+
+The available MMLib 1.16.5 source branch contains food behavior but omits the `HighCropBlock` and edible-seed classes required by this Corn checkout. Later MMLib branches confirm the independent-half growth design; they do not certify the exact missing 1.1.1 binary. The native crop is an adaptation with this explicit dependency-evidence limit. MMLib implementation code is not vendored.
+
+
+`AddonRecipes.register(namespace, roots, extraTypes...)` declares real native acquisition roots and processors. The startup fixed point rejects addon-owned ingredient chains without acquisition. `AddonRecipes.processing(namespace, input, output)` declares genuine non-recipe conversions such as unripe-to-ripe cheese aging; it does not fabricate prerequisites. Catalogs and tags freeze after all addon initialization and before the native processors register. Cutting tools may be exact item/tag ingredients, including End's Nether Star tool, as well as existing knife/shears/tool-class predicates.
+
+The native integration also permits qualified serving items, explicit feast leftovers, addon knife subclasses, addon stove heat, additional named food effects, food-effect tooltips, and 1.7.10 metadata model sets. Rendering remains client-only. No addon bundles the core classes. The existing rice water block exposes native liquid level zero on 1.8.9 and 1.12.2 so vanilla flow inspection can coexist with its tile-backed age and restored water behavior.
+
+Brewin preserves actual fermentation rather than crafting substitutes. The port accepts both upstream duration field spellings, enforces all five temperature ranges, permits liquid automation, validates buffer/container identity and capacity, preserves placed progress and stored XP, and avoids resetting partial wheel portions by replacement. Tipsy intercepts only vanilla food-healing calls, so Sweet Heart cannot revive a zero-amount food heal and Modern Regen retains its own ownership. Satisfaction uses a server-safe 1.7.10 hunger update. Bad Omen and waterlogging have no native counterpart on either target; 1.7.10 additionally omits unavailable Glowing/Luck/Levitation effects. Absent recipe prerequisites continue to gate their associated content.
+
+Ocean's checked-in metadata and license text disagree (MIT declaration versus LGPL boilerplate). The local port retains the source notices; publication rights need resolution before distributing that addon publicly. This initiative does not publish releases.

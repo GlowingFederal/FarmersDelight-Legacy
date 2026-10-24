@@ -81,6 +81,10 @@ public final class ClientFeedback extends Gui {
         if(stack.getItem() instanceof LegacyFood) {
             FoodDefinition definition=((LegacyFood)stack.getItem()).definition;
             effect(lines,LegacyFood.effect(definition.effect),definition.duration,definition.amplifier);
+            if(definition.effects!=null) for(FoodDefinition.Effect extra:definition.effects) {
+                int before=lines.size();effect(lines,LegacyFood.effect(extra.effect),extra.duration,extra.amplifier);
+                if(lines.size()>before && extra.chance<1) lines.set(lines.size()-1,lines.get(lines.size()-1)+" ["+Math.round(extra.chance*100)+"%]");
+            }
             if(definition.id.equals("milk_bottle") || definition.id.equals("hot_cocoa") || definition.id.equals("melon_juice"))
                 lines.add("\u00a79"+I18n.format("farmersdelight.tooltip."+definition.id));
         }

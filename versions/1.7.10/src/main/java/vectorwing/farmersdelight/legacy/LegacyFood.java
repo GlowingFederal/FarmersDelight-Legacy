@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import vectorwing.farmersdelight.legacy.api.FoodDefinition;
 
 
-public final class LegacyFood extends ItemFood {
+public class LegacyFood extends ItemFood {
     public final FoodDefinition definition;
     public LegacyFood(FoodDefinition definition) {
         super(definition.nutrition, definition.saturation, definition.meat);
@@ -61,11 +61,35 @@ public final class LegacyFood extends ItemFood {
         Potion potion = effect(definition.effect);
         if (potion != null && world.rand.nextFloat() < definition.chance)
             player.addPotionEffect(new PotionEffect(potion.id, definition.duration, definition.amplifier));
+        if (definition.effects != null) for (FoodDefinition.Effect extra : definition.effects) {
+            Potion additional = effect(extra.effect);
+            if (additional != null && world.rand.nextFloat() < extra.chance)
+                player.addPotionEffect(new PotionEffect(additional.id, extra.duration, extra.amplifier));
+        }
+    }
+    private static final java.util.Map<String,Potion> ADDON_EFFECTS=new java.util.LinkedHashMap<String,Potion>();
+    public static void registerEffect(String name,Potion potion) {
+        if(name.indexOf(':')<1 || potion==null || ADDON_EFFECTS.containsKey(name)) throw new IllegalArgumentException("Invalid or duplicate effect: "+name);
+        ADDON_EFFECTS.put(name,potion);
     }
     public static Potion effect(String name) {
         if (name == null) return null;
+        if (ADDON_EFFECTS.containsKey(name)) return ADDON_EFFECTS.get(name);
         if (name.equals("comfort")) return Content.comfort;
         if (name.equals("nourishment")) return Content.nourishment;
+        if (name.equals("resistance")) return Potion.resistance;
+        if (name.equals("health_boost")) return Potion.field_76434_w;
+        if (name.equals("night_vision")) return Potion.nightVision;
+        if (name.equals("water_breathing")) return Potion.waterBreathing;
+        if (name.equals("weakness")) return Potion.weakness;
+        if (name.equals("slowness")) return Potion.moveSlowdown;
+        if (name.equals("wither")) return Potion.wither;
+        if (name.equals("haste")) return Potion.digSpeed;
+        // These effects have no native representation here; their dependency chains are deferred by addons.
+        if (name.equals("levitation") || name.equals("glowing") || name.equals("luck")) return null;
+        if (name.equals("blindness")) return Potion.blindness;
+        if (name.equals("mining_fatigue")) return Potion.digSlowdown;
+        if (name.equals("strength")) return Potion.damageBoost;
         if (name.equals("speed")) return Potion.moveSpeed;
         if (name.equals("hunger")) return Potion.hunger;
         if (name.equals("regeneration")) return Potion.regeneration;

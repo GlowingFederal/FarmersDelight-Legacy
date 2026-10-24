@@ -58,13 +58,23 @@ On **1.7.10**, keep `config/legacy-potion-ids.properties` with your modpack and 
 file to clients and server. Updated EFR-R cooperates with this allocator, but neither mod requires the other.
 Both mods reserve existing overrides before selecting free native potion slots and retain saved allocations when
 effects are disabled or mods are temporarily removed. The Forge handshake rejects different active mappings before
-player effect packets arrive. Each world records a snapshot in `data/legacy-potion-ids.properties` and refuses to
-load if a recorded allocation changes or disappears. Keep legacy configuration files during upgrade so older worlds
+player effect packets arrive. Each world records a snapshot in `data/legacy-potion-ids.properties`. Changed IDs
+are migrated before world data is loaded; missing allocations still stop loading. Keep legacy configuration files during upgrade so older worlds
 inherit their established IDs. Do not delete or regenerate the allocation file for an existing world.
 
-Automatic allocation uses the live registry capacity and native signed-byte IDs 1..127; a full table fails explicitly.
-Unmodified mods can still impose conflicting hardcoded IDs. Resolve such conflicts deliberately rather than
-reassigning saved effects. An installation that never successfully loaded EFR-R's new Nautilus/Dolphin effects
+The 1.7.10 allocator expands the potion table to at least 128 slots before registration, independently of UAB or
+an ID extender, preserving existing entries and larger third-party tables. Automatic allocation uses native
+signed-byte IDs 1..127; a full table fails explicitly. This also supports Brewin' and Chewin' allocations above 31.
+Manual `effects.comfortId` and `effects.nourishmentId` overrides are read during construction. To change them,
+stop the game/server, select unused IDs, update both sides and restart. Each world migrates its saved active effects
+and custom potion items from its recorded mapping before players or chunks load, including offline players and
+unloaded dimensions. Swapping the two IDs is supported. Durations, amplifiers and unrelated effects are retained.
+Changed files and converted copies are kept under `data/potion-id-migrations/`; interrupted conversions resume
+before the world opens. The world snapshot is committed only after all converted files are installed. Worlds
+without an allocation snapshot establish their first mapping from the current configuration; older numeric effects
+without a recorded identity cannot be inferred. `-1` keeps an existing automatic allocation rather than reallocating it.
+Unmodified mods can still impose conflicting hardcoded IDs. Choose unused explicit FD IDs and let saved worlds
+migrate, keeping the allocation files. An installation that never successfully loaded EFR-R's new Nautilus/Dolphin effects
 alongside FD can set only EFR-R's conflicting `nautilusBreathID` / `dolphinGraceID` overrides to `-1` before its
 first allocator-enabled launch, preserving FD's established IDs. Both client and server need updated mod JARs.
 

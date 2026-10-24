@@ -23,6 +23,8 @@ public final class ClientProxy extends vectorwing.farmersdelight.legacy.CommonPr
         cpw.mods.fml.client.registry.ClientRegistry.bindTileEntitySpecialRenderer(vectorwing.farmersdelight.legacy.CuttingBoardTile.class, new CuttingBoardRenderer());
     }
     @Override public vectorwing.farmersdelight.legacy.GuiHandler guiHandler() { return new ClientGuiHandler(); }
+    @Override public void registerMetadataModels(net.minecraft.block.Block block,String namespace,String[] names,int[] metadata) { models.addMetadataVariants(block,namespace,names,metadata); }
+    @Override public void registerModels(net.minecraft.block.Block block,String namespace,String[] stages) { models.addVariants(block,namespace,stages); }
     private NativeModels models;
     private RiceRenderer rice;
     @Override public int riceRenderId() { return rice == null ? 0 : rice.id; }

@@ -30,6 +30,7 @@ public final class IngredientRegistry<S> {
         return entries.get(name);
     }
     public void define(String name) { edit(name); }
+    public boolean contains(String name) { return entries.containsKey(name); }
     public void add(String name, S stack) { edit(name).exact.add(stacks.copy(stack)); }
     public void ore(String name, String ore) { edit(name).ores.add(ore); }
     public void alias(String name, String member) { edit(name).aliases.add(member); }

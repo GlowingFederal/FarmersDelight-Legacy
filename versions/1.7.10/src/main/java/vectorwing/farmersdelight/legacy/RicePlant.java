@@ -27,7 +27,7 @@ public final class RicePlant extends BlockContainer implements IGrowable,ISheara
         setBlockBounds(0.0625F,0,0.0625F,0.9375F,1,0.9375F);
     }
     public TileEntity createNewTileEntity(World world,int meta) { return new RiceTile(); }
-    private static boolean ground(Block block) { return block==Blocks.dirt || block==Blocks.grass || block==Blocks.farmland || block==Content.richSoil || block==Content.richFarmland; }
+    private static boolean ground(Block block) { return block==Blocks.dirt || block==Blocks.grass || block==Blocks.farmland || block==Content.richSoil || block==Content.richFarmland || UABCompatibility.riceGround(block); }
     public boolean canPlant(World world,int x,int y,int z) {
         return y>0 && y<254 && world.getBlock(x,y,z) instanceof net.minecraft.block.BlockLiquid && world.getBlock(x,y,z).getMaterial()==Material.water && world.getBlockMetadata(x,y,z)==0 && ground(world.getBlock(x,y-1,z)) && (!wild || world.isAirBlock(x,y+1,z));
     }

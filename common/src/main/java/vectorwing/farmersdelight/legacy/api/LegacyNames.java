@@ -10,6 +10,7 @@ public final class LegacyNames {
     static {
         Map<String, String> names = new LinkedHashMap<String, String>();
         String[][] aliases = {
+            {"popped_chorus_fruit", "chorus_fruit_popped"}, {"end_stone_bricks", "end_bricks"},
             {"cod", "fish@0"}, {"salmon", "fish@1"}, {"tropical_fish", "fish@2"}, {"pufferfish", "fish@3"},
             {"cooked_cod", "cooked_fish@0"}, {"cooked_salmon", "cooked_fish@1"},
             {"melon", "melon_block"}, {"melon_slice", "melon"}, {"bricks", "brick_block"},

@@ -16,6 +16,9 @@ public final class ClientProxy extends CommonProxy {
         net.minecraftforge.fml.client.registry.ClientRegistry.bindTileEntitySpecialRenderer(CuttingBoardTile.class,new CuttingBoardRenderer());
     }
     private void models() {
+        net.minecraft.client.renderer.block.statemap.StateMap riceMap=new net.minecraft.client.renderer.block.statemap.StateMap.Builder().ignore(net.minecraft.block.BlockLiquid.LEVEL).build();
+        net.minecraftforge.client.model.ModelLoader.setCustomStateMapper(Content.riceCrop,riceMap);
+        net.minecraftforge.client.model.ModelLoader.setCustomStateMapper(Content.wildRice,riceMap);
         for(net.minecraft.item.Item item:Content.ITEMS.values())
             net.minecraftforge.client.model.ModelLoader.setCustomModelResourceLocation(item,0,new net.minecraft.client.resources.model.ModelResourceLocation(item.getRegistryName(),"inventory"));
     }

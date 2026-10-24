@@ -16,10 +16,30 @@ import net.minecraftforge.oredict.OreDictionary;
 public final class SourceTags {
     private static final JsonObject TAGS = new Gson().fromJson(new InputStreamReader(
             SourceTags.class.getResourceAsStream("/farmersdelight/source_tags.json"), StandardCharsets.UTF_8), JsonObject.class);
+    private static boolean frozen;
+    /** Merge additive upstream item tags during addon init, before native recipes are compiled. */
+    public static void addCatalog(Class<?> owner, String resource) {
+        if (frozen) throw new IllegalStateException("Tag registration has closed");
+        java.io.InputStream stream=owner.getResourceAsStream(resource);
+        if(stream==null) throw new IllegalArgumentException("Missing tag catalog: "+resource);
+        try (InputStreamReader reader=new InputStreamReader(stream,StandardCharsets.UTF_8)) {
+            JsonObject root=new Gson().fromJson(reader,JsonObject.class);
+            for(java.util.Map.Entry<String,JsonElement> entry:root.entrySet()) {
+                JsonObject incoming=entry.getValue().getAsJsonObject();
+                if(incoming.has("replace") && incoming.get("replace").getAsBoolean())
+                    throw new IllegalArgumentException("Addon tags must be additive: "+entry.getKey());
+                if(!TAGS.has(entry.getKey())) TAGS.add(entry.getKey(),incoming);
+                else for(JsonElement value:incoming.getAsJsonArray("values"))
+                    TAGS.getAsJsonObject(entry.getKey()).getAsJsonArray("values").add(value);
+            }
+        } catch(java.io.IOException e) { throw new IllegalStateException("Cannot load addon tags",e); }
+    }
+    public static void freeze() { frozen=true; }
     public static List<ItemStack> candidates(String tag) { return collect(tag, new HashSet<String>()); }
     private static List<ItemStack> collect(String tag, Set<String> path) {
         if (!path.add(tag)) throw new IllegalArgumentException("Tag cycle: " + tag);
         List<ItemStack> result = new ArrayList<ItemStack>();
+        if (Ingredients.REGISTRY.contains(tag)) result.addAll(Ingredients.REGISTRY.candidates(tag));
         if (TAGS.has(tag)) {
             for (JsonElement value : TAGS.getAsJsonObject(tag).getAsJsonArray("values")) {
                 String id = value.isJsonPrimitive() ? value.getAsString() : value.getAsJsonObject().get("id").getAsString();

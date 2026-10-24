@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import vectorwing.farmersdelight.legacy.api.FoodDefinition;
 import net.minecraft.entity.EntityLivingBase; import net.minecraft.util.ResourceLocation; import net.minecraft.util.SoundCategory; import net.minecraft.init.SoundEvents;
 
-public final class LegacyFood extends ItemFood {
+public class LegacyFood extends ItemFood {
     public final FoodDefinition definition;
     public LegacyFood(FoodDefinition definition) {
         super(definition.nutrition, definition.saturation, definition.meat);
@@ -62,9 +62,20 @@ public final class LegacyFood extends ItemFood {
         Potion potion = effect(definition.effect);
         if (potion != null && world.rand.nextFloat() < definition.chance)
             player.addPotionEffect(new PotionEffect(potion, definition.duration, definition.amplifier));
+        if (definition.effects != null) for (FoodDefinition.Effect extra : definition.effects) {
+            Potion additional = effect(extra.effect);
+            if (additional != null && world.rand.nextFloat() < extra.chance)
+                player.addPotionEffect(new PotionEffect(additional, extra.duration, extra.amplifier));
+        }
+    }
+    private static final java.util.Map<String,Potion> ADDON_EFFECTS=new java.util.LinkedHashMap<String,Potion>();
+    public static void registerEffect(String name,Potion potion) {
+        if(name.indexOf(':')<1 || potion==null || ADDON_EFFECTS.containsKey(name)) throw new IllegalArgumentException("Invalid or duplicate effect: "+name);
+        ADDON_EFFECTS.put(name,potion);
     }
     public static Potion effect(String name) {
         if (name == null) return null;
+        if (ADDON_EFFECTS.containsKey(name)) return ADDON_EFFECTS.get(name);
         if (name.equals("comfort")) return Content.comfort;
         if (name.equals("nourishment")) return Content.nourishment;
         return Potion.getPotionFromResourceLocation("minecraft:" + name);

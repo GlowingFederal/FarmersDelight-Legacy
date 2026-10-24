@@ -13,16 +13,19 @@ import net.minecraft.world.IBlockAccess;
 
 
 /** The remaining portions belong to the placed meal and never regenerate on pickup. */
-public final class ServingBlock extends BlockContainer {
+public class ServingBlock extends BlockContainer {
     public final String id;
     public final boolean pie, leftovers;
     private final String serving;
 
     public ServingBlock(String id,boolean pie,String serving) {
-        super(Material.cloth); this.id=id; this.pie=pie; this.serving=serving;
-        leftovers=!pie && !id.equals("stuffed_pumpkin_block");
-        setBlockName("farmersdelight."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
-        setBlockTextureName("farmersdelight:"+(pie ? id+"_top" : id.equals("stuffed_pumpkin_block") ? "stuffed_pumpkin_bottom" : id.equals("shepherds_pie_block") ? "shepherds_pie_top" : id.replace("_block","")+"_body"));
+        this("farmersdelight",id,pie,"farmersdelight:"+serving,!pie && !id.equals("stuffed_pumpkin_block"));
+    }
+    /** Native addon feast using the same serving, persistence and duplication protections. */
+    public ServingBlock(String namespace,String id,boolean pie,String serving,boolean leftovers) {
+        super(Material.cloth); this.id=id; this.pie=pie; this.serving=serving; this.leftovers=leftovers;
+        setBlockName(namespace+"."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
+        setBlockTextureName(namespace+":"+(pie ? id+"_top" : id.equals("stuffed_pumpkin_block") ? "stuffed_pumpkin_bottom" : id.equals("shepherds_pie_block") ? "shepherds_pie_top" : id.replace("_block","")+"_body"));
     }
     public TileEntity createNewTileEntity(World world,int meta) { return new ServingTile(); }
     public static int portions(TileEntity tile) { return tile instanceof ServingTile ? ((ServingTile)tile).remaining : 0; }
@@ -49,7 +52,7 @@ public final class ServingBlock extends BlockContainer {
             return true;
         }
         ItemStack held=player.getHeldItem();
-        ItemStack portion=new ItemStack(Content.ITEMS.get(serving));
+        ItemStack portion=Stacks.resolve(serving);
         boolean knife=Ingredients.isKnife(held);
         if(pie && !knife && !player.canEat(false)) return false;
         if(!pie && (Stacks.empty(held) || held.getItem()!=net.minecraft.init.Items.bowl)) return false;

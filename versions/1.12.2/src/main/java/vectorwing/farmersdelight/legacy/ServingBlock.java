@@ -18,16 +18,19 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 
 /** The remaining portions belong to the placed meal and never regenerate on pickup. */
-public final class ServingBlock extends BlockContainer {
+public class ServingBlock extends BlockContainer {
     public final String id;
     public final boolean pie, leftovers;
     private final String serving;
     public static final net.minecraft.block.properties.PropertyDirection FACING=net.minecraft.block.BlockHorizontal.FACING;
     public static final PropertyInteger SERVINGS=PropertyInteger.create("servings",0,4);
     public ServingBlock(String id,boolean pie,String serving) {
-        super(Material.CLOTH); this.id=id; this.pie=pie; this.serving=serving;
-        leftovers=!pie && !id.equals("stuffed_pumpkin_block");
-        setTranslationKey("farmersdelight."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
+        this("farmersdelight",id,pie,"farmersdelight:"+serving,!pie && !id.equals("stuffed_pumpkin_block"));
+    }
+    /** Native addon feast using the same serving, persistence and duplication protections. */
+    public ServingBlock(String namespace,String id,boolean pie,String serving,boolean leftovers) {
+        super(Material.CLOTH); this.id=id; this.pie=pie; this.serving=serving; this.leftovers=leftovers;
+        setTranslationKey(namespace+"."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
         setDefaultState(blockState.getBaseState().withProperty(FACING,EnumFacing.NORTH).withProperty(SERVINGS,4));
     }
     public TileEntity createNewTileEntity(World world,int meta) { return new ServingTile(); }
@@ -58,7 +61,7 @@ public final class ServingBlock extends BlockContainer {
             return true;
         }
         ItemStack held=player.getHeldItem(hand);
-        ItemStack portion=new ItemStack(Content.ITEMS.get(serving));
+        ItemStack portion=Stacks.resolve(serving);
         boolean knife=Ingredients.isKnife(held);
         if(pie && !knife && !player.canEat(false)) return false;
         if(!pie && (Stacks.empty(held) || held.getItem()!=net.minecraft.init.Items.BOWL)) return false;

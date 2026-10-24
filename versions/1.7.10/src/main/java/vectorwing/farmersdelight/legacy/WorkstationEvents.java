@@ -61,6 +61,7 @@ public final class WorkstationEvents {
                 || target instanceof net.minecraft.entity.passive.EntityHorse && ((net.minecraft.entity.passive.EntityHorse)target).getHorseType()<3)
             extra=new ItemStack(Items.leather);
 
+        else extra=UABCompatibility.scavenge(target);
         if(!Stacks.empty(extra)) event.drops.add(new EntityItem(target.worldObj,target.posX,target.posY,target.posZ,extra));
     }
 }

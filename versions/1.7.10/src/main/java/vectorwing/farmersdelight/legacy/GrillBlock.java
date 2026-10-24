@@ -16,8 +16,9 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public final class GrillBlock extends BlockContainer {
+public class GrillBlock extends BlockContainer {
     private final boolean stove;
+    public final boolean isStove() { return stove; }
     @SideOnly(Side.CLIENT) private net.minecraft.util.IIcon top, bottom, front, lit, litTop;
     private static final int[] FACES = {2,5,3,4};
     public GrillBlock(boolean stove) {

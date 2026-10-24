@@ -29,6 +29,10 @@ public final class FoodEvents {
         Progression.consumed(event.entityPlayer,food);
         if (Settings.comfortSoups && food != null && food.getItem() == Items.mushroom_stew)
             event.entityPlayer.addPotionEffect(new PotionEffect(Content.comfort.id, 3600, 0));
+        boolean rabbit=UABCompatibility.soup(food,"rabbit_stew");
+        if(Settings.comfortSoups && (rabbit || UABCompatibility.soup(food,"beetroot_soup")))
+            event.entityPlayer.addPotionEffect(new PotionEffect(Content.comfort.id,rabbit ? 6000 : 3600,0));
+        if(Settings.rabbitJump && rabbit) event.entityPlayer.addPotionEffect(new PotionEffect(net.minecraft.potion.Potion.jump.id,200,1));
 
 
     }

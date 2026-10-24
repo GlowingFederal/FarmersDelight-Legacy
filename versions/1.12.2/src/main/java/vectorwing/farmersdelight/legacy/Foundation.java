@@ -35,6 +35,9 @@ public final class Foundation {
     @Mod.EventHandler public void postInit(FMLPostInitializationEvent event) {
         Ingredients.REGISTRY.freeze();
         Recipes.REGISTRY.freeze();
+        AddonRecipes.resolve();
+        vectorwing.farmersdelight.legacy.api.SourceRecipes.freeze();
+        SourceTags.freeze();
         CuttingRecipes.register();
         CookingRecipes.register();
         GrillingRecipes.register();
@@ -46,6 +49,7 @@ public final class Foundation {
         org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred heat recipes: {}",GrillingRecipes.DEFERRED);
         org.apache.logging.log4j.LogManager.getLogger(MODID).info("Cooking Pot: {} active recipes; {} deferred. Additional crafting: {} active; {} deferred.",
                 CookingRecipes.ALL.size(), CookingRecipes.DEFERRED.size(), SourceCrafting.activeCount(), SourceCrafting.DEFERRED.size());
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred addon acquisition paths: {}",vectorwing.farmersdelight.legacy.api.SourceRecipes.deferred());
         CuttingDispenser.register();
         org.apache.logging.log4j.LogManager.getLogger(MODID).info("Cutting Board: {} active recipes; {} deferred for unavailable prerequisites",
                 CuttingRecipes.ALL.size(), CuttingRecipes.DEFERRED.size());

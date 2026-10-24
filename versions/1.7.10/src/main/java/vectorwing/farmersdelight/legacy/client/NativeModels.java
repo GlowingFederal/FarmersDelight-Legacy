@@ -27,6 +27,7 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
     public final int id = RenderingRegistry.getNextAvailableRenderId();
     private final Map<Block, Quad[][]> models = new LinkedHashMap<Block, Quad[][]>();
     private final Map<Block, Quad[][][]> variants = new LinkedHashMap<Block, Quad[][][]>();
+    private final Map<Block,int[]> metadataVariants=new LinkedHashMap<Block,int[]>();
     private final Map<String, IIcon> textures = new LinkedHashMap<String, IIcon>();
     public NativeModels() {
         add(Content.cuttingBoard, "cutting_board"); add(Content.cookingPot, "cooking_pot"); add(Content.skillet, "skillet");
@@ -57,9 +58,23 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
         for(String name:new String[]{"tatami_half","tatami_even","tatami_odd"}) { add(Content.tatami,name); tatami[stage++]=models.get(Content.tatami); }
         variants.put(Content.tatami,tatami);
     }
-    private void add(Block block, String name) {
+    public void addMetadataVariants(Block block,String namespace,String[] names,int[] metadata) {
+        if(metadata.length!=16 || names.length==0) throw new IllegalArgumentException("Invalid metadata model map");
+        for(int value:metadata) if(value<0 || value>=names.length) throw new IllegalArgumentException("Invalid metadata model index");
+        Quad[][][] states=new Quad[names.length][][];
+        for(int i=0;i<names.length;i++) { add(block,namespace,names[i]);states[i]=models.get(block); }
+        variants.put(block,states);metadataVariants.put(block,metadata.clone());
+    }
+    public void addVariants(Block block,String namespace,String[] names) {
+        if(names.length!=5) throw new IllegalArgumentException("A feast requires five portion models");
+        Quad[][][] stages=new Quad[5][][];
+        for(int i=0;i<5;i++) { add(block,namespace,names[i]);stages[i]=models.get(block); }
+        variants.put(block,stages);
+    }
+    private void add(Block block,String name) { add(block,"farmersdelight",name); }
+    private void add(Block block, String namespace,String name) {
         JsonObject json = new Gson().fromJson(new InputStreamReader(NativeModels.class.getResourceAsStream(
-                "/assets/farmersdelight/models/block/" + name + ".json"), StandardCharsets.UTF_8), JsonObject.class);
+                "/assets/"+namespace+"/models/block/" + name + ".json"), StandardCharsets.UTF_8), JsonObject.class);
         Quad[][] rotated = new Quad[block==Content.basket || block==Content.tatami ? 6 : 4][];
         for (int facing = 0; facing < rotated.length; facing++) {
             List<Quad> quads = new ArrayList<Quad>();
@@ -72,7 +87,7 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
                         if (++depth > 16) throw new IllegalArgumentException("Cyclic model texture " + name);
                         texture = json.getAsJsonObject("textures").get(texture.substring(1)).getAsString();
                     }
-                    texture = texture.replace("farmersdelight:block/", "farmersdelight:").replace("farmersdelight:blocks/", "farmersdelight:").replace("minecraft:block/","minecraft:").replace("minecraft:blocks/","minecraft:"); textures.put(texture, null);
+                    texture = texture.replace("farmersdelight:block/", "farmersdelight:").replace("farmersdelight:blocks/", "farmersdelight:").replace("minecraft:block/","minecraft:").replace("minecraft:blocks/","minecraft:"); texture = texture.replace(":blocks/", ":").replace(":block/", ":"); textures.put(texture, null);
                     double[][] points = face(face.getKey(), from, to);
                     for (double[] point : points) {
                         if (box.has("rotation")) rotate(point, box.getAsJsonObject("rotation"));
@@ -120,6 +135,7 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
     public void renderInventoryBlock(Block block, int metadata, int model, RenderBlocks renderer) {
         GL11.glPushMatrix(); GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         int variant=block instanceof vectorwing.farmersdelight.legacy.ServingBlock ? 4 : 0;
+        if(metadataVariants.containsKey(block)) variant=metadataVariants.get(block)[metadata&15];
         Tessellator.instance.startDrawingQuads(); render(block, block==Content.basket || block==Content.tatami ? 1 : 0, variant, 0, 0, 0, false); Tessellator.instance.draw(); GL11.glPopMatrix();
     }
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int model, RenderBlocks renderer) {
@@ -128,6 +144,7 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
         int variant=block==Content.cookingPot ? Math.min(2,(meta>>2)&3) : block instanceof vectorwing.farmersdelight.legacy.MatBlock ? (meta>>2)&1
                 : block==Content.tatami ? (meta&8)==0 ? 0 : (meta&1)==0 ? 1 : 2
                 : vectorwing.farmersdelight.legacy.ServingBlock.portions(world.getTileEntity(x,y,z));
+        if(metadataVariants.containsKey(block)) variant=metadataVariants.get(block)[meta&15];
         render(block, meta & (block==Content.basket || block==Content.tatami ? 7 : 3), variant, x, y, z, true); return true;
     }
     private void render(Block block, int facing, int remaining, int x, int y, int z, boolean world) {

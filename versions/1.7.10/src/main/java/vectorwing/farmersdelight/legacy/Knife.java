@@ -8,7 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraft.block.Block; import net.minecraft.block.material.Material;
-public final class Knife extends ItemSword {
+public class Knife extends ItemSword {
     private final ToolMaterial material;
     public Knife(ToolMaterial material) { super(material); this.material = material; }
     @Override public int getItemEnchantability() { return material == ToolMaterial.STONE ? 5 : super.getItemEnchantability(); }

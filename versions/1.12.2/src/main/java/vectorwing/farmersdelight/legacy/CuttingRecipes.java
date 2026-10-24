@@ -39,11 +39,19 @@ public final class CuttingRecipes {
             }
             if (unavailable != null) { DEFERRED.put(entry.getKey(), unavailable); continue; }
             if (outputs.isEmpty() || outputs.size() > 4) throw new IllegalArgumentException("Invalid cutting results: " + entry.getKey());
-            JsonObject tool = json.getAsJsonObject("tool");
-            String toolKind = tool.has("tool") ? tool.get("tool").getAsString()
-                    : tool.get("tag").getAsString().equals("forge:shears") ? "shears" : "knife";
+            JsonElement specification=json.get("tool");
+            JsonObject tool=specification.isJsonObject()?specification.getAsJsonObject():null;
+            String toolKind="ingredient";
+            List<ItemStack> toolItems=null;
+            if(tool!=null && tool.has("tool")) toolKind=tool.get("tool").getAsString();
+            else if(tool!=null && tool.has("tag") && (tool.get("tag").getAsString().equals("forge:tools/knives") || tool.get("tag").getAsString().equals("farmersdelight:tools/knives"))) toolKind="knife";
+            else if(tool!=null && tool.has("tag") && tool.get("tag").getAsString().equals("forge:shears")) toolKind="shears";
+            else {
+                toolItems=Stacks.candidates(specification);
+                if(toolItems.isEmpty()) { DEFERRED.put(entry.getKey(),"Unavailable cutting tool "+specification);continue; }
+            }
             Recipe recipe = new Recipe(entry.getKey(), inputs, outputs, chances, toolKind,
-                    json.has("sound") ? json.get("sound").getAsString() : "");
+                    json.has("sound") ? json.get("sound").getAsString() : "",toolItems);
             ALL.add(recipe);
             for (ItemStack input : inputs) {
                 List<Recipe> list = BY_INPUT.get(input.getItem());
@@ -68,14 +76,17 @@ public final class CuttingRecipes {
         public final String id, tool, sound;
         public final List<ItemStack> inputs, outputs;
         public final List<Double> chances;
-        Recipe(String id, List<ItemStack> inputs, List<ItemStack> outputs, List<Double> chances, String tool, String sound) {
+        private final List<ItemStack> toolItems;
+        Recipe(String id, List<ItemStack> inputs, List<ItemStack> outputs, List<Double> chances, String tool, String sound,List<ItemStack> toolItems) {
             this.id = id; this.inputs = Collections.unmodifiableList(inputs); this.outputs = Collections.unmodifiableList(outputs);
             this.chances = Collections.unmodifiableList(chances); this.tool = tool; this.sound = sound;
+            this.toolItems=toolItems==null?null:Collections.unmodifiableList(toolItems);
         }
         public boolean matchesInput(ItemStack stack) { return Stacks.matches(inputs, stack); }
-        public boolean matchesTool(ItemStack stack) { return CuttingRecipes.tool(stack, tool); }
+        public boolean matchesTool(ItemStack stack) { return toolItems==null?CuttingRecipes.tool(stack, tool):Stacks.matches(toolItems,stack); }
         public List<ItemStack> tools() {
             List<ItemStack> result = new ArrayList<ItemStack>();
+            if(toolItems!=null) { for(ItemStack stack:toolItems) result.add(stack.copy());return result; }
             if (tool.equals("knife")) {
                 for (String id : new String[] {"flint_knife", "iron_knife", "golden_knife", "diamond_knife"})
                     result.add(new ItemStack(Content.ITEMS.get(id)));

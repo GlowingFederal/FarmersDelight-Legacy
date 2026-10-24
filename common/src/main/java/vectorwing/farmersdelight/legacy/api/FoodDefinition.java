@@ -15,4 +15,12 @@ public final class FoodDefinition {
     public String container;
     public int stackSize = 64;
     public String action;
+    /** Additional effects for addon foods; the original single-effect contract remains valid. */
+    public Effect[] effects;
+    public static final class Effect {
+        public String effect;
+        public int duration;
+        public int amplifier;
+        public float chance = 1.0F;
+    }
 }

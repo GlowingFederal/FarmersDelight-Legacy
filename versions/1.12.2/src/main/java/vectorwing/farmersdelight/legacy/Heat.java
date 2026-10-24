@@ -14,7 +14,7 @@ public final class Heat {
     private static boolean source(World world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
         String id = String.valueOf(block.getRegistryName());
-        if ("farmersdelight:stove".equals(id)) return (block.getMetaFromState(world.getBlockState(pos)) & 4) != 0;
+        if (block instanceof GrillBlock && ((GrillBlock)block).isStove()) return (block.getMetaFromState(world.getBlockState(pos)) & 4) != 0;
         return block == Blocks.FIRE || block == Blocks.LAVA || block == Blocks.FLOWING_LAVA
                 || block == Blocks.MAGMA;
     }

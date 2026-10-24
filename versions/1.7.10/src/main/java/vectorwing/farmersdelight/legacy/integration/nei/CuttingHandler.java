@@ -63,7 +63,7 @@ public final class CuttingHandler extends FDRecipeHandler {
         final String tool;
         final List<PositionedStack> inputs = new ArrayList<PositionedStack>(), outputs = new ArrayList<PositionedStack>();
         Cached(CuttingRecipes.Recipe recipe) {
-            this.recipe = recipe; tool = text("tool." + recipe.tool);
+            this.recipe = recipe; tool = recipe.tool.equals("ingredient") ? recipe.tools().get(0).getDisplayName() : text("tool." + recipe.tool);
             inputs.add(new PositionedStack(recipe.inputs, 6, 16));
             inputs.add(new PositionedStack(recipe.tools(), 34, 16));
             for (int i = 0; i < recipe.outputs.size(); i++)

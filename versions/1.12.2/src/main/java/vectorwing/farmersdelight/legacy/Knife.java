@@ -9,7 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.EntityEquipmentSlot; import net.minecraft.block.state.IBlockState; import net.minecraft.block.material.Material; import net.minecraft.util.ActionResult; import net.minecraft.util.EnumActionResult; import net.minecraft.util.EnumHand;
-public final class Knife extends ItemSword {
+public class Knife extends ItemSword {
     private final ToolMaterial material;
     public Knife(ToolMaterial material) { super(material); this.material = material; }
     @Override public int getItemEnchantability() { return material == ToolMaterial.STONE ? 5 : super.getItemEnchantability(); }

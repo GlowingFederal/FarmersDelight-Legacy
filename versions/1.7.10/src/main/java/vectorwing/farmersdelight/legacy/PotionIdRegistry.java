@@ -38,6 +38,12 @@ public final class PotionIdRegistry {
     public void reserve(Map<String, Integer> overrides) { reserve(overrides, overrides.keySet()); }
 
     public void reserve(Map<String, Integer> overrides, Set<String> enabled) {
+        // Construction precedes every mod's pre-init allocation. Capacity belongs to this
+        // allocator, including addon-only packs and saved mappings created with an extender.
+        // Native packets and effect NBT support IDs through 127 without a protocol change.
+        if (Potion.potionTypes.length < 128)
+            vectorwing.farmersdelight.legacy.mixin.PotionArrayAccessor.farmersdelight$setPotionTypes(
+                    java.util.Arrays.copyOf(Potion.potionTypes, 128));
         synchronized (lock(FILE)) {
             Properties data = read(FILE);
             for (Map.Entry<String, Integer> entry : overrides.entrySet()) {
@@ -48,9 +54,11 @@ public final class PotionIdRegistry {
                 if (stored == null || stored.equals("-1")) {
                     if (override >= 0 || enabled.contains(entry.getKey())) data.setProperty(key, Integer.toString(override));
                     else data.remove(key);
-                } else if (override >= 0 && Integer.parseInt(stored) != override)
-                    throw failure(key + " requests " + override + " but its persisted allocation is " + stored
-                            + ". Restore the matching configuration/allocation file; changing saved IDs requires migration.");
+                } else if (override >= 0) {
+                    // Apply all overrides before validation so effects can exchange IDs.
+                    // Each world retains its old mapping until its saves are migrated.
+                    data.setProperty(key, Integer.toString(override));
+                }
                 if (enabled.contains(entry.getKey())) requested.add(key);
             }
             validate(data);
@@ -134,6 +142,13 @@ public final class PotionIdRegistry {
         return matches;
     }
 
+    /** Called before SaveHandler reads level.dat or any players/chunks. */
+    public static void prepareWorld(File directory) {
+        synchronized (lock(FILE)) {
+            PotionSaveMigration.migrate(directory, read(FILE));
+        }
+    }
+
     @SubscribeEvent
     public void worldLoad(WorldEvent.Load event) {
         if (event.world.isRemote || event.world.provider.dimensionId != 0) return;
@@ -163,7 +178,7 @@ public final class PotionIdRegistry {
         catch (IOException exception) { throw new IllegalStateException("Cannot resolve potion allocation file", exception); }
     }
 
-    private static Properties read(File file) {
+    static Properties read(File file) {
         Properties data = new Properties();
         if (file.exists()) {
             try (FileInputStream input = new FileInputStream(file)) { data.load(input); }
@@ -190,7 +205,7 @@ public final class PotionIdRegistry {
         }
     }
 
-    private static void write(File file, Properties data) {
+    static void write(File file, Properties data) {
         Path temporary = null;
         try {
             Files.createDirectories(file.toPath().getParent());
