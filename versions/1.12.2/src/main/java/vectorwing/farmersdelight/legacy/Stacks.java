@@ -27,12 +27,17 @@ public final class Stacks {
                 && ItemStack.areItemStackTagsEqual(a, b);
     }
     public static ItemStack resolve(String modernId) {
+        if (!UABCompatibility.foodAvailable(modernId)) return none();
+        if (modernId.equals("minecraft:sugar_cane")) return new ItemStack(net.minecraft.init.Items.REEDS);
+        if (modernId.startsWith("minecraft:") && modernId.endsWith("_trapdoor") && !modernId.equals("minecraft:oak_trapdoor") && !modernId.equals("minecraft:iron_trapdoor"))
+            return UABCompatibility.resolve(modernId);
         String id = LegacyNames.ITEMS.containsKey(modernId) ? LegacyNames.ITEMS.get(modernId) : modernId;
         int metadata = 0;
         int marker = id.indexOf('@');
         if (marker >= 0) { metadata = Integer.parseInt(id.substring(marker + 1)); id = id.substring(0, marker); }
         Item item = Item.REGISTRY.getObject(new ResourceLocation(id));
-        return item == null || item == net.minecraft.init.Items.AIR ? none() : new ItemStack(item, 1, metadata);
+        ItemStack stack = item == null || item == net.minecraft.init.Items.AIR ? UABCompatibility.resolve(modernId) : new ItemStack(item, 1, metadata);
+        return UABCompatibility.available(stack) ? stack : none();
     }
     public static ItemStack result(JsonObject json) {
         ItemStack stack = resolve(json.get("item").getAsString());
@@ -59,6 +64,7 @@ public final class Stacks {
     }
     public static boolean matches(List<ItemStack> candidates, ItemStack actual) {
         if (empty(actual)) return false;
+        if (candidates instanceof ScriptRecipes.Ingredient) return ((ScriptRecipes.Ingredient) candidates).matches(actual);
         // Vanilla JSON item ingredients ignore damage on damageable items and preserve arbitrary input NBT.
         for (ItemStack expected : candidates)
             if (expected.getItem() == actual.getItem() && (actual.isItemStackDamageable()

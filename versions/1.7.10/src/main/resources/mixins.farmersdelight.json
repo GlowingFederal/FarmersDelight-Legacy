@@ -16,7 +16,8 @@
     "MushroomSoilMixin",
     "ToolKnockbackMixin",
     "SkilletEnchantmentsMixin",
-    "SafetyNetBounceMixin"
+    "SafetyNetBounceMixin",
+    "NetheriteKnifeFireMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -12,3 +12,7 @@ dependencies {
 // GTNH's UniMixins convention registers the static MixinConfigs manifest entry.
 // Register it once; a second early loader would compete with that configuration.
 jar.finalizedBy 'reobfJar'
+
+// Optional scripting API; no scripting classes are bundled or required at runtime.
+repositories { maven { url = 'https://maven.blamejared.com' } }
+dependencies { compileOnly 'MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-3.0.13.43' }

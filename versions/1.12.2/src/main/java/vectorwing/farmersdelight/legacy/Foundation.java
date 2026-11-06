@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 @Mod(modid = Foundation.MODID, name = "Farmer's Delight Legacy", version = BuildVersion.VERSION,
-     acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:mixinbooter@[11.18,)")
+     acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:mixinbooter@[11.18,);after:etfuturum")
 public final class Foundation {
     public static final String MODID = "farmersdelight";
     @Mod.Instance(MODID) public static Foundation instance;
@@ -22,9 +22,12 @@ public final class Foundation {
         MinecraftForge.EVENT_BUS.register(new ToolCombat());
         net.minecraftforge.fml.common.registry.EntityRegistry.registerModEntity(new net.minecraft.util.ResourceLocation(MODID,"rotten_tomato"),RottenTomato.class,"rotten_tomato",0,instance,64,10,true);
         net.minecraftforge.fml.common.registry.GameRegistry.registerWorldGenerator(new WildGeneration(),0);
+        if (net.minecraftforge.fml.common.Loader.isModLoaded("crafttweaker"))
+            vectorwing.farmersdelight.legacy.integration.scripting.TweakerIntegration.register();
         proxy.preInit();
     }
     @Mod.EventHandler public void init(FMLInitializationEvent event) {
+        UABCompatibility.initialize();
         Recipes.register();
         RecipeSettingsSync.register();
         Acquisition.register();
@@ -41,12 +44,14 @@ public final class Foundation {
         CuttingRecipes.register();
         CookingRecipes.register();
         GrillingRecipes.register();
+        ScriptRecipes.initialize();
         SourceCrafting.register();
+        UABCompatibility.registerRecipes();
         Progression.register();
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred cutting recipes: {}",CuttingRecipes.DEFERRED);
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred pot recipes: {}",CookingRecipes.DEFERRED);
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred crafting recipes: {}",SourceCrafting.DEFERRED);
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred heat recipes: {}",GrillingRecipes.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred cutting recipes: {}",CuttingRecipes.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred pot recipes: {}",CookingRecipes.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred crafting recipes: {}",SourceCrafting.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred heat recipes: {}",GrillingRecipes.DEFERRED);
         org.apache.logging.log4j.LogManager.getLogger(MODID).info("Cooking Pot: {} active recipes; {} deferred. Additional crafting: {} active; {} deferred.",
                 CookingRecipes.ALL.size(), CookingRecipes.DEFERRED.size(), SourceCrafting.activeCount(), SourceCrafting.DEFERRED.size());
         org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred addon acquisition paths: {}",vectorwing.farmersdelight.legacy.api.SourceRecipes.deferred());

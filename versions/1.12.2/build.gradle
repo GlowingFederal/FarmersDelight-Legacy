@@ -33,6 +33,7 @@ tasks.register('generateMixinMapping') {
         def target = mixinSrg.get().asFile
         target.parentFile.mkdirs()
         target.text = 'MD: net/minecraft/entity/player/EntityPlayer/addExhaustion (F)V net/minecraft/entity/player/EntityPlayer/func_71020_j (F)V\n'
+        target << 'MD: net/minecraft/entity/item/EntityItem/attackEntityFrom (Lnet/minecraft/util/DamageSource;F)Z net/minecraft/entity/item/EntityItem/func_70097_a (Lnet/minecraft/util/DamageSource;F)Z\n'
         target << 'MD: net/minecraft/entity/passive/EntityPig/<init> (Lnet/minecraft/world/World;)V net/minecraft/entity/passive/EntityPig/<init> (Lnet/minecraft/world/World;)V\n'
         target << 'MD: net/minecraft/entity/passive/EntityChicken/<init> (Lnet/minecraft/world/World;)V net/minecraft/entity/passive/EntityChicken/<init> (Lnet/minecraft/world/World;)V\n'
         target << 'MD: net/minecraft/entity/passive/EntityPig/isBreedingItem (Lnet/minecraft/item/ItemStack;)Z net/minecraft/entity/passive/EntityPig/func_70877_b (Lnet/minecraft/item/ItemStack;)Z\n'
@@ -53,3 +54,6 @@ compileJava {
 processResources { dependsOn compileJava; from(mixinRefmap) }
 jar { manifest { attributes 'MixinConfigs': 'mixins.farmersdelight.json' } }
 jar.finalizedBy 'remapJar'
+
+// Optional scripting API; no scripting classes are bundled or required at runtime.
+dependencies { compileOnly 'CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.718' }

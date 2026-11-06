@@ -8,6 +8,7 @@ public abstract class GrillingTile extends InventoryTile  {
     public final int[] progress;
     private final GrillingRecipes.Recipe[] recipes;
     private final String[] savedRecipes;
+    private int scriptRevision = ScriptRecipes.revision();
     private boolean dirtyRecipes = true;
     protected final boolean stove;
     protected GrillingTile(boolean stove) {
@@ -54,6 +55,9 @@ public abstract class GrillingTile extends InventoryTile  {
             }
             if (any) changed();
             return;
+        }
+        if (scriptRevision != ScriptRecipes.revision()) {
+            scriptRevision = ScriptRecipes.revision(); dirtyRecipes = true; java.util.Arrays.fill(progress, 0);
         }
         if (dirtyRecipes) {
             for (int i = 0; i < inventory.length; i++) {

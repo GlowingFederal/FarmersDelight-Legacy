@@ -87,3 +87,9 @@
 - Apply explicit 1.7.10 Comfort/Nourishment ID changes, including swaps, to the canonical allocation instead of rejecting them. Keep automatic allocations persistent and reject occupied or duplicate targets.
 - Before reading world metadata, convert recorded active effects and custom potion items across player saves, integrated-player metadata, region files, inventories and unloaded dimensions using each world's previous mapping. Preserve durations, amplifiers, ambient flags and unrelated NBT.
 - Stage and verify converted files, retain original backups under data/potion-id-migrations, and resume interrupted transactions before loading the world. Commit its mapping only after every converted file is installed; retain the existing client/server mapping checks.
+
+2026-11-02 01:08 — Resynchronize UAB recipes and add optional recipe scripting
+
+- Restore original honey/berry foods, Nether salad, Nether pantries, 1.7.10 beetroot storage/wild plants and native netherite-knife upgrades. Preserve existing saved identities, food values, containers and UAB template policy.
+- Resolve both targets through their actual UAB availability APIs; restore campfire, bamboo, scaffolding, flower, door/sign and slab mappings, filter disabled ingredients and include exact enabled modern plank variants. Log missing recipe prerequisites.
+- Add optional MineTweaker 3 / CraftTweaker 2 edits for cooking, cutting, shared skillet/stove recipes and addon processors. Preserve NBT, metadata, servings, tools, heat, native container returns and script order; rebuild indexes and invalidate machine caches. Document syntax, examples and the complete recipe matrix.

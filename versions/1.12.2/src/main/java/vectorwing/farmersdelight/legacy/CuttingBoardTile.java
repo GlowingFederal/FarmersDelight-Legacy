@@ -35,7 +35,8 @@ public final class CuttingBoardTile extends InventoryTile {
         if (player == null) {
             if (tool.attemptDamageItem(1, world.rand, null)) Stacks.shrink(tool, 1);
         } else if (!player.capabilities.isCreativeMode) tool.damageItem(1, player);
-        world.playSound(null, pos, recipe.tool.equals("knife") ? Content.cuttingSound : net.minecraft.init.SoundEvents.BLOCK_WOOD_BREAK,
+        net.minecraft.util.SoundEvent sound = recipe.sound.isEmpty() ? null : net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation(recipe.sound));
+        world.playSound(null, pos, sound != null ? sound : recipe.tool.equals("knife") ? Content.cuttingSound : net.minecraft.init.SoundEvents.BLOCK_WOOD_BREAK,
                 net.minecraft.util.SoundCategory.BLOCKS, 0.8F, 1F);
         world.addBlockEvent(pos, getBlockType(), 1, 0);
         if(player!=null) Progression.grant(player,"use_cutting_board","cutting_board");

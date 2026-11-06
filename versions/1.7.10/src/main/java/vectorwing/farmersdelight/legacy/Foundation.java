@@ -35,6 +35,8 @@ public final class Foundation {
         MinecraftForge.EVENT_BUS.register(new ToolCombat());
         cpw.mods.fml.common.registry.EntityRegistry.registerModEntity(RottenTomato.class,"rotten_tomato",0,instance,64,10,true);
         cpw.mods.fml.common.registry.GameRegistry.registerWorldGenerator(new WildGeneration(),0);
+        if (cpw.mods.fml.common.Loader.isModLoaded("MineTweaker3"))
+            vectorwing.farmersdelight.legacy.integration.scripting.TweakerIntegration.register();
         proxy.preInit();
     }
     @Mod.EventHandler public void init(FMLInitializationEvent event) {
@@ -55,12 +57,14 @@ public final class Foundation {
         CuttingRecipes.register();
         CookingRecipes.register();
         GrillingRecipes.register();
+        ScriptRecipes.initialize();
         SourceCrafting.register();
+        UABCompatibility.registerRecipes();
         Progression.register();
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred cutting recipes: {}",CuttingRecipes.DEFERRED);
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred pot recipes: {}",CookingRecipes.DEFERRED);
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred crafting recipes: {}",SourceCrafting.DEFERRED);
-        org.apache.logging.log4j.LogManager.getLogger(MODID).debug("Deferred heat recipes: {}",GrillingRecipes.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred cutting recipes: {}",CuttingRecipes.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred pot recipes: {}",CookingRecipes.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred crafting recipes: {}",SourceCrafting.DEFERRED);
+        org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred heat recipes: {}",GrillingRecipes.DEFERRED);
         org.apache.logging.log4j.LogManager.getLogger(MODID).info("Cooking Pot: {} active recipes; {} deferred. Additional crafting: {} active; {} deferred.",
                 CookingRecipes.ALL.size(), CookingRecipes.DEFERRED.size(), SourceCrafting.activeCount(), SourceCrafting.DEFERRED.size());
         org.apache.logging.log4j.LogManager.getLogger(MODID).info("Deferred addon acquisition paths: {}",vectorwing.farmersdelight.legacy.api.SourceRecipes.deferred());

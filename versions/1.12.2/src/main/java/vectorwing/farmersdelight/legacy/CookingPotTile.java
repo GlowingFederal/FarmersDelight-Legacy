@@ -13,6 +13,7 @@ public final class CookingPotTile extends InventoryTile implements net.minecraft
     private static final int[] INPUTS = {0, 1, 2, 3, 4, 5}, SERVING = {7, 8};
     public int progress, total = 200;
     public boolean heated;
+    private int scriptRevision = ScriptRecipes.revision();
     private boolean recipeDirty = true;
     private CookingRecipes.Recipe recipe;
     private String savedRecipe = "", customName = "";
@@ -32,6 +33,9 @@ public final class CookingPotTile extends InventoryTile implements net.minecraft
             return;
         }
         if (heated != nowHeated) { heated = nowHeated; changed(); }
+        if (scriptRevision != ScriptRecipes.revision()) {
+            scriptRevision = ScriptRecipes.revision(); recipeDirty = true; progress = 0;
+        }
         if (recipeDirty) {
             CookingRecipes.Recipe found = CookingRecipes.find(inventory);
             String next = found == null ? "" : found.id;

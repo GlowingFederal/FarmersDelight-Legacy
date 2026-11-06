@@ -20,6 +20,7 @@ compileJava.dependsOn 'generateVersion'
 repositories { mavenCentral() }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 def catalog = file('../../common/src/main/resources/farmersdelight/foods.json')
+def uabFoods = file('../../common/src/main/resources/farmersdelight/uab_foods.json')
 def sourceAssets = file('../../src/main/resources/assets/farmersdelight')
 def generatedAssets = file('../../src/generated/resources/assets/farmersdelight')
 def sourceRecipes = file('../../src/generated/resources/data/farmersdelight/recipes')
@@ -27,6 +28,7 @@ def handwrittenRecipes = file('../../src/main/resources/data/farmersdelight/reci
 def sourceData = file('../../src/generated/resources/data')
 processResources {
     inputs.file catalog
+    inputs.file uabFoods
     inputs.dir sourceAssets
     inputs.dir generatedAssets
     inputs.dir sourceRecipes
@@ -56,8 +58,10 @@ processResources {
         }
         new File(destinationDir, 'farmersdelight/source_tags.json').setText(groovy.json.JsonOutput.toJson(tags), 'UTF-8')
         def foods = new JsonSlurper().parse(catalog)
+        if (minecraftTarget in ['1.7.10', '1.12.2']) foods += new JsonSlurper().parse(uabFoods)
         def ids = foods.collect { it.id } + ['rice', 'rice_panicle', 'straw', 'canvas', 'tree_bark',
                 'flint_knife', 'iron_knife', 'golden_knife', 'diamond_knife', 'rotten_tomato', 'horse_feed']
+        if (minecraftTarget in ['1.7.10', '1.12.2']) ids += 'netherite_knife'
         def language = new JsonSlurper().parse(new File(sourceAssets, 'lang/en_us.json'))
         def entries = []
         ids.each { id ->
@@ -228,6 +232,7 @@ processResources {
             }
         }
         def pantryWoods=['oak','spruce','birch','jungle','acacia','dark_oak']
+        if (minecraftTarget in ['1.7.10','1.12.2']) pantryWoods += ['crimson','warped']
         (pantryWoods.collectMany { wood -> ['side','top','front','front_open'].collect { wood+'_pantry_'+it } } + ['basket_top','basket_side','basket_bottom','basket_handle']).each { texture ->
             copy { from new File(sourceAssets,"textures/block/${texture}.png"); into "${destinationDir}/assets/farmersdelight/textures/blocks" }
         }

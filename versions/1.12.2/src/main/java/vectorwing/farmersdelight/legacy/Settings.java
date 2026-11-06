@@ -17,6 +17,7 @@ public final class Settings {
     public static void load(File file) {
         Configuration config = new Configuration(file);
         config.load();
+        UABCompatibility.configure(config);
         foodTooltips=config.getBoolean("foodEffectTooltip","client",true,"Show food effects, pet feeding benefits and portable pot contents.");
         comfortOverlay=config.getBoolean("comfortHealthOverlay","client",true,"Show a heart sheen while Comfort can supply healing.");
         nourishmentOverlay=config.getBoolean("nourishmentHungerOverlay","client",true,"Show gilded hunger icons while Nourishment is active.");

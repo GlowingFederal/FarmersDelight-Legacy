@@ -44,7 +44,7 @@ public final class Settings {
         backstabbingId=config.getInt("backstabbingId","enchantments",80,0,net.minecraft.enchantment.Enchantment.enchantmentsList.length-1,"Unused enchantment slot; must match client and server.");
         if(net.minecraft.enchantment.Enchantment.enchantmentsList[backstabbingId]!=null) throw new IllegalStateException("Backstabbing enchantment ID "+backstabbingId+" is already occupied; change enchantments.backstabbingId.");
         richSoilBoost = config.getFloat("growthBoost", "farming", 0.2F, 0, 1, "Chance for rich soil to boost the plant above it on a random tick.");
-        for(String crop:new String[]{"cabbages","tomatoes","onions","carrots","potatoes","rice"}) {
+        for(String crop:new String[]{"cabbages","tomatoes","onions","carrots","potatoes","beetroots","rice"}) {
             boolean enabled=config.getBoolean(crop,"wildCrops",true,"Generate wild "+crop+" in new surface chunks.");
             int rarity=config.getInt(crop+"Rarity","wildCrops",crop.equals("cabbages") || crop.equals("beetroots") || crop.equals("rice") ? 10 : 8,1,Integer.MAX_VALUE,"Average eligible chunks per wild crop patch.");
             wildRarity.put(crop,enabled ? rarity : 0);

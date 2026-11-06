@@ -10,7 +10,8 @@
     "ChickenFoodMixin",
     "MushroomSoilMixin",
     "ToolKnockbackMixin",
-    "SkilletEnchantmentsMixin"
+    "SkilletEnchantmentsMixin",
+    "NetheriteKnifeFireMixin"
   ],
   "injectors": {
     "defaultRequire": 1

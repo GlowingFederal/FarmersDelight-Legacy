@@ -1,0 +1,41 @@
+[
+  {
+    "id": "sweet_berry_cheesecake_slice",
+    "nutrition": 3,
+    "saturation": 0.3,
+    "fast": true,
+    "effect": "speed",
+    "duration": 600
+  },
+  {
+    "id": "sweet_berry_cookie",
+    "nutrition": 2,
+    "saturation": 0.1,
+    "fast": true
+  },
+  {
+    "id": "honey_cookie",
+    "nutrition": 2,
+    "saturation": 0.1,
+    "fast": true
+  },
+  {
+    "id": "nether_salad",
+    "nutrition": 5,
+    "saturation": 0.4,
+    "effect": "nausea",
+    "duration": 240,
+    "chance": 0.3,
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  },
+  {
+    "id": "honey_glazed_ham",
+    "nutrition": 12,
+    "saturation": 0.9,
+    "effect": "nourishment",
+    "duration": 6000,
+    "container": "minecraft:bowl",
+    "stackSize": 16
+  }
+]

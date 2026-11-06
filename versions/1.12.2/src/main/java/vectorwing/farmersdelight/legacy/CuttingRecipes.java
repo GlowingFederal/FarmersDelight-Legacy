@@ -60,6 +60,14 @@ public final class CuttingRecipes {
             }
         }
     }
+    public static void reindex() {
+        BY_INPUT.clear();
+        for (Recipe recipe : ALL) for (ItemStack input : recipe.inputs) {
+            List<Recipe> list = BY_INPUT.get(input.getItem());
+            if (list == null) { list = new ArrayList<Recipe>(); BY_INPUT.put(input.getItem(), list); }
+            if (!list.contains(recipe)) list.add(recipe);
+        }
+    }
     public static Recipe find(ItemStack input, ItemStack tool) {
         if (Stacks.empty(input) || Stacks.empty(tool)) return null;
         List<Recipe> recipes = BY_INPUT.get(input.getItem());
@@ -78,9 +86,9 @@ public final class CuttingRecipes {
         public final List<Double> chances;
         private final List<ItemStack> toolItems;
         Recipe(String id, List<ItemStack> inputs, List<ItemStack> outputs, List<Double> chances, String tool, String sound,List<ItemStack> toolItems) {
-            this.id = id; this.inputs = Collections.unmodifiableList(inputs); this.outputs = Collections.unmodifiableList(outputs);
+            this.id = id; this.inputs = inputs instanceof ScriptRecipes.Ingredient ? inputs : Collections.unmodifiableList(inputs); this.outputs = Collections.unmodifiableList(outputs);
             this.chances = Collections.unmodifiableList(chances); this.tool = tool; this.sound = sound;
-            this.toolItems=toolItems==null?null:Collections.unmodifiableList(toolItems);
+            this.toolItems=toolItems==null?null:toolItems instanceof ScriptRecipes.Ingredient ? toolItems : Collections.unmodifiableList(toolItems);
         }
         public boolean matchesInput(ItemStack stack) { return Stacks.matches(inputs, stack); }
         public boolean matchesTool(ItemStack stack) { return toolItems==null?CuttingRecipes.tool(stack, tool):Stacks.matches(toolItems,stack); }

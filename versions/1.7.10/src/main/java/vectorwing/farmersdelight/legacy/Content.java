@@ -50,6 +50,11 @@ public final class Content {
             foods = new Gson().fromJson(reader, FoodDefinition[].class);
         } catch (java.io.IOException e) { throw new IllegalStateException("Cannot load food contract", e); }
         for (FoodDefinition definition : foods) add(definition.id, new LegacyFood(definition));
+        // Original foods omitted from the early reduced catalog; identities remain stable without UAB.
+        try (InputStreamReader reader = new InputStreamReader(Content.class.getResourceAsStream("/farmersdelight/uab_foods.json"), StandardCharsets.UTF_8)) {
+            for (FoodDefinition definition : new Gson().fromJson(reader, FoodDefinition[].class)) add(definition.id, new LegacyFood(definition));
+        } catch (java.io.IOException failure) { throw new IllegalStateException("Cannot load original UAB-dependent foods", failure); }
+        add("netherite_knife", new NetheriteKnife());
         cuttingBoard = new CuttingBoard();
         GameRegistry.registerBlock(cuttingBoard, "cutting_board"); ITEMS.put("cutting_board", Item.getItemFromBlock(cuttingBoard));
         GameRegistry.registerTileEntity(CuttingBoardTile.class, "farmersdelight:cutting_board");
@@ -77,7 +82,7 @@ public final class Content {
         add("cabbage_seeds",new CropSeeds("cabbage"));
         add("tomato_seeds",new CropSeeds("tomato"));
         add("wild_rice",new CropSeeds("wild_rice"));
-        for(String kind:new String[]{"cabbages","tomatoes","onions","carrots","potatoes"})
+        for(String kind:new String[]{"cabbages","tomatoes","onions","carrots","potatoes","beetroots"})
             WILD.put(kind,block("wild_"+kind,new WildPlant(kind),true));
         GameRegistry.registerTileEntity(RiceTile.class,"farmersdelight:rice");
         for(String id:new String[]{"apple_pie","chocolate_pie","sweet_berry_cheesecake"})
@@ -90,7 +95,7 @@ public final class Content {
         }
         GameRegistry.registerTileEntity(ServingTile.class,"farmersdelight:serving");
         basket=block("basket",new StorageBlock("basket",true),true);
-        for(String wood:new String[]{"oak","spruce","birch","jungle","acacia","dark_oak"})
+        for(String wood:new String[]{"oak","spruce","birch","jungle","acacia","dark_oak","crimson","warped"})
             PANTRIES.put(wood,block(wood+"_pantry",new StorageBlock(wood+"_pantry",false),true));
         GameRegistry.registerTileEntity(StorageTile.class,"farmersdelight:pantry");
         GameRegistry.registerTileEntity(BasketTile.class,"farmersdelight:basket");
@@ -98,7 +103,7 @@ public final class Content {
         add("horse_feed",new Item().setMaxStackSize(16));
         backstabbing=new Backstabbing();
         net.minecraft.enchantment.Enchantment.addToBookList(backstabbing);
-        for(String id:new String[]{"carrot_crate","potato_crate","cabbage_crate","tomato_crate","onion_crate","rice_bag","rice_bale"})
+        for(String id:new String[]{"carrot_crate","potato_crate","beetroot_crate","cabbage_crate","tomato_crate","onion_crate","rice_bag","rice_bale"})
             PACKED.put(id,block(id,new PackedBlock(id),true));
         safetyNet=block("safety_net",new SafetyNet(),true);
         rope=block("rope",new RopeBlock(),false); add("rope",new RopeItem(rope));

@@ -27,15 +27,21 @@ public final class Stacks {
                 && ItemStack.areItemStackTagsEqual(a, b);
     }
     public static ItemStack resolve(String modernId) {
+        if (!UABCompatibility.foodAvailable(modernId)) return none();
+        if (modernId.equals("minecraft:sugar_cane")) return new ItemStack(net.minecraft.init.Items.reeds);
         if ((modernId.equals("farmersdelight:mutton_chops") || modernId.equals("farmersdelight:cooked_mutton_chops"))
                 && empty(resolve(modernId.equals("farmersdelight:mutton_chops") ? "minecraft:mutton" : "minecraft:cooked_mutton"))) return none();
+        // Species-specific trapdoors must not silently become oak when their provider is disabled.
+        if (modernId.startsWith("minecraft:") && modernId.endsWith("_trapdoor") && !modernId.equals("minecraft:oak_trapdoor") && !modernId.equals("minecraft:iron_trapdoor"))
+            return UABCompatibility.resolve(modernId);
         String id = LegacyNames.ITEMS.containsKey(modernId) ? LegacyNames.ITEMS.get(modernId) : modernId;
         int metadata = 0;
         int marker = id.indexOf('@');
         if (marker >= 0) { metadata = Integer.parseInt(id.substring(marker + 1)); id = id.substring(0, marker); }
         if(id.equals("minecraft:cooked_fish")) id="minecraft:cooked_fished";
         Item item = (Item) Item.itemRegistry.getObject(id);
-        return item == null ? UABCompatibility.resolve(modernId) : new ItemStack(item, 1, metadata);
+        ItemStack stack = item == null ? UABCompatibility.resolve(modernId) : new ItemStack(item, 1, metadata);
+        return UABCompatibility.available(stack) ? stack : none();
     }
     public static ItemStack result(JsonObject json) {
         ItemStack stack = resolve(json.get("item").getAsString());
@@ -62,6 +68,7 @@ public final class Stacks {
     }
     public static boolean matches(List<ItemStack> candidates, ItemStack actual) {
         if (empty(actual)) return false;
+        if (candidates instanceof ScriptRecipes.Ingredient) return ((ScriptRecipes.Ingredient) candidates).matches(actual);
         // Vanilla JSON item ingredients ignore damage on damageable items and preserve arbitrary input NBT.
         for (ItemStack expected : candidates)
             if (expected.getItem() == actual.getItem() && (actual.isItemStackDamageable()

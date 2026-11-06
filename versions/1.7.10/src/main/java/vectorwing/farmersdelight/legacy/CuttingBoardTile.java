@@ -37,7 +37,7 @@ public final class CuttingBoardTile extends InventoryTile {
             if (tool.attemptDamageItem(1, worldObj.rand)) Stacks.shrink(tool, 1);
         } else if (!player.capabilities.isCreativeMode) tool.damageItem(1, player);
         worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.1, zCoord + 0.5,
-                recipe.tool.equals("knife") ? "farmersdelight:block.cutting_board.knife" : recipe.tool.equals("shears") ? "mob.sheep.shear" : "dig.wood", 0.8F, 1F);
+                !recipe.sound.isEmpty() && !recipe.sound.equals("minecraft:item.axe.strip") ? recipe.sound : recipe.tool.equals("knife") ? "farmersdelight:block.cutting_board.knife" : recipe.tool.equals("shears") ? "mob.sheep.shear" : "dig.wood", 0.8F, 1F);
         worldObj.addBlockEvent(xCoord, yCoord, zCoord, getBlockType(), 1, 0);
         if(player!=null) Progression.grant(player,"use_cutting_board","cutting_board");
         changed(); return true;

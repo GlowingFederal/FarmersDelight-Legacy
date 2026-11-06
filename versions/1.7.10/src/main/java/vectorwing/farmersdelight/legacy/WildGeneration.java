@@ -21,6 +21,7 @@ public final class WildGeneration implements IWorldGenerator {
         boolean rice=types.contains(net.minecraftforge.common.BiomeDictionary.Type.SWAMP) || types.contains(net.minecraftforge.common.BiomeDictionary.Type.JUNGLE);
         for(java.util.Map.Entry<String,Integer> entry:Settings.wildRarity.entrySet()) {
             String kind=entry.getKey();
+            if(kind.equals("beetroots") && Stacks.empty(Stacks.resolve("minecraft:beetroot_seeds"))) continue;
             boolean suitable=kind.equals("rice") ? rice : kind.equals("cabbages") || kind.equals("beetroots") ? beach
                     : kind.equals("tomatoes") ? temperature>=1 : kind.equals("potatoes") ? temperature>0 && temperature<=0.3F : temperature>0.3F && temperature<1;
             if(!suitable || entry.getValue()==0 || random.nextInt(entry.getValue())!=0) continue;

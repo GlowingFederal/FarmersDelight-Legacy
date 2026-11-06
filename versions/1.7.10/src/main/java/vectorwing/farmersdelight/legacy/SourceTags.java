@@ -48,6 +48,12 @@ public final class SourceTags {
             }
         }
         if (tag.equals("minecraft:planks")) {
+            // UAB 1.12.2 exports single-form wood items as wildcard OreDictionary entries.
+            // Use known enabled aliases to retain concrete variant metadata on both targets.
+            for (String wood : new String[] {"crimson", "warped", "mangrove", "cherry", "bamboo", "pale_oak"}) {
+                ItemStack plank = UABCompatibility.resolve("minecraft:" + wood + "_planks");
+                if (!Stacks.empty(plank)) result.add(plank);
+            }
             for (int i = 0; i < 6; i++) result.add(new ItemStack(net.minecraft.init.Blocks.planks, 1, i));
         }
         if (tag.equals("minecraft:logs") || tag.equals("minecraft:logs_that_burn")) {
@@ -55,7 +61,8 @@ public final class SourceTags {
                 result.add(Stacks.resolve("minecraft:" + wood + "_log"));
         }
         String ore = null;
-        if (tag.startsWith("forge:crops/")) {
+        if (tag.equals("minecraft:planks")) ore = "plankWood";
+        else if (tag.startsWith("forge:crops/")) {
             String crop = tag.substring("forge:crops/".length()); ore = "crop" + Character.toUpperCase(crop.charAt(0)) + crop.substring(1);
         } else if(tag.startsWith("forge:dyes/")) {
             String color=tag.substring("forge:dyes/".length());
@@ -74,6 +81,7 @@ public final class SourceTags {
         if (ore != null) for (ItemStack stack : OreDictionary.getOres(ore)) {
             if (stack.getItemDamage() != OreDictionary.WILDCARD_VALUE) result.add(stack.copy());
         }
+        result.removeIf(stack -> !UABCompatibility.available(stack));
         path.remove(tag);
         return result;
     }

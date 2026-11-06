@@ -42,6 +42,13 @@ public final class AddonRecipes {
    if(recipe.has("container") && !available(recipe.get("container"))) return false;
    return true;
   }
+  String missing(JsonObject recipe) {
+   List<String> reasons=new ArrayList<String>();
+   if(recipe.has("ingredients")) for(JsonElement ingredient:recipe.getAsJsonArray("ingredients")) if(!available(ingredient)) reasons.add(ingredient.toString());
+   for(String key:new String[]{"ingredient","liquid","container"}) if(recipe.has(key) && !available(recipe.get(key))) reasons.add(key+"="+recipe.get(key));
+   if(recipe.has("key")) for(Map.Entry<String,JsonElement> entry:recipe.getAsJsonObject("key").entrySet()) if(!available(entry.getValue())) reasons.add(entry.getValue().toString());
+   return reasons+" (provider absent, effective feature disabled, or dependent addon acquisition unavailable)";
+  }
   String item(JsonElement output) { return output.isJsonPrimitive()?output.getAsString():output.getAsJsonObject().get("item").getAsString(); }
   boolean addOutput(JsonElement output) {
    String id=item(output);return id.startsWith(namespace+":") && !Stacks.empty(Stacks.resolve(id)) && reachable.add(id);
@@ -62,7 +69,7 @@ public final class AddonRecipes {
    for(Map.Entry<String,JsonObject> entry:recipes.entrySet()) {
     String type=entry.getValue().get("type").getAsString();
     if(!types.contains(type)) SourceRecipes.defer(entry.getKey(),"No native dependency/processor for upstream recipe type "+type);
-    else if(!inputs(entry.getValue())) SourceRecipes.defer(entry.getKey(),"An original ingredient or serving container has no acquisition on this target; deferred for its real provider (future UAB where applicable)");
+    else if(!inputs(entry.getValue())) SourceRecipes.defer(entry.getKey(),"Unavailable original prerequisites: "+missing(entry.getValue()));
    }
   }
  }
