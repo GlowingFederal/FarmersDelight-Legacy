@@ -1,0 +1,159 @@
+
+name: "Feature Request / Compatibility Enhancement"
+description: "Suggest new features, addon integrations, QoL improvements, or compatibility with external mods."
+title: "[Enhancement]: "
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Farmer's Delight: Classic Edition — Enhancements
+
+        Use this form to suggest new features, quality-of-life
+        improvements, addon support, or compatibility with
+        other Minecraft mods.
+
+        This form is NOT for reporting broken functionality.
+        Please use the Bug / Compatibility Report instead.
+
+  - type: dropdown
+    id: request-type
+    attributes:
+      label: Enhancement Category
+      description: "What kind of improvement are you requesting?"
+      options:
+        - "New Feature / Content"
+        - "External Mod Compatibility"
+        - "Existing Mod Integration"
+        - "Quality of Life (QoL)"
+        - "Gameplay / Balance Improvement"
+        - "Performance / Optimization"
+        - "Configuration / Customization"
+        - "Other Enhancement"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: minecraft-version
+    attributes:
+      label: Target Minecraft Version
+      description: "Which versions should this enhancement support?"
+      multiple: true
+      options:
+        - "1.6.4"
+        - "1.7.10"
+        - "1.8.9"
+        - "1.12.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-mod
+    attributes:
+      label: Affected Mod / Addon
+      description: "Select all relevant projects."
+      multiple: true
+      options:
+        - "Farmer's Delight: Classic Edition"
+        - "Brewin' & Chewin': Classic Edition"
+        - "Corn's Delight: Classic Edition"
+        - "Ocean's Delight: Classic Edition"
+        - "End's Delight: Classic Edition"
+        - "Multiple / Entire Ecosystem"
+    validations:
+      required: true
+
+  - type: input
+    id: external-mod
+    attributes:
+      label: External Mod Name (if applicable)
+      description: "Name the mod you want integration with."
+      placeholder: "Example: Biomes O' Plenty"
+    validations:
+      required: false
+
+  - type: input
+    id: external-mod-link
+    attributes:
+      label: External Mod Link (if applicable)
+      description: "Provide a CurseForge, Modrinth, or GitHub link."
+      placeholder: "https://www.curseforge.com/minecraft/mc-mods/..."
+    validations:
+      required: false
+
+  - type: input
+    id: external-mod-version
+    attributes:
+      label: External Mod Version (if applicable)
+      description: "Provide the exact version or target version range."
+      placeholder: "Example: 2.0.0"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: uab-presence
+    attributes:
+      label: Universal Adaptive Backporter (UAB)
+      options:
+        - label: "This request involves or depends on UAB."
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Proposed Enhancement
+      description: "Describe the feature or improvement you want."
+      placeholder: |
+        Explain what should be added, changed, or integrated.
+        Be specific about the intended functionality.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case / Motivation
+      description: "What problem does this solve or improve?"
+      placeholder: |
+        Explain why this enhancement would be useful
+        and how players would benefit from it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Suggested Implementation (Optional)
+      description: "Describe how this could work, if you have an idea."
+      placeholder: |
+        Example:
+        Add recipe compatibility for an external mod's
+        crops, allowing them to be used in FD recipes.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Existing Alternatives (Optional)
+      description: "Are there existing mods, workarounds, or similar features?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Additional Context / References
+      description: "Screenshots, documentation, links, or examples."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: "I have checked for existing or duplicate requests."
+          required: true
+        - label: "This is an enhancement request, not a bug report."
+          required: true
