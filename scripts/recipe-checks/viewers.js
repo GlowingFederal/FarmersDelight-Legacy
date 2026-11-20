@@ -1,0 +1,24 @@
+var is12=Java.type('net.minecraftforge.common.ForgeVersion').getVersion().startsWith('14'),MC=Java.type('net.minecraft.client.Minecraft').func_71410_x();
+var S=Java.type('vectorwing.farmersdelight.legacy.Stacks'),checks=0,failures=[],categories=[];
+function check(ok,message){checks++;if(!ok)throw new Error(message);}
+function each(list,fn){var it=list.iterator();while(it.hasNext())fn(it.next());}
+function field(obj,name){var type=obj.getClass();while(type!=null){try{var f=type.getDeclaredField(name);f.setAccessible(true);return f.get(obj);}catch(e){type=type.getSuperclass();}}throw new Error(name);}
+var families=[['farmersdelight.cooking','vectorwing.farmersdelight.legacy.integration.nei.CookingHandler',Java.type('vectorwing.farmersdelight.legacy.CookingRecipes').ALL],['farmersdelight.cutting','vectorwing.farmersdelight.legacy.integration.nei.CuttingHandler',Java.type('vectorwing.farmersdelight.legacy.CuttingRecipes').ALL],['farmersdelight.grilling','vectorwing.farmersdelight.legacy.integration.nei.GrillingHandler',Java.type('vectorwing.farmersdelight.legacy.GrillingRecipes').ALL],['brewinandchewin.fermenting','com.brewinandchewin.legacy.integration.FermentingHandler',Java.type('com.brewinandchewin.legacy.Fermentation').ALL]];
+if(is12){
+ var f=Java.type('vectorwing.farmersdelight.legacy.integration.jei.FoundationJEI').class.getDeclaredField('runtime');f.setAccessible(true);var runtime=f.get(null);check(runtime!=null,'JEI runtime available');var registry=runtime.getRecipeRegistry();
+ families.forEach(function(family){try{var category=registry.getRecipeCategory(family[0]);check(category!=null,'category '+family[0]);check(category.getIcon()!=null,'workstation icon '+family[0]);var wrappers=registry.getRecipeWrappers(category),expected={};each(family[2],function(r){expected[String(r.id)]=true;});check(wrappers.size()==family[2].size(),'JEI count '+family[0]+' '+wrappers.size()+'/'+family[2].size());each(wrappers,function(w){var r=field(w,'recipe');check(expected[String(r.id)],'unexpected wrapper '+r.id);delete expected[String(r.id)];});check(Object.keys(expected).length==0,'missing JEI IDs');categories.push({uid:family[0],count:wrappers.size()});}catch(e){failures.push({category:family[0],reason:String(e)});}});
+ var foundation=registry.getRecipeCategory('farmersdelight.foundation'),wrappers=registry.getRecipeWrappers(foundation);var n=Java.type('vectorwing.farmersdelight.legacy.SourceCrafting').activeCount()+Java.type('vectorwing.farmersdelight.legacy.Recipes').REGISTRY.entries().size();check(wrappers.size()==n,'JEI crafting count');categories.push({uid:'farmersdelight.foundation',count:wrappers.size()});
+}else{
+ var GUI=Java.type('codechicken.nei.recipe.GuiCraftingRecipe'),Usage=Java.type('codechicken.nei.recipe.GuiUsageRecipe');
+ families.push(['farmersdelight.foundation','vectorwing.farmersdelight.legacy.integration.nei.FoundationHandler',null]);
+ families.forEach(function(family){try{
+  var registered=false;[GUI.craftinghandlers,GUI.serialCraftingHandlers].forEach(function(list){each(list,function(h){if(String(h.getClass().getName())==family[1])registered=true;});});check(registered,'NEI plugin registered '+family[1]);var info=Java.type('codechicken.nei.recipe.GuiRecipeTab').getHandlerInfo(new (Java.type(family[1]))());check(info!=null&&!S.empty(info.getItemStack()),'NEI workstation icon '+family[0]);
+  var h=new (Java.type(family[1]))();h.loadCraftingRecipes(family[0],Java.to([],'java.lang.Object[]'));
+  var expected=family[2]==null?Java.type('vectorwing.farmersdelight.legacy.SourceCrafting').activeCount()+Java.type('vectorwing.farmersdelight.legacy.Recipes').REGISTRY.entries().size():family[2].size();check(h.numRecipes()==expected,'NEI count '+family[0]+' '+h.numRecipes()+'/'+expected);
+  for(var i=0;i<h.numRecipes();i++){var out=h.getResultStack(i);check(out!=null&&!S.empty(out.item),'NEI output '+family[0]+'/'+i);var inputs=h.getIngredientStacks(i);each(inputs,function(p){check(p.items.length>0,'NEI empty ingredient');});}
+  if(family[2]!=null)each(family[2],function(r){var out=typeof r.output!='undefined'?r.output:typeof r.result!='undefined'?r.result:r.outputs.get(0);var query=h.getRecipeHandler('item',Java.to([out],'java.lang.Object[]'));check(query.numRecipes()>0,'NEI item lookup '+r.id);});
+  var all=GUI.getCraftingHandlers(family[0],Java.to([],'java.lang.Object[]'));var count=0;each(all,function(handler){if(String(handler.getOverlayIdentifier())==family[0])count+=handler.numRecipes();});check(count==expected,'NEI global handler routing '+family[0]+' '+count+'/'+expected);
+  categories.push({uid:family[0],count:h.numRecipes()});
+ }catch(e){failures.push({category:family[0],reason:String(e),stack:String(e.stack)});}});
+}
+JSON.stringify({target:is12?'1.12.2':'1.7.10',player:MC.field_71439_g!=null,screen:MC.field_71462_r==null?'none':String(MC.field_71462_r.getClass().getName()),checks:checks,failures:failures,categories:categories});

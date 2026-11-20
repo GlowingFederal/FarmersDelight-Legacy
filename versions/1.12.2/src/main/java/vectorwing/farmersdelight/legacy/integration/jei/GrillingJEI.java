@@ -19,14 +19,16 @@ import vectorwing.farmersdelight.legacy.GrillingRecipes;
 final class GrillingJEI {
     private static final String UID="farmersdelight.grilling";
     static void categories(IRecipeCategoryRegistration registration) {
-        final IDrawable background=registration.getJeiHelpers().getGuiHelper().createBlankDrawable(154,62);
+        final IDrawable background=new RecipeArtwork(2);
         registration.addRecipeCategories(new IRecipeCategory<Wrapper>() {
+            private final IDrawable icon = registration.getJeiHelpers().getGuiHelper().createDrawableIngredient(new ItemStack(Content.skillet));
+            public IDrawable getIcon() { return icon; }
             public String getUid() { return UID; }
             public String getTitle() { return "Skillet / Stove"; }
             public String getModName() { return "Farmer's Delight Legacy"; }
             public IDrawable getBackground() { return background; }
             public void setRecipe(IRecipeLayout layout,Wrapper wrapper,IIngredients ingredients) {
-                layout.getItemStacks().init(0,true,26,4); layout.getItemStacks().init(1,false,106,4); layout.getItemStacks().set(ingredients);
+                layout.getItemStacks().init(0,true,29,6); layout.getItemStacks().init(1,false,109,6); layout.getItemStacks().set(ingredients);
             }
         });
     }
@@ -42,9 +44,10 @@ final class GrillingJEI {
             ingredients.setInputLists(VanillaTypes.ITEM,Collections.singletonList(recipe.inputs)); ingredients.setOutput(VanillaTypes.ITEM,recipe.output);
         }
         public void drawInfo(Minecraft minecraft,int width,int height,int mx,int my) {
-            minecraft.fontRenderer.drawString(">",74,10,0x555555);
-            minecraft.fontRenderer.drawString("Stove: "+recipe.time/20F+" s",4,30,0x555555);
-            minecraft.fontRenderer.drawString("Heated skillet: "+GrillingRecipes.skilletTime(recipe.time,0)/20F+" s",4,44,0x555555);
+            RecipeArtwork.progress(minecraft,RecipeArtwork.FURNACE,72,7,176,14,24,16);
+            minecraft.fontRenderer.drawString("Stove: "+recipe.time/20F+" s",6,32,0x404040);
+            minecraft.fontRenderer.drawString("Skillet: "+GrillingRecipes.skilletTime(recipe.time,0)/20F+" s",6,44,0x404040);
+            minecraft.fontRenderer.drawString("Fire Aspect speeds skillets",6,56,0x404040);
         }
     }
 }

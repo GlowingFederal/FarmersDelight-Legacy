@@ -13,6 +13,7 @@ import net.minecraftforge.common.config.Configuration;
 
 /** Startup snapshot of UAB acquisition availability; no linked UAB classes or dependency. */
 public final class UABCompatibility {
+    public static boolean smithingRegistered;
     private static boolean initialized, active, recipes, mobDrops, worldgen, outerEnd;
     private static final Map<String, ItemStack> ITEMS = new HashMap<String, ItemStack>();
     private static final Map<String, ItemStack> GAMEPLAY = new HashMap<String, ItemStack>();
@@ -226,6 +227,7 @@ public final class UABCompatibility {
             Object upgrade = recipe.getConstructor(Object.class, Object.class, ItemStack.class, boolean.class, Object.class)
                     .newInstance(base, material, new ItemStack(Content.ITEMS.get("netherite_knife")), true, Stacks.empty(template) ? null : template);
             catalog.getMethod("addRecipe", recipe).invoke(registry, upgrade);
+            smithingRegistered = true;
             log.info("UAB smithing: restored original netherite knife upgrade with native NBT/template handling");
         } catch (ReflectiveOperationException | LinkageError failure) {
             log.warn("UAB smithing family deferred: native smithing API unavailable", failure);

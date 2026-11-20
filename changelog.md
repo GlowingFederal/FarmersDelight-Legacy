@@ -93,3 +93,14 @@
 - Restore original honey/berry foods, Nether salad, Nether pantries, 1.7.10 beetroot storage/wild plants and native netherite-knife upgrades. Preserve existing saved identities, food values, containers and UAB template policy.
 - Resolve both targets through their actual UAB availability APIs; restore campfire, bamboo, scaffolding, flower, door/sign and slab mappings, filter disabled ingredients and include exact enabled modern plank variants. Log missing recipe prerequisites.
 - Add optional MineTweaker 3 / CraftTweaker 2 edits for cooking, cutting, shared skillet/stove recipes and addon processors. Preserve NBT, metadata, servings, tools, heat, native container returns and script order; rebuild indexes and invalidate machine caches. Document syntax, examples and the complete recipe matrix.
+
+2026-11-12 13:32 — Audit native recipe coverage and preserve ingredient/model compatibility
+
+- Let foundation dough and milk-bottle recipes accept named ingredients through the same item/metadata matcher as source recipes; retain explicit script NBT rules.
+- Add operator-only /fdrecipes inventories and repeatable production-server regression checks, retaining deferred reference IDs, distinguishing unavailable processors, checking native matching/furnace results and reporting absent keg acquisition.
+- Package the original shared 1.12.2 mug model so addon drinks and tankards render correctly in inventories and JEI, preserving its hand transforms and checking the asset during release staging.
+- Restore Cooking Pot, Cutting Board and Skillet/Stove artwork, slot framing and animated progress to 1.12.2 JEI, matching the established NEI layouts and native workstation textures.
+
+2026-11-12 14:05 — Increment patch version for release packaging
+
+- Advance the mod patch version by 0.0.1 and refresh matching native artifact and mod metadata versions.

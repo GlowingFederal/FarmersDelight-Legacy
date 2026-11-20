@@ -63,8 +63,9 @@ public final class Ingredients {
     }
     public static boolean matches(String specification, ItemStack actual) {
         if (actual == null || actual.isEmpty()) return false;
-        if (specification.startsWith("#")) return REGISTRY.matches(specification.substring(1), actual);
-        return actual.getItem() == Content.item(specification) && actual.getItemDamage() == 0 && !actual.hasTagCompound();
+        // Reference item/tag ingredients ignore arbitrary input NBT, like the source compiler.
+        // Explicit NBT-sensitive script ingredients retain their own matching contract.
+        return Stacks.matches(candidates(specification), actual);
     }
     public static boolean isKnife(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;

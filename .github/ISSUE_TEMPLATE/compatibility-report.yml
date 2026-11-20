@@ -1,0 +1,125 @@
+
+name: "Bug / Compatibility Report"
+description: "Report issues with Farmer's Delight Classic Edition and supported addons."
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Farmer's Delight: Classic Edition
+        Please provide exact Minecraft, Forge, and mod versions.
+        Do not use "latest" in place of a version number.
+
+  - type: dropdown
+    id: minecraft-version
+    attributes:
+      label: Minecraft Version
+      options:
+        - "1.6.4"
+        - "1.7.10"
+        - "1.8.9"
+        - "1.12.2"
+    validations:
+      required: true
+
+  - type: input
+    id: forge-version
+    attributes:
+      label: Forge Version
+      placeholder: "Enter the exact Forge version"
+    validations:
+      required: true
+
+  - type: input
+    id: fd-version
+    attributes:
+      label: Farmer's Delight Version
+      placeholder: "Example: 1.1.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-mod
+    attributes:
+      label: Affected Mod / Addon
+      description: "Select all mods involved in the issue."
+      multiple: true
+      options:
+        - "Farmer's Delight: Classic Edition"
+        - "Brewin' & Chewin': Classic Edition"
+        - "Corn's Delight: Classic Edition"
+        - "Ocean's Delight: Classic Edition"
+        - "End's Delight: Classic Edition"
+    validations:
+      required: true
+
+  - type: textarea
+    id: addon-versions
+    attributes:
+      label: Installed Addon Versions
+      description: |
+        List the exact versions of all installed
+        Farmer's Delight addons, or enter "None".
+      placeholder: |
+        Brewin' & Chewin': 1.1.1
+        Corn's Delight: 1.0.0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: uab-presence
+    attributes:
+      label: Universal Adaptive Backporter (UAB)
+      options:
+        - label: "I have UAB installed."
+
+  - type: input
+    id: uab-version
+    attributes:
+      label: UAB Version (if installed)
+      description: "Enter the exact UAB version, or leave blank."
+      placeholder: "Exact version number"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: "What happened, and what did you expect?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Launch Minecraft with the listed mods
+        2. Enter a world
+        3. Perform the affected action
+        4. Observe the issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Crash Reports
+      description: |
+        Drag and drop logs, attach screenshots,
+        or link to a crash report.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: "I have provided exact version numbers."
+          required: true
+        - label: "I have checked for duplicate issues."
+          required: true

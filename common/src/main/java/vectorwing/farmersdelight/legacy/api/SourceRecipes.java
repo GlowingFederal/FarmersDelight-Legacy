@@ -13,6 +13,7 @@ import java.util.Random;
 /** The original recipe data, indexed once; native adapters decide which prerequisites exist. */
 public final class SourceRecipes {
     private static final Map<String, JsonObject> RECIPES = load();
+    private static final Map<String, JsonObject> EXPECTED = new LinkedHashMap<String, JsonObject>(RECIPES);
     private static boolean frozen;
     private static final Map<String, String> DEFERRED = new LinkedHashMap<String, String>();
 
@@ -27,6 +28,8 @@ public final class SourceRecipes {
     }
 
     public static Map<String, JsonObject> all() { return Collections.unmodifiableMap(RECIPES); }
+    /** Complete reference inventory, including recipes deferred before native compilation. */
+    public static Map<String, JsonObject> expected() { return Collections.unmodifiableMap(EXPECTED); }
 
     /** Addon initialization hook. Call during init, before FD compiles recipes in postInit. */
     public static void addCatalog(String namespace, Class<?> owner, String resource) {
@@ -45,6 +48,7 @@ public final class SourceRecipes {
                     String type=recipe.get("type").getAsString();
                     if(type.indexOf(':')<0) recipe.addProperty("type","minecraft:"+type);
                     RECIPES.put(entry.getKey(),recipe);
+                    EXPECTED.put(entry.getKey(),recipe);
                 }
         } catch (IOException e) { throw new IllegalStateException("Cannot load addon recipes: " + resource, e); }
     }

@@ -19,16 +19,18 @@ import vectorwing.farmersdelight.legacy.Stacks;
 final class CookingJEI {
     static final String UID = "farmersdelight.cooking";
     static void categories(IRecipeCategoryRegistration registration) {
-        final IDrawable background = registration.getJeiHelpers().getGuiHelper().createBlankDrawable(154, 72);
+        final IDrawable background = new RecipeArtwork(0);
         registration.addRecipeCategories(new IRecipeCategory<Wrapper>() {
+            private final IDrawable icon = registration.getJeiHelpers().getGuiHelper().createDrawableIngredient(new ItemStack(Content.cookingPot));
+            public IDrawable getIcon() { return icon; }
             public String getUid() { return UID; }
             public String getTitle() { return "Cooking Pot"; }
             public String getModName() { return "Farmer's Delight Legacy"; }
             public IDrawable getBackground() { return background; }
             public void setRecipe(IRecipeLayout layout, Wrapper wrapper, IIngredients ingredients) {
-                for (int i = 0; i < 6; i++) layout.getItemStacks().init(i, true, 2 + i % 3 * 18, 2 + i / 3 * 18);
-                layout.getItemStacks().init(6, true, 80, 20);
-                layout.getItemStacks().init(7, false, 122, 20);
+                for (int i = 0; i < 6; i++) layout.getItemStacks().init(i, true, 5 + i % 3 * 18, 1 + i / 3 * 18);
+                layout.getItemStacks().init(6, true, 67, 39);
+                layout.getItemStacks().init(7, false, 99, 39);
                 layout.getItemStacks().set(ingredients);
             }
         });
@@ -62,8 +64,10 @@ final class CookingJEI {
             ingredients.setInputLists(VanillaTypes.ITEM, inputs); ingredients.setOutput(VanillaTypes.ITEM, recipe.output);
         }
         public void drawInfo(Minecraft minecraft, int width, int height, int mouseX, int mouseY) {
-            minecraft.fontRenderer.drawString("Heated: " + recipe.time / 20F + " s", 2, 48, 0x555555);
-            minecraft.fontRenderer.drawString(recipe.experience + " XP / batch", 2, 60, 0x555555);
+            RecipeArtwork.progress(minecraft, RecipeArtwork.POT, 65, 10, 176, 15, 25, 17);
+            minecraft.fontRenderer.drawString(recipe.time / 20F + " s", 123, 12, 0x404040);
+            minecraft.fontRenderer.drawString(recipe.experience + " XP", 123, 25, 0x404040);
+            minecraft.fontRenderer.drawString("Heated batch", 6, 56, 0x404040);
             minecraft.fontRenderer.drawString(">", 106, 26, 0x555555);
         }
     }

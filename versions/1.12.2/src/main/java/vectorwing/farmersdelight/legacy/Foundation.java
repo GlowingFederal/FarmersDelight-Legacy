@@ -9,6 +9,9 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(modid = Foundation.MODID, name = "Farmer's Delight Legacy", version = BuildVersion.VERSION,
      acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:mixinbooter@[11.18,);after:etfuturum")
 public final class Foundation {
+    @Mod.EventHandler public void serverStarting(net.minecraftforge.fml.common.event.FMLServerStartingEvent event) {
+        event.registerServerCommand(new RecipeAudit());
+    }
     public static final String MODID = "farmersdelight";
     @Mod.Instance(MODID) public static Foundation instance;
     @SidedProxy(clientSide = "vectorwing.farmersdelight.legacy.client.ClientProxy", serverSide = "vectorwing.farmersdelight.legacy.CommonProxy")

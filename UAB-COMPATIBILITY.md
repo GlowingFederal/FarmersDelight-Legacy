@@ -52,3 +52,21 @@ Missing inputs, outputs, liquids or serving containers defer the original recipe
 Existing registries, entity identities, inventories and tile serialization are preserved. No retrogen is performed. Wild crop and corn generation retain their existing rules; UAB already supplies the appropriate Forge biome tags and climates. Succulents use one bounded native population pass on already loaded terrain, require exposed End stone and leave existing structures/blocks intact. UAB continues to own terrain, biomes, structures and mob spawning.
 
 The shared 1.7.10 potion allocator uses a UniMixins accessor to expand the native potion array to at least 128 slots during construction, before effects are allocated. This applies with or without UAB, including Brewin' and Chewin' installations. Existing entries and larger third-party arrays are retained. Automatic allocations remain within native signed-byte IDs 1..127, preserving packets and effect NBT. Capacity remains available with ingredient compatibility switched off or UAB removed, so saved effects through ID 127 stay readable without a separate ID extender.
+
+## Recipe diagnostics
+
+Operators can run `/fdrecipes` on Forge 1.7.10 and 1.12.2. It writes `fd-recipe-audit.json` in the game/server directory, inspecting current native catalogs without modifying the world. The report retains every original recipe ID, including acquisition deferrals and unsupported external processors, and groups counts by mod, category and status. Repeated equivalent smelting/smoking/blasting definitions count as separate reference routes backed by the same legacy furnace mapping.
+
+`registered` means the native manager contains the route; it does not prove that every ingredient or machine is obtainable in survival. Brewin' & Chewin' reports `registered_unreachable` for otherwise valid fermentation recipes when the original keg crafting route is unavailable. The keg requires honeycomb. Without an enabled provider, including when UAB honey is disabled, existing kegs still work but fresh survival progression cannot obtain one. No replacement ingredient is added. Its tankards also require iron nuggets, which vanilla 1.7.10 lacks. Detailed exclusions for the default full stack are in [the recipe matrix](UAB-RECIPE-MATRIX.md).
+
+`unavailable` identifies missing or disabled prerequisites. `unsupported` identifies an external processor without a native adapter. `disabled` identifies a retained configuration-gated crafting recipe. `missing`, `invalid` and `conflict` flag unaccounted reference recipes, failed representative input/output checks, or a different native furnace result. Custom scripts may intentionally remove recipes and therefore produce `missing` entries; inspect the script edits before treating those as regressions. Diagnostic addon providers are optional on older FD releases. Normal gameplay does not run this inventory scan.
+
+For repeatable regression checks, start a disposable **production** Java 8 server with a localhost debugger, then use JDK 21 to run:
+
+```powershell
+.\scripts\recipe-checks\run.ps1 -Port 5005 -Output C:\Temp\recipe-checks.json
+```
+
+The runner resumes and removes its temporary tick breakpoint even if a check fails. It exercises actual crafting selection, renamed ingredients, pot/cutting input matching, and every active keg recipe through the native tile callback, including output quantities and serving-container consumption. Keg time and temperature are controlled for deterministic callback testing. Container returns can spawn in the disposable world. This does not certify full survival progression, physical heat arrangements, mouse-driven interactions, or every possible scripted ingredient predicate. The JSON inventory is also included in the test output; no extra mod or test implementation is installed.
+
+Client viewer checks for the full five-mod set can be run against an isolated, loaded NEI/JEI client using the same runner with `-Client` and that client's debugger port. These validate native category registration, full category counts, ingredient/output lookup and workstation icons. They do not drive mouse interactions or replace framebuffer inspection.

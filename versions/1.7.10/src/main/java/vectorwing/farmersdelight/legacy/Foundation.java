@@ -9,6 +9,9 @@ import net.minecraftforge.common.MinecraftForge;
 @Mod(modid = Foundation.MODID, name = "Farmer's Delight Legacy", version = BuildVersion.VERSION,
      acceptedMinecraftVersions = "[1.7.10]", dependencies = "required-after:unimixins@[0.3.1,);after:etfuturum")
 public final class Foundation {
+    @Mod.EventHandler public void serverStarting(cpw.mods.fml.common.event.FMLServerStartingEvent event) {
+        event.registerServerCommand(new RecipeAudit());
+    }
     public static final String MODID = "farmersdelight";
     public static final PotionIdRegistry POTIONS = new PotionIdRegistry(MODID);
     @Mod.Instance(MODID) public static Foundation instance;

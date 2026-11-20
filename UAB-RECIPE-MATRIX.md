@@ -1,6 +1,6 @@
 # UAB recipe compatibility matrix
 
-Forge 1.7.10 and 1.12.2; original catalogs from Farmer's Delight Classic Edition and all four addons, synchronized against UAB 1.1.2. The UAB feature matrix and native registration/availability implementations are the reference. [Configuration and implementation](UAB-COMPATIBILITY.md) · [Scripting syntax and examples](SCRIPTING.md).
+Forge 1.7.10 and 1.12.2; original catalogs from Farmer's Delight Classic Edition and all four addons, rechecked against UAB 1.1.5. The UAB feature matrix and native registration/availability implementations are the reference. [Configuration, diagnostics and implementation](UAB-COMPATIBILITY.md) · [Scripting syntax and examples](SCRIPTING.md).
 
 The statuses below describe a fresh installation with all five mods, default feature settings and UAB enabled, without custom recipe scripts or unrelated content mods. They come from production dedicated-server catalogs. A supported recipe becomes deferred if a required feature, update master, ingredient, output, liquid-item or serving container is disabled or unavailable. Eight native vanilla grilling entries are listed separately from the original mod catalogs.
 
@@ -33,6 +33,8 @@ The statuses below describe a fresh installation with all five mods, default fea
 | End foods, knives, crate and stove chains | Existing native routes plus campfire correction | UAB Nether/modern inputs restored | Original chorus/breath/shells and native End drops; preserve the native 1.12.2 provider and effective 1.7.10 UAB acquisition. |
 
 ## Remaining limitations
+
+These counts apply to the full default stack. Without UAB or another enabled ingredient provider, additional original routes are unavailable. In particular, Brewin' & Chewin's keg needs honeycomb, and tankards need iron nuggets (absent from vanilla 1.7.10). A fermentation recipe can remain registered and work in an existing keg while a new survival world cannot craft that keg. `/fdrecipes` reports this distinction; it does not silently substitute ingredients or erase saved machines.
 
 - UAB supplies no leather horse armor on these targets, so its cutting recipe remains unavailable.
 - Native ink sac and black dye share one legacy item/metadata identity; registering the modern conversion would duplicate that ingredient, so it remains disabled.

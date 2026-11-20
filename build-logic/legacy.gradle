@@ -58,6 +58,14 @@ processResources {
         }
         new File(destinationDir, 'farmersdelight/source_tags.json').setText(groovy.json.JsonOutput.toJson(tags), 'UTF-8')
         def foods = new JsonSlurper().parse(catalog)
+        if (minecraftTarget == '1.12.2') {
+            // Addons inherit this shared item model, including its original hand transforms.
+            def mug = new JsonSlurper().parse(new File(sourceAssets, 'models/item/mug.json'))
+            mug.parent = 'item/generated'
+            def mugModel = new File(destinationDir, 'assets/farmersdelight/models/item/mug.json')
+            mugModel.parentFile.mkdirs()
+            mugModel.setText(groovy.json.JsonOutput.toJson(mug), 'UTF-8')
+        }
         if (minecraftTarget in ['1.7.10', '1.12.2']) foods += new JsonSlurper().parse(uabFoods)
         def ids = foods.collect { it.id } + ['rice', 'rice_panicle', 'straw', 'canvas', 'tree_bark',
                 'flint_knife', 'iron_knife', 'golden_knife', 'diamond_knife', 'rotten_tomato', 'horse_feed']
@@ -589,6 +597,8 @@ tasks.register('release', Sync) {
                 if (!zip.getEntry(entry)) throw new GradleException("${artifact}: missing ${entry}")
             }
             def readEntry = { String entry -> zip.getInputStream(zip.getEntry(entry)).withCloseable { it.getText('UTF-8') } }
+            if (minecraftTarget == '1.12.2' && !zip.getEntry('assets/farmersdelight/models/item/mug.json'))
+                throw new GradleException("${artifact}: missing shared addon mug model")
             def metadata = new JsonSlurper().parseText(readEntry('mcmod.info'))
             if (metadata.size() != 1 || metadata[0].modid != 'farmersdelight' ||
                     metadata[0].version != project.version.toString() || metadata[0].mcversion != minecraftTarget) {
