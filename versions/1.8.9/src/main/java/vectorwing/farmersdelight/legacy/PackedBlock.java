@@ -14,7 +14,7 @@ public final class PackedBlock extends Block {
     private final boolean bale;
     public static final net.minecraft.block.properties.PropertyDirection FACING=net.minecraft.block.properties.PropertyDirection.create("facing");
     public PackedBlock(String id) {
-        super(id.endsWith("_crate") ? Material.wood : Material.cloth);
+        super(id.endsWith("_crate") ? Material.wood : Material.cloth); setStepSound(id.endsWith("_crate") ? soundTypeWood : id.equals("rice_bale") ? soundTypeGrass : soundTypeCloth);
         this.id=id; bale=id.equals("rice_bale"); setHardness(id.endsWith("_crate") ? 2 : 0.5F); setCreativeTab(Content.TAB);
         setUnlocalizedName("farmersdelight."+id);
         setDefaultState(blockState.getBaseState().withProperty(FACING,EnumFacing.UP));

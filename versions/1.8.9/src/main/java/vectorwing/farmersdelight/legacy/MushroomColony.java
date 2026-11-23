@@ -22,7 +22,7 @@ public final class MushroomColony extends BlockBush implements IGrowable,ISheara
     private final boolean red;
     public static final PropertyInteger AGE=PropertyInteger.create("age",0,3);
     public MushroomColony(boolean red) {
-        super(); this.red=red; setTickRandomly(true); setCreativeTab(Content.TAB);
+        super(); setStepSound(soundTypeGrass); this.red=red; setTickRandomly(true); setCreativeTab(Content.TAB);
         setUnlocalizedName("farmersdelight."+(red ? "red" : "brown")+"_mushroom_colony");
         setDefaultState(blockState.getBaseState().withProperty(AGE,0));
     }

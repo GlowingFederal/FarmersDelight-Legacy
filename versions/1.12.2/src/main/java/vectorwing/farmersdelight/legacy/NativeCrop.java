@@ -20,7 +20,7 @@ public class NativeCrop extends BlockCrops {
     protected final String kind;
     private static final int[] TOMATO_HEIGHT={6,6,10,10,13,13,16,16}, CABBAGE_HEIGHT={2,3,5,7,8,9,9,10};
 
-    public NativeCrop(String kind) { super(); this.kind=kind; setTranslationKey("farmersdelight."+kind); }
+    public NativeCrop(String kind) { super(); setSoundType(net.minecraft.block.SoundType.PLANT); this.kind=kind; setTranslationKey("farmersdelight."+kind); }
     protected Item seed() { return Content.ITEMS.get(kind.equals("cabbages") ? "cabbage_seeds" : kind.equals("tomatoes") ? "tomato_seeds" : "onion"); }
     protected Item produce() { return Content.ITEMS.get(kind.equals("cabbages") ? "cabbage" : kind.equals("tomatoes") ? "tomato" : "onion"); }
     protected Item getSeed() { return seed(); }

@@ -22,7 +22,7 @@ public class NativeCrop extends BlockCrops {
         setBlockBounds(0,0,0,1,(kind.equals("tomatoes") ? TOMATO_HEIGHT[age] : kind.equals("cabbages") ? CABBAGE_HEIGHT[age] : age+2)/16F,1);
     }
     @SideOnly(Side.CLIENT) private IIcon[] stages;
-    public NativeCrop(String kind) { super(); this.kind=kind; setBlockName("farmersdelight."+kind); }
+    public NativeCrop(String kind) { super(); setStepSound(soundTypeGrass); this.kind=kind; setBlockName("farmersdelight."+kind); }
     protected Item seed() { return Content.ITEMS.get(kind.equals("cabbages") ? "cabbage_seeds" : kind.equals("tomatoes") ? "tomato_seeds" : "onion"); }
     protected Item produce() { return Content.ITEMS.get(kind.equals("cabbages") ? "cabbage" : kind.equals("tomatoes") ? "tomato" : "onion"); }
     protected Item func_149866_i() { return seed(); }

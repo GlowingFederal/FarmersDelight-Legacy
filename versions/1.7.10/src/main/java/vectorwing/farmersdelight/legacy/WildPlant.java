@@ -15,7 +15,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public final class WildPlant extends BlockBush implements IGrowable,IShearable {
     public final String kind;
     public WildPlant(String kind) {
-        super(); this.kind=kind; setBlockName("farmersdelight.wild_"+kind);
+        super(); setStepSound(soundTypeGrass); this.kind=kind; setBlockName("farmersdelight.wild_"+kind);
         setCreativeTab(Content.TAB); setBlockTextureName("farmersdelight:wild_"+kind);
     }
     private String seed() {

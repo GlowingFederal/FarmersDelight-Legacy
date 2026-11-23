@@ -15,7 +15,7 @@ import net.minecraftforge.common.ForgeDirection;
 public final class WildPlant extends BlockFlower implements IShearable {
     public final String kind;
     public WildPlant(String kind) {
-        super(LegacyIds.block("wild_"+kind)); this.kind=kind; setUnlocalizedName("farmersdelight.wild_"+kind);
+        super(LegacyIds.block("wild_"+kind)); setStepSound(soundGrassFootstep); this.kind=kind; setUnlocalizedName("farmersdelight.wild_"+kind);
         setCreativeTab(Content.TAB); setTextureName("farmersdelight:wild_"+kind);
     }
     private String seed() {

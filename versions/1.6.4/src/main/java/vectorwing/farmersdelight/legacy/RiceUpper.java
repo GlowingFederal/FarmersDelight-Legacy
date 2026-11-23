@@ -17,7 +17,7 @@ public final class RiceUpper extends BlockCrops implements IShearable {
     public int getRenderType() { return 1; }
     private final boolean wild;
     @SideOnly(Side.CLIENT) private Icon[] stages;
-    public RiceUpper(boolean wild) { super(LegacyIds.block(wild ? "wild_rice_upper" : "rice_upper_crop")); this.wild=wild; setUnlocalizedName("farmersdelight."+(wild ? "wild_rice_upper" : "rice_upper_crop")); }
+    public RiceUpper(boolean wild) { super(LegacyIds.block(wild ? "wild_rice_upper" : "rice_upper_crop")); setStepSound(soundGrassFootstep); this.wild=wild; setUnlocalizedName("farmersdelight."+(wild ? "wild_rice_upper" : "rice_upper_crop")); }
     protected Item func_149866_i() { return Content.ITEMS.get("rice"); }
     protected Item func_149865_P() { return Content.ITEMS.get("rice_panicle"); }
     protected boolean canThisPlantGrowOnThisBlockID(int nativeId) { return nativeId==(wild ? Content.wildRice : Content.riceCrop).blockID; }

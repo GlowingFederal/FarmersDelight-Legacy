@@ -23,7 +23,7 @@ public class ServingBlock extends BlockContainer {
     }
     /** Native addon feast using the same serving, persistence and duplication protections. */
     public ServingBlock(String namespace,String id,boolean pie,String serving,boolean leftovers) {
-        super(Material.cloth); this.id=id; this.pie=pie; this.serving=serving; this.leftovers=leftovers;
+        super(Material.cloth); setStepSound(id.equals("stuffed_pumpkin_block") ? soundTypeWood : soundTypeCloth); this.id=id; this.pie=pie; this.serving=serving; this.leftovers=leftovers;
         setBlockName(namespace+"."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
         setBlockTextureName(namespace+":"+(pie ? id+"_top" : id.equals("stuffed_pumpkin_block") ? "stuffed_pumpkin_bottom" : id.equals("shepherds_pie_block") ? "shepherds_pie_top" : id.replace("_block","")+"_body"));
     }
@@ -57,15 +57,34 @@ public class ServingBlock extends BlockContainer {
         if(pie && !knife && !player.canEat(false)) return false;
         if(!pie && (Stacks.empty(held) || held.getItem()!=net.minecraft.init.Items.bowl)) return false;
         if(world.isRemote) return true;
+        if(Stacks.empty(portion)) return false;
         tile.take();
         if(pie && !knife) ((LegacyFood)portion.getItem()).eatPlaced(player,world);
         else {
-            if(!pie && !player.capabilities.isCreativeMode) Stacks.shrink(held,1);
             if(pie) dropBlockAsItem(world,x,y,z,portion);
-            else if(!player.inventory.addItemStackToInventory(portion)) player.dropPlayerItemWithRandomChoice(portion,false);
+            else {
+                if(!player.capabilities.isCreativeMode) {
+                    Stacks.shrink(held,1);
+                    if(Stacks.empty(held)) player.inventory.setInventorySlotContents(player.inventory.currentItem,null);
+                }
+                // Creative inventory insertion silently discards a portion when there is no room.
+                if((player.capabilities.isCreativeMode && !hasRoomForPortion(player,portion))
+                        || !player.inventory.addItemStackToInventory(portion)) player.dropPlayerItemWithRandomChoice(portion,false);
+                player.inventory.markDirty();
+                // Send changed slots before vanilla's interaction handler can cache them.
+                player.openContainer.detectAndSendChanges();
+            }
         }
         if(tile.remaining==0 && !leftovers) world.setBlockToAir(x,y,z);
         return true;
+    }
+    private static boolean hasRoomForPortion(EntityPlayer player, ItemStack portion) {
+        if(player.inventory.getFirstEmptyStack()>=0) return true;
+        for(ItemStack stack : player.inventory.mainInventory) {
+            if(Stacks.same(stack,portion) && stack.isStackable()
+                    && stack.stackSize<Math.min(stack.getMaxStackSize(),player.inventory.getInventoryStackLimit())) return true;
+        }
+        return false;
     }
     private void drops(java.util.List<ItemStack> drops,int portions) {
         if(portions==4) { drops.add(new ItemStack(this)); return; }

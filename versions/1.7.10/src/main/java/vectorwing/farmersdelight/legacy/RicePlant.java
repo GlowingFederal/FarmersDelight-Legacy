@@ -22,7 +22,7 @@ public final class RicePlant extends BlockContainer implements IGrowable,ISheara
     public final boolean wild;
     @SideOnly(Side.CLIENT) private IIcon[] stages; @SideOnly(Side.CLIENT) private IIcon supporting;
     public RicePlant(boolean wild) {
-        super(Material.water); this.wild=wild; setTickRandomly(true); setHardness(0);
+        super(Material.water); setStepSound(soundTypeGrass); this.wild=wild; setTickRandomly(true); setHardness(0);
         setBlockName("farmersdelight."+(wild ? "wild_rice" : "rice_crop"));
         setBlockBounds(0.0625F,0,0.0625F,0.9375F,1,0.9375F);
     }

@@ -19,7 +19,7 @@ public final class MushroomColony extends BlockFlower implements IShearable {
     private final boolean red;
     @SideOnly(Side.CLIENT) private net.minecraft.util.Icon[] stages;
     public MushroomColony(boolean red) {
-        super(LegacyIds.block((red ? "red" : "brown")+"_mushroom_colony")); this.red=red; setTickRandomly(true); setCreativeTab(Content.TAB);
+        super(LegacyIds.block((red ? "red" : "brown")+"_mushroom_colony")); setStepSound(soundGrassFootstep); this.red=red; setTickRandomly(true); setCreativeTab(Content.TAB);
         setUnlocalizedName("farmersdelight."+(red ? "red" : "brown")+"_mushroom_colony");
 
     }

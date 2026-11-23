@@ -26,7 +26,9 @@ public final class StorageBlock extends BlockContainer {
     public final boolean basket;
     @cpw.mods.fml.relauncher.SideOnly(cpw.mods.fml.relauncher.Side.CLIENT) private net.minecraft.util.IIcon front,open,top,side;
     public StorageBlock(String id,boolean basket) {
-        super(Material.wood); this.id=id; this.basket=basket;
+        super(Material.wood); setStepSound(basket ? soundTypeCloth : soundTypeWood); this.id=id; this.basket=basket;
+        // Block queries opacity during construction, before the basket field is set.
+        if(basket) setLightOpacity(0);
         setBlockName("farmersdelight."+id); setCreativeTab(Content.TAB); setHardness(1.5F);
 
     }

@@ -33,7 +33,7 @@ public final class GrillBlock extends BlockContainer {
     public int getRenderType() { return stove ? 0 : Foundation.proxy.modelRenderId(); }
     public int getLightValue(IBlockAccess world, int x, int y, int z) { return stove && (world.getBlockMetadata(x,y,z) & 4) != 0 ? 13 : 0; }
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack stack) {
-        world.setBlockMetadataWithNotify(x,y,z, (MathHelper.floor_double(placer.rotationYaw * 4 / 360 + 0.5) & 3) | (stove ? 4 : 0), 3);
+        world.setBlockMetadataWithNotify(x,y,z, ((MathHelper.floor_double(placer.rotationYaw * 4 / 360 + 0.5) + (stove ? 0 : 2)) & 3) | (stove ? 4 : 0), 3);
         if (!stove && world.getBlockTileEntity(x,y,z) instanceof SkilletTile) ((SkilletTile) world.getBlockTileEntity(x,y,z)).identity(stack);
     }
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hx, float hy, float hz) {

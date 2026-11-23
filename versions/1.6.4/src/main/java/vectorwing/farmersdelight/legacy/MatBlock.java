@@ -13,7 +13,7 @@ public final class MatBlock extends Block {
     public final boolean full,rug;
 
     public MatBlock(String id) {
-        super(LegacyIds.block(id),Material.cloth); this.id=id; full=id.equals("full_tatami_mat"); rug=id.equals("canvas_rug");
+        super(LegacyIds.block(id),Material.cloth); setStepSound(soundClothFootstep); this.id=id; full=id.equals("full_tatami_mat"); rug=id.equals("canvas_rug");
         setCreativeTab(Content.TAB); setHardness(rug ? 0.2F : 0.3F);
         setUnlocalizedName("farmersdelight."+id); setTextureName("farmersdelight:"+(rug ? id : "tatami_mat_half")); setBlockBounds(0,0,0,1,rug ? 0.0625F : 0.125F,1);
     }

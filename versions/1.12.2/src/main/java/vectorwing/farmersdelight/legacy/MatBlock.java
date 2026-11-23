@@ -17,7 +17,7 @@ public final class MatBlock extends Block {
     public static final net.minecraft.block.properties.PropertyDirection FACING=net.minecraft.block.BlockHorizontal.FACING;
     public static final net.minecraft.block.properties.PropertyBool HEAD=net.minecraft.block.properties.PropertyBool.create("head");
     public MatBlock(String id) {
-        super(Material.CLOTH); this.id=id; full=id.equals("full_tatami_mat"); rug=id.equals("canvas_rug");
+        super(Material.CLOTH); setSoundType(net.minecraft.block.SoundType.CLOTH); this.id=id; full=id.equals("full_tatami_mat"); rug=id.equals("canvas_rug");
         setCreativeTab(Content.TAB); setHardness(rug ? 0.2F : 0.3F);
         setTranslationKey("farmersdelight."+id); setDefaultState(blockState.getBaseState().withProperty(FACING,EnumFacing.SOUTH).withProperty(HEAD,false));
     }

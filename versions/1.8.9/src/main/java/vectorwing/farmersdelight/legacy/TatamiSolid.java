@@ -13,7 +13,7 @@ public final class TatamiSolid extends Block {
     public static final net.minecraft.block.properties.PropertyDirection FACING=net.minecraft.block.properties.PropertyDirection.create("facing");
     public static final net.minecraft.block.properties.PropertyBool PAIRED=net.minecraft.block.properties.PropertyBool.create("paired");
     public TatamiSolid() {
-        super(Material.cloth); setHardness(0.8F); setCreativeTab(Content.TAB);
+        super(Material.cloth); setStepSound(soundTypeCloth); setHardness(0.8F); setCreativeTab(Content.TAB);
         setUnlocalizedName("farmersdelight.tatami"); setDefaultState(blockState.getBaseState().withProperty(FACING,EnumFacing.DOWN).withProperty(PAIRED,false));
     }
     protected BlockState createBlockState() { return new BlockState(this,FACING,PAIRED); }

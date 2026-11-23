@@ -29,7 +29,7 @@ public class ServingBlock extends BlockContainer {
     }
     /** Native addon feast using the same serving, persistence and duplication protections. */
     public ServingBlock(String namespace,String id,boolean pie,String serving,boolean leftovers) {
-        super(Material.CLOTH); this.id=id; this.pie=pie; this.serving=serving; this.leftovers=leftovers;
+        super(Material.CLOTH); setSoundType(id.equals("stuffed_pumpkin_block") ? net.minecraft.block.SoundType.WOOD : net.minecraft.block.SoundType.CLOTH); this.id=id; this.pie=pie; this.serving=serving; this.leftovers=leftovers;
         setTranslationKey(namespace+"."+id); setCreativeTab(Content.TAB); setHardness(0.5F);
         setDefaultState(blockState.getBaseState().withProperty(FACING,EnumFacing.NORTH).withProperty(SERVINGS,4));
     }
@@ -66,12 +66,23 @@ public class ServingBlock extends BlockContainer {
         if(pie && !knife && !player.canEat(false)) return false;
         if(!pie && (Stacks.empty(held) || held.getItem()!=net.minecraft.init.Items.BOWL)) return false;
         if(world.isRemote) return true;
+        if(Stacks.empty(portion)) return false;
         tile.take();
         if(pie && !knife) ((LegacyFood)portion.getItem()).eatPlaced(player,world);
         else {
-            if(!pie && !player.capabilities.isCreativeMode) Stacks.shrink(held,1);
             if(pie) spawnAsEntity(world,pos,portion);
-            else if(!player.inventory.addItemStackToInventory(portion)) player.dropItem(portion,false);
+            else {
+                if(!player.capabilities.isCreativeMode) {
+                    Stacks.shrink(held,1);
+                    if(held.isEmpty()) player.setHeldItem(hand,ItemStack.EMPTY);
+                }
+                // Creative inventory insertion silently discards a portion when there is no room.
+                if((player.capabilities.isCreativeMode && (player.inventory.getFirstEmptyStack()<0 && player.inventory.storeItemStack(portion)<0))
+                        || !player.inventory.addItemStackToInventory(portion)) player.dropItem(portion,false);
+                player.inventory.markDirty();
+                // Send changed slots before vanilla's interaction handler can cache them.
+                player.openContainer.detectAndSendChanges();
+            }
         }
         if(tile.remaining==0 && !leftovers) world.setBlockToAir(pos);
         return true;

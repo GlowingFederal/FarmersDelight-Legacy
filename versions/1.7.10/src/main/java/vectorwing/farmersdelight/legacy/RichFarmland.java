@@ -17,7 +17,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public final class RichFarmland extends BlockFarmland {
     @SideOnly(Side.CLIENT) private net.minecraft.util.IIcon dry,moist,side,moistSide;
-    public RichFarmland() { super(); setHardness(0.6F); setBlockName("farmersdelight.rich_soil_farmland"); }
+    public RichFarmland() { super(); setStepSound(soundTypeGravel); setHardness(0.6F); setBlockName("farmersdelight.rich_soil_farmland"); }
     private boolean covered(World world,int x,int y,int z) {
         Block block=world.getBlock(x,y+1,z);
         return block.getMaterial().isSolid() && block!=Blocks.melon_block && block!=Blocks.pumpkin;

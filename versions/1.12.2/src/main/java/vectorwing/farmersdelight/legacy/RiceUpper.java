@@ -18,7 +18,7 @@ import net.minecraft.util.NonNullList;
 public final class RiceUpper extends BlockCrops implements IShearable {
     private final boolean wild;
     public static final PropertyInteger RICE_AGE=PropertyInteger.create("age",0,3);
-    public RiceUpper(boolean wild) { super(); this.wild=wild; setTranslationKey("farmersdelight."+(wild ? "wild_rice_upper" : "rice_upper_crop")); }
+    public RiceUpper(boolean wild) { super(); setSoundType(net.minecraft.block.SoundType.PLANT); this.wild=wild; setTranslationKey("farmersdelight."+(wild ? "wild_rice_upper" : "rice_upper_crop")); }
     public int getMaxAge() { return 3; }
     public PropertyInteger getAgeProperty() { return RICE_AGE; }
     public int getAge(IBlockState state) { return state.getValue(RICE_AGE); }

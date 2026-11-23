@@ -30,7 +30,9 @@ public final class StorageBlock extends BlockContainer {
     public static final net.minecraft.block.properties.PropertyDirection FACING=net.minecraft.block.properties.PropertyDirection.create("facing");
     public static final net.minecraft.block.properties.PropertyBool OPEN=net.minecraft.block.properties.PropertyBool.create("open");
     public StorageBlock(String id,boolean basket) {
-        super(Material.WOOD); this.id=id; this.basket=basket;
+        super(Material.WOOD); setSoundType(basket ? net.minecraft.block.SoundType.CLOTH : net.minecraft.block.SoundType.WOOD); this.id=id; this.basket=basket;
+        // Block queries opacity during construction, before the basket field is set.
+        if(basket) setLightOpacity(0);
         setTranslationKey("farmersdelight."+id); setCreativeTab(Content.TAB); setHardness(1.5F);
         setDefaultState(blockState.getBaseState().withProperty(FACING,basket ? EnumFacing.UP : EnumFacing.NORTH).withProperty(OPEN,false));
     }

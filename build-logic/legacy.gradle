@@ -268,7 +268,7 @@ processResources {
                 writeStorage("models/item/${wood}_pantry.json",[parent:'farmersdelight:block/'+wood+'_pantry'])
             }
             def variants=[:]
-            ['down':[180,0],'up':[0,0],'north':[90,0],'south':[270,0],'west':[90,270],'east':[90,90]].each { facing,rotation ->
+            ['down':[180,0],'up':[0,0],'north':[90,0],'south':[90,180],'west':[90,270],'east':[90,90]].each { facing,rotation ->
                 [false,true].each { opened -> variants["facing=${facing},open=${opened}"]=[model:'farmersdelight:basket',x:rotation[0],y:rotation[1]] }
             }
             writeStorage('blockstates/basket.json',[variants:variants])
@@ -483,6 +483,9 @@ processResources {
             fileTree(new File(destinationDir,'assets/farmersdelight/models')).matching { include '**/*.json' }.files.each { modelFile ->
                 def model=new JsonSlurper().parse(modelFile)
                 if(model.parent in ['block/template_farmland','minecraft:block/template_farmland']) model.parent='block/farmland'
+                if(minecraftTarget=='1.8.9' && modelFile.name=='rich_soil_farmland_moist.json' && !model.textures.particle) {
+                    model.textures.particle='#top'
+                }
                 if(model.parent in ['block/orientable_with_bottom','minecraft:block/orientable_with_bottom']) {
                     model.parent='block/cube'
                     model.textures += [down:model.textures.bottom,up:model.textures.top,north:model.textures.front,east:model.textures.side,south:model.textures.side,west:model.textures.side,particle:model.textures.front]

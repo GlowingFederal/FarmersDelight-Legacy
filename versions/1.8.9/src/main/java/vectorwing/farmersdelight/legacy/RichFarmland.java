@@ -17,7 +17,7 @@ import net.minecraft.util.EnumFacing;
 
 public final class RichFarmland extends BlockFarmland {
 
-    public RichFarmland() { super(); setHardness(0.6F); setUnlocalizedName("farmersdelight.rich_soil_farmland"); }
+    public RichFarmland() { super(); setStepSound(soundTypeGravel); setHardness(0.6F); setUnlocalizedName("farmersdelight.rich_soil_farmland"); }
     private boolean covered(World world,BlockPos pos) {
         Block block=world.getBlockState(pos.up()).getBlock();
         return world.getBlockState(pos.up()).getBlock().getMaterial().isSolid() && block!=Blocks.melon_block && block!=Blocks.pumpkin;

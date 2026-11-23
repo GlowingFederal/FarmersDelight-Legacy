@@ -18,7 +18,7 @@ import net.minecraft.util.EnumFacing;
 public final class WildPlant extends BlockBush implements IGrowable,IShearable {
     public final String kind;
     public WildPlant(String kind) {
-        super(); this.kind=kind; setUnlocalizedName("farmersdelight.wild_"+kind);
+        super(); setStepSound(soundTypeGrass); this.kind=kind; setUnlocalizedName("farmersdelight.wild_"+kind);
         setCreativeTab(Content.TAB);
     }
     private String seed() {

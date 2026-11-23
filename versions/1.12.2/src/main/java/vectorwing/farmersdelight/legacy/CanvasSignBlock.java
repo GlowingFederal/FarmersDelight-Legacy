@@ -20,7 +20,7 @@ public final class CanvasSignBlock extends BlockSign {
     public static final net.minecraft.block.properties.PropertyInteger ROTATION=net.minecraft.block.properties.PropertyInteger.create("rotation",0,15);
     public static final net.minecraft.block.properties.PropertyDirection FACING=net.minecraft.block.BlockHorizontal.FACING;
     public CanvasSignBlock(String background,boolean wall) {
-        super(); this.background=background; this.wall=wall;
+        super(); setSoundType(net.minecraft.block.SoundType.WOOD); this.background=background; this.wall=wall;
         id=background.isEmpty() ? "canvas_sign" : background+"_canvas_sign";
         setTranslationKey("farmersdelight."+id); setHardness(1F);
         setDefaultState(blockState.getBaseState().withProperty(ROTATION,0).withProperty(FACING,EnumFacing.NORTH));

@@ -3,7 +3,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 public final class SafetyNet extends Block {
     public SafetyNet() {
-        super(Material.CLOTH); setHardness(0.2F); setCreativeTab(Content.TAB);
+        super(Material.CLOTH); setSoundType(net.minecraft.block.SoundType.CLOTH); setHardness(0.2F); setCreativeTab(Content.TAB);
         setTranslationKey("farmersdelight.safety_net");
     }
     public boolean isOpaqueCube(net.minecraft.block.state.IBlockState state) { return false; }

@@ -92,7 +92,7 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
                     for (double[] point : points) {
                         if (box.has("rotation")) rotate(point, box.getAsJsonObject("rotation"));
                         if(block==Content.basket || block==Content.tatami) {
-                            int turns=facing==0 ? 2 : facing==2 ? 1 : facing==3 ? 3 : facing==4 ? 3 : facing==5 ? 1 : 0;
+                            int turns=facing==0 ? 2 : facing==2 ? 3 : facing==3 ? 1 : facing==4 ? 1 : facing==5 ? 3 : 0;
                             for(int turn=0;turn<turns;turn++) {
                                 if(facing<4) { double y=point[1]; point[1]=1-point[2]; point[2]=y; }
                                 else { double x=point[0]; point[0]=1-point[1]; point[1]=x; }
@@ -145,7 +145,10 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
                 : block==Content.tatami ? (meta&8)==0 ? 0 : (meta&1)==0 ? 1 : 2
                 : vectorwing.farmersdelight.legacy.ServingBlock.portions(world.getTileEntity(x,y,z));
         if(metadataVariants.containsKey(block)) variant=metadataVariants.get(block)[meta&15];
-        render(block, meta & (block==Content.basket || block==Content.tatami ? 7 : 3), variant, x, y, z, true); return true;
+        int facing=meta & (block==Content.basket || block==Content.tatami ? 7 : 3);
+        // Feast metadata starts at south, while the model rotation table starts at north.
+        if(block instanceof vectorwing.farmersdelight.legacy.ServingBlock) facing=(facing+2)&3;
+        render(block, facing, variant, x, y, z, true); return true;
     }
     private void render(Block block, int facing, int remaining, int x, int y, int z, boolean world) {
         Quad[][] prepared = variants.containsKey(block) ? variants.get(block)[remaining] : models.get(block); if (prepared == null) return;

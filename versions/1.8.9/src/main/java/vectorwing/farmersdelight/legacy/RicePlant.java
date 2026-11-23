@@ -27,7 +27,7 @@ public final class RicePlant extends BlockContainer implements IGrowable,ISheara
     public static final PropertyInteger AGE=PropertyInteger.create("age",0,3);
     public static final net.minecraft.block.properties.PropertyBool SUPPORTING=net.minecraft.block.properties.PropertyBool.create("supporting");
     public RicePlant(boolean wild) {
-        super(Material.water); this.wild=wild; setTickRandomly(true); setHardness(0);
+        super(Material.water); setStepSound(soundTypeGrass); this.wild=wild; setTickRandomly(true); setHardness(0);
         setUnlocalizedName("farmersdelight."+(wild ? "wild_rice" : "rice_crop"));
         setDefaultState(blockState.getBaseState().withProperty(AGE,0).withProperty(SUPPORTING,false).withProperty(net.minecraft.block.BlockLiquid.LEVEL,0));
     }

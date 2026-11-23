@@ -18,7 +18,7 @@ import net.minecraft.util.BlockPos;
 public final class RiceUpper extends net.minecraft.block.BlockBush implements net.minecraft.block.IGrowable,IShearable {
     private final boolean wild;
     public static final PropertyInteger RICE_AGE=PropertyInteger.create("age",0,3);
-    public RiceUpper(boolean wild) { super(); this.wild=wild; setUnlocalizedName("farmersdelight."+(wild ? "wild_rice_upper" : "rice_upper_crop")); }
+    public RiceUpper(boolean wild) { super(); setStepSound(soundTypeGrass); this.wild=wild; setUnlocalizedName("farmersdelight."+(wild ? "wild_rice_upper" : "rice_upper_crop")); }
     public IBlockState withAge(int age) { return getDefaultState().withProperty(RICE_AGE,age); }
     public IBlockState getStateFromMeta(int meta) { return withAge(meta&3); }
     public int getMetaFromState(IBlockState state) { return getAge(state); }

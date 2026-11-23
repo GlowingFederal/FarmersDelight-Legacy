@@ -104,3 +104,9 @@
 2026-11-12 14:05 — Increment patch version for release packaging
 
 - Advance the mod patch version by 0.0.1 and refresh matching native artifact and mod metadata versions.
+
+2026-11-22 - Fix feast serving and legacy block presentation
+
+- Update the bowl and served food slots immediately when serving a feast, including addon feasts. Keep creative bowls, drop portions when the inventory is full, and support either hand on 1.12.2.
+- Give crops, soils, storage, decorations, meals and grills material-appropriate sounds. Fix basket lighting and facing, legacy feast model orientation, and moist Rich Soil Farmland particles on 1.8.9.
+- Match the original Cutting Board placements for flat items, blocks and carved tools, and display multiple items in a Skillet with stable offsets.

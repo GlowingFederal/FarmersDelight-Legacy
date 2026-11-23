@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 public final class TatamiSolid extends Block {
 
     public TatamiSolid() {
-        super(Material.cloth); setHardness(0.8F); setCreativeTab(Content.TAB);
+        super(Material.cloth); setStepSound(soundTypeCloth); setHardness(0.8F); setCreativeTab(Content.TAB);
         setBlockName("farmersdelight.tatami"); setBlockTextureName("farmersdelight:tatami_mat_half");
     }
     public int getRenderType() { return Foundation.proxy.modelRenderId(); }

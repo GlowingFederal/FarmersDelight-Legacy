@@ -22,7 +22,7 @@ public final class RicePlant extends BlockContainer implements IShearable {
     public final boolean wild;
     @SideOnly(Side.CLIENT) private Icon[] stages; @SideOnly(Side.CLIENT) private Icon supporting;
     public RicePlant(boolean wild) {
-        super(LegacyIds.block(wild ? "wild_rice" : "rice_crop"),Material.water); this.wild=wild; setTickRandomly(true); setHardness(0);
+        super(LegacyIds.block(wild ? "wild_rice" : "rice_crop"),Material.water); setStepSound(soundGrassFootstep); this.wild=wild; setTickRandomly(true); setHardness(0);
         setUnlocalizedName("farmersdelight."+(wild ? "wild_rice" : "rice_crop"));
         setBlockBounds(0.0625F,0,0.0625F,0.9375F,1,0.9375F);
     }

@@ -7,6 +7,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.util.IIcon;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 
 public final class CanvasSignBlock extends BlockSign {
@@ -15,10 +18,15 @@ public final class CanvasSignBlock extends BlockSign {
     private static final int[] DYE_TEXT={0x1D1D21,0xB02E26,0x5E7C16,0x835432,0x3C44AA,0x8932B8,0x169C9C,0x9D9D97,0x474F52,0xF38BAA,0x80C71F,0xFED83D,0x3AB3DA,0xC74EBD,0xF9801D,0xF9FFFE};
 
     public CanvasSignBlock(String background,boolean wall) {
-        super(CanvasSignTile.class,!wall); this.background=background; this.wall=wall;
+        super(CanvasSignTile.class,!wall); setStepSound(soundTypeWood); this.background=background; this.wall=wall;
         id=background.isEmpty() ? "canvas_sign" : background+"_canvas_sign";
         setBlockName("farmersdelight."+id); setHardness(1F);
 
+    }
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int metadata) {
+        return Content.canvasRug.getIcon(side, 0);
     }
     public TileEntity createNewTileEntity(World world,int meta) { return new CanvasSignTile(); }
     public Item getItemDropped(int meta,java.util.Random random,int fortune) { return Content.ITEMS.get(id); }

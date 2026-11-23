@@ -11,7 +11,7 @@ public final class PackedBlock extends Block {
     private final boolean bale;
     @cpw.mods.fml.relauncher.SideOnly(cpw.mods.fml.relauncher.Side.CLIENT) private net.minecraft.util.IIcon top,bottom,side,tied;
     public PackedBlock(String id) {
-        super(id.endsWith("_crate") ? Material.wood : Material.cloth);
+        super(id.endsWith("_crate") ? Material.wood : Material.cloth); setStepSound(id.endsWith("_crate") ? soundTypeWood : id.equals("rice_bale") ? soundTypeGrass : soundTypeCloth);
         this.id=id; bale=id.equals("rice_bale"); setHardness(id.endsWith("_crate") ? 2 : 0.5F); setCreativeTab(Content.TAB);
         setBlockName("farmersdelight."+id);
 

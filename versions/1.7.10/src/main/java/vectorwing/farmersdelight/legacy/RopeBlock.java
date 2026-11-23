@@ -4,7 +4,7 @@ import net.minecraft.block.BlockPane;
 import net.minecraft.block.material.Material;
 public final class RopeBlock extends BlockPane {
     public RopeBlock() {
-        super("farmersdelight:rope","farmersdelight:rope",Material.cloth,true);
+        super("farmersdelight:rope","farmersdelight:rope",Material.cloth,true); setStepSound(soundTypeCloth);
         setBlockName("farmersdelight.rope"); setCreativeTab(Content.TAB); setHardness(0.2F);
     }
     public boolean isLadder(net.minecraft.world.IBlockAccess world,int x,int y,int z,net.minecraft.entity.EntityLivingBase entity) { return true; }

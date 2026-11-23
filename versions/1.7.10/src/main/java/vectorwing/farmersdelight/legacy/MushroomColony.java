@@ -19,7 +19,7 @@ public final class MushroomColony extends BlockBush implements IGrowable,ISheara
     private final boolean red;
     @SideOnly(Side.CLIENT) private net.minecraft.util.IIcon[] stages;
     public MushroomColony(boolean red) {
-        super(); this.red=red; setTickRandomly(true); setCreativeTab(Content.TAB);
+        super(); setStepSound(soundTypeGrass); this.red=red; setTickRandomly(true); setCreativeTab(Content.TAB);
         setBlockName("farmersdelight."+(red ? "red" : "brown")+"_mushroom_colony");
 
     }

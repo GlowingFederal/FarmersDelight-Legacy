@@ -19,7 +19,7 @@ public class NativeCrop extends BlockCrops {
     protected final String kind;
     private static final int[] TOMATO_HEIGHT={6,6,10,10,13,13,16,16}, CABBAGE_HEIGHT={2,3,5,7,8,9,9,10};
 
-    public NativeCrop(String kind) { super(); this.kind=kind; setUnlocalizedName("farmersdelight."+kind); }
+    public NativeCrop(String kind) { super(); setStepSound(soundTypeGrass); this.kind=kind; setUnlocalizedName("farmersdelight."+kind); }
     private static final Random itemRandom=new Random();
     public int getAge(IBlockState state) { return state.getValue(AGE); }
     public IBlockState withAge(int age) { return getDefaultState().withProperty(AGE,age); }

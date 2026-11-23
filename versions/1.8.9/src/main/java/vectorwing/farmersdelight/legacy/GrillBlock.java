@@ -43,7 +43,8 @@ public final class GrillBlock extends BlockContainer {
     public IBlockState getStateFromMeta(int meta) { return getDefaultState().withProperty(FACING,EnumFacing.getHorizontal(meta & 3)).withProperty(LIT,(meta & 4)!=0); }
     public int getMetaFromState(IBlockState state) { return state.getValue(FACING).getHorizontalIndex() | (state.getValue(LIT) ? 4 : 0); }
     public IBlockState onBlockPlaced(World world,BlockPos pos,EnumFacing side,float x,float y,float z,int meta,EntityLivingBase placer) {
-        return getDefaultState().withProperty(FACING,placer.getHorizontalFacing().getOpposite()).withProperty(LIT,stove);
+        EnumFacing facing=placer.getHorizontalFacing();
+        return getDefaultState().withProperty(FACING,stove ? facing.getOpposite() : facing).withProperty(LIT,stove);
     }
     public void onBlockPlacedBy(World world,BlockPos pos,IBlockState state,EntityLivingBase placer,ItemStack stack) {
         if (!stove && world.getTileEntity(pos) instanceof SkilletTile) ((SkilletTile)world.getTileEntity(pos)).identity(stack);

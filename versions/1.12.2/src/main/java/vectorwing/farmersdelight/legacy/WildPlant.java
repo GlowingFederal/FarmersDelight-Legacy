@@ -18,7 +18,7 @@ import net.minecraft.util.NonNullList;
 public final class WildPlant extends BlockBush implements IGrowable,IShearable {
     public final String kind;
     public WildPlant(String kind) {
-        super(); this.kind=kind; setTranslationKey("farmersdelight.wild_"+kind);
+        super(); setSoundType(net.minecraft.block.SoundType.PLANT); this.kind=kind; setTranslationKey("farmersdelight.wild_"+kind);
         setCreativeTab(Content.TAB);
     }
     private String seed() {
