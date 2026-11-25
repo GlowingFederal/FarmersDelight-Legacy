@@ -484,7 +484,7 @@ processResources {
                 def model=new JsonSlurper().parse(modelFile)
                 if(model.parent in ['block/template_farmland','minecraft:block/template_farmland']) model.parent='block/farmland'
                 if(minecraftTarget=='1.8.9' && modelFile.name=='rich_soil_farmland_moist.json' && !model.textures.particle) {
-                    model.textures.particle='#top'
+                    model.textures.particle=model.textures.top
                 }
                 if(model.parent in ['block/orientable_with_bottom','minecraft:block/orientable_with_bottom']) {
                     model.parent='block/cube'

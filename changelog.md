@@ -110,3 +110,12 @@
 - Update the bowl and served food slots immediately when serving a feast, including addon feasts. Keep creative bowls, drop portions when the inventory is full, and support either hand on 1.12.2.
 - Give crops, soils, storage, decorations, meals and grills material-appropriate sounds. Fix basket lighting and facing, legacy feast model orientation, and moist Rich Soil Farmland particles on 1.8.9.
 - Match the original Cutting Board placements for flat items, blocks and carved tools, and display multiple items in a Skillet with stable offsets.
+
+2026-11-24 23:41 — Restore 1.12.2 localization and 1.8.9 farmland particles
+
+- Declare resource-pack format 3 so Forge loads the packaged lowercase language filenames for item names, block names, and translated interface messages.
+- Use the moist Rich Soil Farmland texture directly for 1.8.9 hit and break particles so the legacy model baker can resolve it.
+
+2026-11-25 00:04 — Restore the bowl-serving sound
+
+- Play a single serving cue at the feast when a bowl of food is delivered. Use the original armor-equip cue on 1.12.2 and the vanilla pop on older targets.

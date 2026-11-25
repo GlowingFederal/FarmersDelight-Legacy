@@ -82,6 +82,8 @@ public class ServingBlock extends BlockContainer {
                 player.inventory.markDirty();
                 // Send changed slots before vanilla's interaction handler can cache them.
                 player.openContainer.detectAndSendChanges();
+                world.playSound(null, pos, net.minecraft.init.SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
+                        net.minecraft.util.SoundCategory.BLOCKS, 1.0F, 1.0F);
             }
         }
         if(tile.remaining==0 && !leftovers) world.setBlockToAir(pos);

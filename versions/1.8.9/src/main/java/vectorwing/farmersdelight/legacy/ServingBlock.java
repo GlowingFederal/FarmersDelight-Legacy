@@ -78,6 +78,7 @@ public final class ServingBlock extends BlockContainer {
                 player.inventory.markDirty();
                 // Send changed slots before vanilla's interaction handler can cache them.
                 player.openContainer.detectAndSendChanges();
+                world.playSoundEffect(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, "random.pop", 1.0F, 1.0F);
             }
         }
         if(tile.remaining==0 && !leftovers) world.setBlockToAir(pos);
