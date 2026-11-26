@@ -62,30 +62,10 @@ public class ServingBlock extends BlockContainer {
         if(pie && !knife) ((LegacyFood)portion.getItem()).eatPlaced(player,world);
         else {
             if(pie) dropBlockAsItem(world,x,y,z,portion);
-            else {
-                if(!player.capabilities.isCreativeMode) {
-                    Stacks.shrink(held,1);
-                    if(Stacks.empty(held)) player.inventory.setInventorySlotContents(player.inventory.currentItem,null);
-                }
-                // Creative inventory insertion silently discards a portion when there is no room.
-                if((player.capabilities.isCreativeMode && !hasRoomForPortion(player,portion))
-                        || !player.inventory.addItemStackToInventory(portion)) player.dropPlayerItemWithRandomChoice(portion,false);
-                player.inventory.markDirty();
-                // Send changed slots before vanilla's interaction handler can cache them.
-                player.openContainer.detectAndSendChanges();
-                world.playSoundEffect(x + 0.5, y + 0.5, z + 0.5, "random.pop", 1.0F, 1.0F);
-            }
+            else FeastServing.give(world,x,y,z,player,portion);
         }
         if(tile.remaining==0 && !leftovers) world.setBlockToAir(x,y,z);
         return true;
-    }
-    private static boolean hasRoomForPortion(EntityPlayer player, ItemStack portion) {
-        if(player.inventory.getFirstEmptyStack()>=0) return true;
-        for(ItemStack stack : player.inventory.mainInventory) {
-            if(Stacks.same(stack,portion) && stack.isStackable()
-                    && stack.stackSize<Math.min(stack.getMaxStackSize(),player.inventory.getInventoryStackLimit())) return true;
-        }
-        return false;
     }
     private void drops(java.util.List<ItemStack> drops,int portions) {
         if(portions==4) { drops.add(new ItemStack(this)); return; }

@@ -77,14 +77,26 @@ public final class UABCompatibility {
                     String id = Item.itemRegistry.getNameForObject(item);
                     if (id.startsWith("etfuturum:") && stack(id.substring("etfuturum:".length()), 0, available) != null) {
                         String name = id.substring("etfuturum:".length());
-                        if (!name.equals("nether_fungus") && !name.equals("wood_planks") && !name.equals("wood_slab")
+                        if (!name.equals("nether_fungus") && !name.equals("nether_roots") && !name.equals("nylium")
+                                && !name.equals("wood_planks") && !name.equals("wood_slab")
                                 && !name.equals("crimson_stem") && !name.equals("warped_stem"))
                             ITEMS.put("minecraft:" + name, new ItemStack(item));
                     }
                 }
                 for (String[] entry : items) add(entry[0], entry[1], 0, available);
-                if (enabled(config, bool, "experiments", "enableCrimsonBlocks", true)) add("crimson_fungus", "nether_fungus", 0, available);
-                if (enabled(config, bool, "experiments", "enableWarpedBlocks", true)) add("warped_fungus", "nether_fungus", 1, available);
+                if (enabled(config, bool, "experiments", "enableCrimsonBlocks", true)) {
+                    add("crimson_fungus", "nether_fungus", 0, available);
+                    add("crimson_roots", "nether_roots", 0, available);
+                    add("crimson_nylium", "nylium", 0, available);
+                }
+                if (enabled(config, bool, "experiments", "enableWarpedBlocks", true)) {
+                    add("warped_fungus", "nether_fungus", 1, available);
+                    add("warped_roots", "nether_roots", 1, available);
+                    add("warped_nylium", "nylium", 1, available);
+                }
+                add("polished_blackstone", "blackstone", 1, available);
+                add("polished_blackstone_bricks", "blackstone", 2, available);
+                add("bone_block", "bone", 0, available);
                 String[] woods = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak"};
                 for (int i = 0; i < woods.length; i++) {
                     String suffix = i < 4 ? "" : "2";

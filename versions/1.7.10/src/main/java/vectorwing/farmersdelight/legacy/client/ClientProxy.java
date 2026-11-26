@@ -24,6 +24,11 @@ public final class ClientProxy extends vectorwing.farmersdelight.legacy.CommonPr
     }
     @Override public vectorwing.farmersdelight.legacy.GuiHandler guiHandler() { return new ClientGuiHandler(); }
     @Override public void registerMetadataModels(net.minecraft.block.Block block,String namespace,String[] names,int[] metadata) { models.addMetadataVariants(block,namespace,names,metadata); }
+    @Override
+    public void registerStateModels(net.minecraft.block.Block block, String namespace, String[] names,
+                                    int inventoryModel, ModelState state) {
+        models.addStateVariants(block, namespace, names, inventoryModel, state);
+    }
     @Override public void registerModels(net.minecraft.block.Block block,String namespace,String[] stages) { models.addVariants(block,namespace,stages); }
     private NativeModels models;
     private RiceRenderer rice;

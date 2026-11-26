@@ -28,6 +28,8 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
     private final Map<Block, Quad[][]> models = new LinkedHashMap<Block, Quad[][]>();
     private final Map<Block, Quad[][][]> variants = new LinkedHashMap<Block, Quad[][][]>();
     private final Map<Block,int[]> metadataVariants=new LinkedHashMap<Block,int[]>();
+    private final Map<Block, vectorwing.farmersdelight.legacy.CommonProxy.ModelState> customStates = new LinkedHashMap<>();
+    private final Map<Block, Integer> inventoryModels = new LinkedHashMap<>();
     private final Map<String, IIcon> textures = new LinkedHashMap<String, IIcon>();
     public NativeModels() {
         add(Content.cuttingBoard, "cutting_board"); add(Content.cookingPot, "cooking_pot"); add(Content.skillet, "skillet");
@@ -64,6 +66,18 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
         Quad[][][] states=new Quad[names.length][][];
         for(int i=0;i<names.length;i++) { add(block,namespace,names[i]);states[i]=models.get(block); }
         variants.put(block,states);metadataVariants.put(block,metadata.clone());
+    }
+    public void addStateVariants(Block block, String namespace, String[] names, int inventoryModel,
+                                 vectorwing.farmersdelight.legacy.CommonProxy.ModelState select) {
+        if (inventoryModel < 0 || inventoryModel >= names.length) throw new IllegalArgumentException("Invalid inventory model");
+        Quad[][][] states = new Quad[names.length][][];
+        for (int i = 0; i < names.length; i++) {
+            add(block, namespace, names[i]);
+            states[i] = models.get(block);
+        }
+        variants.put(block, states);
+        inventoryModels.put(block, inventoryModel);
+        customStates.put(block, select);
     }
     public void addVariants(Block block,String namespace,String[] names) {
         if(names.length!=5) throw new IllegalArgumentException("A feast requires five portion models");
@@ -136,6 +150,7 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
         GL11.glPushMatrix(); GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
         int variant=block instanceof vectorwing.farmersdelight.legacy.ServingBlock ? 4 : 0;
         if(metadataVariants.containsKey(block)) variant=metadataVariants.get(block)[metadata&15];
+        if (inventoryModels.containsKey(block)) variant = inventoryModels.get(block);
         Tessellator.instance.startDrawingQuads(); render(block, block==Content.basket || block==Content.tatami ? 1 : 0, variant, 0, 0, 0, false); Tessellator.instance.draw(); GL11.glPopMatrix();
     }
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int model, RenderBlocks renderer) {
@@ -148,6 +163,12 @@ public final class NativeModels implements ISimpleBlockRenderingHandler {
         int facing=meta & (block==Content.basket || block==Content.tatami ? 7 : 3);
         // Feast metadata starts at south, while the model rotation table starts at north.
         if(block instanceof vectorwing.farmersdelight.legacy.ServingBlock) facing=(facing+2)&3;
+        vectorwing.farmersdelight.legacy.CommonProxy.ModelState select = customStates.get(block);
+        if (select != null) {
+            int visual = select.select(world, x, y, z);
+            facing = visual & 3;
+            variant = visual >>> 2;
+        }
         render(block, facing, variant, x, y, z, true); return true;
     }
     private void render(Block block, int facing, int remaining, int x, int y, int z, boolean world) {

@@ -119,3 +119,9 @@
 2026-11-25 00:04 — Restore the bowl-serving sound
 
 - Play a single serving cue at the feast when a bowl of food is delivered. Use the original armor-equip cue on 1.12.2 and the vanilla pop on older targets.
+
+2026-11-25 08:04 — Expose native addon feast serving and model selection
+
+- Let the two-block Stuffed Hoglin use the same bowl transaction, overflow handling, client synchronization, and serving sound as existing feasts.
+- Add a 1.7.10 client hook to choose addon models by native block and tile state.
+- Resolve 1.7.10 UAB roots, Nylium, and Blackstone variants with exact legacy metadata and effective feature switches.
